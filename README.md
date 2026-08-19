@@ -1,5 +1,5 @@
 # DTaaS-Testbed2026-Phase2
-repository for wiki, engineering report and documentation of the DTaaS Testbed 2026
+repository for wiki, engineering report and documentation of the DTaaS Testbed 2026 Phase 2
 
 We expect submissions to this repository adhere to the cc-by license:
 
