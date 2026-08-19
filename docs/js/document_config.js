@@ -1,6 +1,6 @@
 var documentConfig =
 {
-  title: "DTaaS Testbed2026",
+  title: "DTaaS Testbed2026 Phase 2",
   subtitle: "Engineering Report",
   specStatus: "wv",
   specType: "hr",
@@ -9,11 +9,11 @@ var documentConfig =
 //   publishDate: "2024-06-21",
   publishVersion: "0.1.0",
   thisVersion: [
-    "https://geonovum.github.io/DTaaS-Testbed2026"
+    "https://geonovum.github.io/DTaaS-Testbed2026-Phase2"
   ],
-  github: "https://github.com/geonovum/DTaaS-Testbed2026/",
-  issueBase: "https://github.com/geonovum/DTaaS-Testbed2026/issues/",
-  edDraftURI: "https://geonovum.github.io/DTaaS-Testbed2026 ",
+  github: "https://github.com/geonovum/DTaaS-Testbed2026-Phase2/",
+  issueBase: "https://github.com/geonovum/DTaaS-Testbed2026-Phase2/issues/",
+  edDraftURI: "https://geonovum.github.io/DTaaS-Testbed2026-Phase2",
   authors: [
     {
       name: "Bart De Lathouwer",
