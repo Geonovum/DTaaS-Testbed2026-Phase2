@@ -1,9 +1,9 @@
 # DTaaS-Testbed2026-Phase2
-repository for wiki, engineering report and documentation of the DTaaS Testbed 2026 Phase 2
 
-We expect submissions to this repository adhere to the cc-by license:
+Repository for wiki, engineering report and documentation of the DTaaS Testbed 2026 Phase 2.
 
-https://creativecommons.org/licenses/by/4.0/
+For every participant there is a folder created.
+Participants can submit deliverables via a pull request.
 
 ---
 
