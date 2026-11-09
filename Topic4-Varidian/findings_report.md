@@ -105,7 +105,7 @@ of subsidence. For the recipe to answer this question, three processes were requ
 level(s) of the provided area, a second to calculate the subsidence of this area, and a third to analyze the subsidence
 result and validate its values against a provided threshold value.
 
-The subsidence process was mainly developed by IMAGEM, which uses the Deltaris Atlantis API. We tuned the inputs so we
+The subsidence process was mainly developed by IMAGEM, which uses the Deltares Atlantis API. We tuned the inputs so we
 could use it for our research topic. The other two processes we build ourselves; for the groundwater level we used the
 dataset from [BRO](https://api.pdok.nl/tno/bro-grondwatermonitoring-in-samenhang-karakteristieken/ogc/v1), while we
 build the GeoTIFF analyzer from scratch.
@@ -213,6 +213,7 @@ considerations in the scoring sheet from [Appendix A](#appendix-a-recipe-definit
 ## Created recipes
 
 ![The created recipes](attachments/figure1.png)
+
 *Figure 1: The three created recipes*
 
 After picking WDL as the recipe definition language for our research, we created three WDL files that each represented a
@@ -249,6 +250,7 @@ the recipe. This results in a very simple recipe execution call.
 ## Platform expanded with recipes
 
 ![Varidian's platform](attachments/figure2.png)
+
 *Figure 2: Our platform including the newly added cook service*
 
 The registry inside our platform did not need any alterations to support running recipes, apart from general
