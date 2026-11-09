@@ -268,7 +268,7 @@ inputs required by the WDL definition, which the cook service then passes to the
 
 # Results
 
-Our full faced research can be found in [Appendix C](#appendix-c-facet-analysis), here we will try to recap our
+Our full facet analysis can be found in [Appendix C](#appendix-c-facet-analysis), here we will try to recap our
 findings.
 
 ## Facet analysis: what does an end user need to trust a workflow result?
