@@ -1,0 +1,70 @@
+{
+  "preferredCrs": "http://www.opengis.net/def/crs/EPSG/0/28992",
+  "view": {
+    "heading": 0.0,
+    "tilt": 0.0,
+    "position": {
+      "latitude": 51.89752880225582,
+      "longitude": 6.386944541372318,
+      "altitude": 322.8536250611942
+    }
+  },
+  "time": {},
+  "layers": [
+    {
+      "title": "Walkable Areas",
+      "type": "scene",
+      "visible": true,
+      "url": "walkable.json",
+      "function": "walkable"
+    },
+    {
+      "title": "Obstacles",
+      "type": "scene",
+      "visible": true,
+      "url": "obstacles.json",
+      "function": "obstacle"
+    },
+    {
+      "title": "Terrain Boundary",
+      "type": "scene",
+      "visible": true,
+      "url": "terrain_boundary.json"
+    },
+    {
+      "title": "Waypoints",
+      "type": "scene",
+      "visible": true,
+      "url": "waypoint.json",
+      "function": "waypoint"
+    },
+    {
+      "title": "Entries",
+      "type": "scene",
+      "visible": true,
+      "url": "entry.json",
+      "function": "entry"
+    },
+    {
+      "title": "Exits",
+      "type": "scene",
+      "visible": true,
+      "url": "exit.json",
+      "function": "exit"
+    },
+    {
+      "title": "Queues",
+      "type": "scene",
+      "visible": true,
+      "url": "queue.json",
+      "function": "queue"
+    },
+    {
+      "title": "Podiums",
+      "type": "scene",
+      "visible": true,
+      "url": "podium.json",
+      "function": "podium"
+    }
+  ]
+}
