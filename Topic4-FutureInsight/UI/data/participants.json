@@ -1,0 +1,28 @@
+{
+  "participants": [
+    {
+      "initials": "CH",
+      "name": "Corné Helmons",
+      "email": "cm.helmons@futureinsight.nl",
+      "role": "Owner"
+    },
+    {
+      "initials": "SB",
+      "name": "Simay Batum",
+      "email": "simay@futureinsight.nl",
+      "role": "Owner"
+    },
+    {
+      "initials": "RK",
+      "name": "Rick Klooster",
+      "email": "rick@futureinsight.nl",
+      "role": "Owner"
+    },
+    {
+      "initials": "FI",
+      "name": "Future Insight",
+      "email": "support@futureinsight.nl",
+      "role": "Owner"
+    }
+  ]
+}

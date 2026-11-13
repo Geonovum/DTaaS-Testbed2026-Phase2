@@ -1,0 +1,5 @@
+.venv/
+.cwlcheck/
+__pycache__/
+*.pyc
+*.db

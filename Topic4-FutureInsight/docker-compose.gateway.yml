@@ -1,0 +1,92 @@
+# Single-origin gateway overlay — use for any deployment fronted by TLS or by
+# Cloudflare's proxy. See deploy/gateway.conf for why path routing is
+# mandatory there rather than merely tidier.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.gateway.yml up -d --build
+#
+# Everything is then reachable on ONE port (GATEWAY_PORT, default 8080):
+# the UI at /, the services under /api/*. Point Cloudflare — tunnel or
+# origin proxy — at that single port and nothing else.
+#
+# This overlay also unpublishes the per-service ports, binding them to
+# 127.0.0.1 so they stay reachable for debugging from a shell on the server
+# but are no longer exposed to the internet. The gateway reaches them over
+# the compose network by service name, so it does not need them published at
+# all; keeping them on loopback is purely a convenience.
+#
+# Public links. The gateway strips each service's /api/<service> prefix
+# before passing a request on, so a service never sees it, and it arrives
+# over plain http. Without help, every link a service writes into its answers
+# (self, execute and monitor links, a job's Location header, landing pages)
+# would miss the prefix and say http instead of https. So each Python service
+# below is started with:
+#   --root-path <its prefix>     the prefix the gateway strips (deploy/gateway.conf)
+#   --forwarded-allow-ips *      trust the gateway's X-Forwarded-Proto (https);
+#                                safe here, as only the gateway can reach the
+#                                services (their ports are on 127.0.0.1)
+# These commands repeat each service's Dockerfile CMD plus the two options:
+# if a Dockerfile's CMD ever changes, change it here too. Only in this
+# overlay: without the gateway, a --root-path would put a prefix into links
+# that isn't there.
+
+services:
+  gateway:
+    image: nginx:alpine
+    ports:
+      - "${GATEWAY_PORT:-8080}:80"
+    volumes:
+      - ./deploy/gateway.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - ui
+      - records-wrapper
+      - cookbook-registry
+      - cook-orchestrator
+      - hub-datasets
+      - tool-add
+      - tool-multiply
+      - tool-multiply3
+      - tool-geo-buffer
+    restart: unless-stopped
+
+  # The UI is no longer published directly — it is served through the gateway
+  # at /, so that everything shares one origin.
+  ui:
+    ports: !override []
+
+  records-wrapper:
+    ports: !override ["127.0.0.1:8001:8000"]
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--root-path", "/api/records", "--forwarded-allow-ips", "*"]
+  cookbook-registry:
+    ports: !override ["127.0.0.1:8002:8000"]
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--root-path", "/api/cookbook", "--forwarded-allow-ips", "*"]
+    # The public address of this service, for the link to a recipe's CWL that
+    # each catalogue record carries (the base file sets the internal one).
+    environment:
+      - COOKBOOK_PUBLIC_URL=https://${PUBLIC_HOST:-localhost}/api/cookbook
+  cook-orchestrator:
+    ports: !override ["127.0.0.1:8003:8000"]
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--root-path", "/api/orchestrator", "--forwarded-allow-ips", "*"]
+    # Behind the gateway the browser reaches hub-datasets at the public
+    # origin's /api/hub, so that is the location a recipe's data input (a CWL
+    # File) carries — rewritten to the internal address for this stack's own
+    # tools (see docker-compose.yml's LOCATION_REWRITES note).
+    environment:
+      - 'LOCATION_REWRITES={"https://${PUBLIC_HOST:-localhost}/api/hub":"http://hub-datasets:8000","http://${PUBLIC_HOST:-localhost}/api/hub":"http://hub-datasets:8000","http://localhost:${GATEWAY_PORT:-8080}/api/hub":"http://hub-datasets:8000","http://localhost:8014":"http://hub-datasets:8000","http://127.0.0.1:8014":"http://hub-datasets:8000"}'
+
+  tool-add:
+    ports: !override ["127.0.0.1:8010:8000"]
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--root-path", "/api/tools/add", "--forwarded-allow-ips", "*"]
+  tool-multiply:
+    ports: !override ["127.0.0.1:8011:8000"]
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--root-path", "/api/tools/multiply", "--forwarded-allow-ips", "*"]
+  tool-multiply3:
+    ports: !override ["127.0.0.1:8012:8000"]
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--root-path", "/api/tools/multiply3", "--forwarded-allow-ips", "*"]
+  tool-geo-buffer:
+    ports: !override ["127.0.0.1:8013:8000"]
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--root-path", "/api/tools/geo-buffer", "--forwarded-allow-ips", "*"]
+  hub-datasets:
+    ports: !override ["127.0.0.1:8014:8000"]
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--root-path", "/api/hub", "--forwarded-allow-ips", "*"]
+  ckan:
+    ports: !override ["127.0.0.1:8020:5000"]

@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Geonovum Testbed Recipes</title>
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <!-- Leaflet 1.9.4: the map behind the Data Catalogue Preview (see
+       js/hubPreview.js). Vendored rather than loaded from a CDN, so the map
+       still draws its layers offline (only the basemap tiles need network). -->
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css" />
+  <script src="vendor/leaflet/leaflet.js"></script>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div id="app-shell">
+    <nav class="app-sidebar" id="sidebar"></nav>
+    <header class="app-header" id="header"></header>
+    <main class="app-main" id="view"></main>
+    <footer class="app-footer">© 2026 Future Insight — Geonovum Testbed 2026 · nLDT Sandbox Stack</footer>
+  </div>
+  <div class="toast" id="toast"></div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

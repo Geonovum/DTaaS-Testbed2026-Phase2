@@ -1,0 +1,24 @@
+{
+  "datasets": [
+    {
+      "id": "ds-sandbox-results",
+      "title": "Sandbox Stack Recipe Results",
+      "description": "Destination dataset for saving the output of live recipes executed via the Sandbox Stack's Cook Orchestrator (e.g. the \"Add then Multiply\" demo recipe) — one resource per run's result.",
+      "owner_hub_id": "nldt-sandbox-hub",
+      "owner_hub_name": "nLDT Sandbox Hub",
+      "license": "CC0 1.0",
+      "findability": "PUBLIC",
+      "tags": [
+        "Sandbox Stack",
+        "Live Recipe Output"
+      ],
+      "resources": [
+        {
+          "id": "res-sandbox-results",
+          "name": "Recipe Run Results",
+          "format": "json"
+        }
+      ]
+    }
+  ]
+}
