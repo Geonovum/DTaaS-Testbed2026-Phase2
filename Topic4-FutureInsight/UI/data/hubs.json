@@ -1,0 +1,13 @@
+{
+  "defaultActiveHub": "nldt-sandbox-hub",
+  "hubs": [
+    {
+      "id": "nldt-sandbox-hub",
+      "name": "nLDT Sandbox Hub",
+      "visibility": "public",
+      "starred": true,
+      "is_participant": true,
+      "subHubs": []
+    }
+  ]
+}

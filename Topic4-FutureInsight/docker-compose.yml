@@ -1,0 +1,307 @@
+# nLDT Sandbox Stack — Geonovum Testbed 2026, Research Topic #4
+#
+# Services (each has its own README under services/, the UI under UI/):
+#   records-wrapper                       OGC API Records catalogue, backed by CKAN (below)
+#   cookbook-registry                     stores recipes (CWL), derives their schema and DAG
+#   cook-orchestrator                     the OGC API Process "cook" that runs a recipe
+#   tool-add / tool-multiply / tool-multiply3 / tool-geo-buffer   our own apps
+#   hub-datasets                          the hub's datasets and saved run results
+#   ui                                    the App Store UI (static files)
+# Design decisions: DECISIONS.md.
+#
+# Running on a host other than your own machine
+# ----------------------------------------------
+# Every service below publishes a port on the docker host, and the browser
+# talks to each one directly (see the "ui" note further down). Nothing needs
+# changing for a local run. For a remote host, set PUBLIC_HOST to the address
+# people will actually browse to, in a .env file next to this one:
+#
+#     PUBLIC_HOST=83.96.253.60
+#
+# That feeds CKAN's site URL and the nldt:processLink hrefs written into
+# recipes. The UI needs no build-time value at all: it derives the backend
+# host from the page's own origin at runtime (UI/js/sandboxApi.js).
+#
+# Substitute your own host for localhost in the commands below when running
+# remotely — or just run them on the server itself, where localhost is right.
+#
+# Behind TLS or Cloudflare, per-service ports stop being an option entirely
+# (Cloudflare's proxy only forwards a fixed port list, which excludes all of
+# these). Use the single-origin gateway overlay instead — it serves the whole
+# stack on one port, routed by path:
+#
+#     docker compose -f docker-compose.yml -f docker-compose.gateway.yml up -d --build
+#
+# See deploy/README.md for the Cloudflare wiring and the .env values.
+#
+# Run, in order:
+#   1. docker compose up --build
+#   2. One-time (or after a `docker compose down -v`): create the CKAN
+#      "recipes" organization and API token records-wrapper needs to write to
+#      it — this can only happen after CKAN itself is up, so it can't just be
+#      a docker-compose env var (see DECISIONS.md, D14):
+#        python services/records-wrapper/scripts/bootstrap_ckan.py
+#   3. Seed every bundled recipe — the demo plus the playground slots (safe
+#      to re-run any time; also how recipes get (re-)published to CKAN):
+#        python services/cookbook-registry/scripts/seed_demo_recipe.py http://localhost:8002
+#   4. Open: http://localhost:8000/#/recipes
+#      (CKAN's own UI, for browsing the real catalog: http://localhost:8020)
+#
+# hub-datasets seeds its own two datasets on startup — no separate script —
+# and fetches Rotterdam's boundary live from PDOK on every read rather than
+# storing a copy (see services/hub-datasets/app/pdok.py).
+#
+# The UI container is a static file server only — the browser it's loaded
+# into calls the backend services directly at their published ports below
+# (see UI/js/sandboxApi.js), not through the Docker network, so no
+# environment wiring is needed between "ui" and the other services. Those
+# ports are resolved against the host the page itself was served from, so
+# the same image works locally and on a remote server; all the published
+# ports below must therefore be reachable by the browser, not just 8000.
+
+services:
+  ckan-db:
+    restart: unless-stopped
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=ckan
+      - POSTGRES_PASSWORD=ckanpass
+      - POSTGRES_DB=ckan
+    volumes:
+      - ckan_pg_data:/var/lib/postgresql/data
+      - ./services/ckan/postgres-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "ckan", "-d", "ckan"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  ckan-solr:
+    restart: unless-stopped
+    # 2.11, not 2.10: ckan/ckan-base:2.10 (and :2.9) ship a broken uwsgi with
+    # zero plugins (apt's plain uwsgi package, not the pip-installed
+    # python-enabled build) — confirmed directly against the pulled image,
+    # independent of anything in this compose file. 2.11+ fixed this
+    # upstream. See DECISIONS.md, D14.
+    image: ckan/ckan-solr:2.11-solr9
+    volumes:
+      - ckan_solr_data:/var/solr
+    healthcheck:
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:8983/solr/"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+
+  ckan-redis:
+    restart: unless-stopped
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "-e", "QUIT"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Real CKAN — backs the OGC API Records Wrapper's catalog (see
+  # services/records-wrapper/app/repository.py and DECISIONS.md, D14).
+  # Sysadmin credentials below are sandbox-only placeholders (no real users,
+  # no external exposure beyond localhost) — same "no auth in this sandbox"
+  # posture as the rest of the stack's open CORS policy. Change before any
+  # real deployment.
+  ckan:
+    restart: unless-stopped
+    image: ckan/ckan-base:2.11
+    depends_on:
+      ckan-db:
+        condition: service_healthy
+      ckan-solr:
+        condition: service_healthy
+      ckan-redis:
+        condition: service_healthy
+    ports:
+      - "8020:5000"
+    environment:
+      # ckan-base's "envvars" plugin (CKAN___SECTION__KEY-style vars) only
+      # patches CKAN's in-memory config once the app/CLI context loads
+      # plugins — too late for prerun.py's own `ckan db init` call, which
+      # reads ckan.ini's *file* value directly and, unpatched, would hit the
+      # image's baked-in default (localhost, wrong credentials). Confirmed
+      # this empirically after it silently failed here. So instead, the
+      # `command:` below writes the real values straight into ckan.ini via
+      # `ckan config-tool` (verified directly to persist to the file)
+      # *before* start_ckan.sh/prerun.py ever run — deterministic, no
+      # plugin-loading-order guesswork. These CKAN_* vars remain only for
+      # prerun.py's own preflight wait-for-db/solr checks. See
+      # DECISIONS.md, D14.
+      - CKAN_SQLALCHEMY_URL=postgresql://ckan:ckanpass@ckan-db/ckan
+      - CKAN_SOLR_URL=http://ckan-solr:8983/solr/ckan
+      - CKAN_REDIS_URL=redis://ckan-redis:6379/1
+      - CKAN_SITE_URL=${CKAN_SITE_URL_OVERRIDE:-http://${PUBLIC_HOST:-localhost}:8020}
+      - CKAN_SITE_ID=default
+      - CKAN_STORAGE_PATH=/var/lib/ckan
+      - CKAN_SYSADMIN_NAME=ckan_admin
+      - CKAN_SYSADMIN_PASSWORD=change-me-strong-password
+      - CKAN_SYSADMIN_EMAIL=simay@futureinsight.nl
+      # Unused by this project (see services/ckan/postgres-init) — CKAN
+      # eagerly initializes the datastore plugin regardless of our plugin
+      # list, so it needs a real, reachable database or CKAN never finishes
+      # loading.
+      - CKAN_DATASTORE_WRITE_URL=postgresql://ckan:ckanpass@ckan-db/datastore_default
+      - CKAN_DATASTORE_READ_URL=postgresql://datastore_ro:ckanpass@ckan-db/datastore_default
+      - TZ=UTC
+    volumes:
+      - ckan_storage_data:/var/lib/ckan
+    command:
+      - sh
+      - -c
+      - |
+        set -e
+        ckan config-tool /srv/app/ckan.ini "sqlalchemy.url = $$CKAN_SQLALCHEMY_URL"
+        ckan config-tool /srv/app/ckan.ini "solr_url = $$CKAN_SOLR_URL"
+        ckan config-tool /srv/app/ckan.ini "ckan.redis.url = $$CKAN_REDIS_URL"
+        ckan config-tool /srv/app/ckan.ini "ckan.site_url = $$CKAN_SITE_URL"
+        ckan config-tool /srv/app/ckan.ini "ckan.datastore.write_url = $$CKAN_DATASTORE_WRITE_URL"
+        ckan config-tool /srv/app/ckan.ini "ckan.datastore.read_url = $$CKAN_DATASTORE_READ_URL"
+        ckan config-tool /srv/app/ckan.ini "beaker.session.secret = nldt-sandbox-beaker-secret-change-me"
+        ckan config-tool /srv/app/ckan.ini "api_token.jwt.encode.secret = string:nldt-sandbox-jwt-secret-change-me"
+        ckan config-tool /srv/app/ckan.ini "api_token.jwt.decode.secret = string:nldt-sandbox-jwt-secret-change-me"
+        # "datastore" stays active (see services/ckan/postgres-init and the
+        # CKAN_DATASTORE_*_URL vars above) since CKAN eagerly initializes it
+        # regardless of the plugin list; image_view/text_view/
+        # datatables_view are dropped — this catalog never stores file
+        # resources, so dataset-preview rendering plugins have nothing to do.
+        ckan config-tool /srv/app/ckan.ini "ckan.plugins = envvars datastore"
+        exec /srv/app/start_ckan.sh
+    healthcheck:
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:5000/api/action/status_show"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+  records-wrapper:
+    restart: unless-stopped
+    build: ./services/records-wrapper
+    ports:
+      - "8001:8000"
+    environment:
+      - CKAN_URL=http://ckan:5000
+      - CKAN_ORGANIZATION=recipes
+      - CKAN_API_TOKEN_FILE=/secrets/ckan_api_token.txt
+    volumes:
+      - ./secrets:/secrets:ro
+    depends_on:
+      ckan:
+        condition: service_healthy
+
+  cookbook-registry:
+    restart: unless-stopped
+    build: ./services/cookbook-registry
+    ports:
+      - "8002:8000"
+    environment:
+      - COOKBOOK_DB_URL=sqlite:////data/cookbook.db
+      - RECORDS_WRAPPER_URL=http://records-wrapper:8000
+      - COOKBOOK_PUBLIC_URL=http://cookbook-registry:8000
+      # Browser-facing address the Registry writes into the nldt:processLink
+      # href of a step whose tool is swapped (the bundled recipes carry their own).
+      # PUBLIC_TOOL_HOST covers the port-per-service shape; PUBLIC_TOOL_BASE
+      # (empty unless set) switches to the single-origin path shape a TLS or
+      # Cloudflare deployment needs. See deploy/README.md and cwl_parser.py's
+      # _public_url.
+      - PUBLIC_TOOL_HOST=${PUBLIC_HOST:-localhost}
+      - PUBLIC_TOOL_BASE=${PUBLIC_TOOL_BASE:-}
+    volumes:
+      - cookbook_registry_data:/data
+    depends_on:
+      - records-wrapper
+
+  tool-add:
+    restart: unless-stopped
+    build: ./services/tool-service
+    ports:
+      - "8010:8000"
+    environment:
+      - PROCESS_ID=add-two-numbers
+      - PROCESS_TITLE=Add two numbers
+      - OPERATION=add
+
+  tool-multiply:
+    restart: unless-stopped
+    build: ./services/tool-service
+    ports:
+      - "8011:8000"
+    environment:
+      - PROCESS_ID=multiply-two-numbers
+      - PROCESS_TITLE=Multiply two numbers
+      - OPERATION=multiply
+
+  tool-multiply3:
+    restart: unless-stopped
+    build: ./services/tool-service
+    ports:
+      - "8012:8000"
+    environment:
+      - PROCESS_ID=multiply-three-numbers
+      - PROCESS_TITLE=Multiply three numbers
+      - OPERATION=multiply3
+
+  tool-geo-buffer:
+    restart: unless-stopped
+    build: ./services/tool-geo-buffer
+    ports:
+      - "8013:8000"
+
+  hub-datasets:
+    restart: unless-stopped
+    build: ./services/hub-datasets
+    ports:
+      - "8014:8000"
+    environment:
+      - HUB_DATASETS_DB_URL=sqlite:////data/hub_datasets.db
+    volumes:
+      - hub_datasets_data:/data
+
+  cook-orchestrator:
+    restart: unless-stopped
+    build: ./services/cook-orchestrator
+    ports:
+      - "8003:8000"
+    environment:
+      - COOKBOOK_URL=http://cookbook-registry:8000
+      # A recipe's data inputs arrive as CWL Files whose `location` is the URL
+      # the BROWSER used — here hub-datasets' published port — which a
+      # container can't reach. For this stack's own tools (on this network)
+      # the Cook rewrites those prefixes to the internal address before
+      # handing the URL over by reference; external processes always get the
+      # public URL. JSON {"<public prefix>": "<internal prefix>"}. The gateway
+      # overlay extends this for its public /api/hub origin.
+      - 'LOCATION_REWRITES={"http://${PUBLIC_HOST:-localhost}:8014":"http://hub-datasets:8000","http://localhost:8014":"http://hub-datasets:8000","http://127.0.0.1:8014":"http://hub-datasets:8000"}'
+      # A tool given a data input by reference fetches it within the execute
+      # request (the live PDOK boundary alone takes ~15s), so allow longer
+      # than the 10s default for a synchronous tool answer.
+      - TOOL_REQUEST_TIMEOUT=90
+    depends_on:
+      - cookbook-registry
+      - tool-add
+      - tool-multiply
+      - tool-multiply3
+      - tool-geo-buffer
+
+  ui:
+    restart: unless-stopped
+    build: ./UI
+    ports:
+      - "8000:80"
+    depends_on:
+      - records-wrapper
+      - cookbook-registry
+      - cook-orchestrator
+      - hub-datasets
+
+volumes:
+  cookbook_registry_data:
+  hub_datasets_data:
+  ckan_pg_data:
+  ckan_solr_data:
+  ckan_storage_data:

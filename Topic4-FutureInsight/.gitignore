@@ -1,0 +1,14 @@
+# The CKAN API token minted by services/records-wrapper/scripts/bootstrap_ckan.py
+# never commit this.
+/secrets/
+
+# Python service virtualenvs / bytecode (each service also has its own
+# .gitignore, kept for when services are used standalone)
+.venv/
+__pycache__/
+*.pyc
+*.db
+.cwlcheck/
+
+# Per-deployment PUBLIC_HOST etc. — see .env.example
+.env

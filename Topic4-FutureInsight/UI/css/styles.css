@@ -1,0 +1,1447 @@
+/* ==========================================================================
+   Geonovum Testbed Recipes — design tokens (re-implemented from the Clearly.Hub
+   visual language for demo purposes; no code copied from fi-suite-app)
+   ========================================================================== */
+:root {
+  --c-navy: #21293b;
+  --c-primary: #2fa1c2;
+  --c-primary-light: #1fa69d;
+  --c-primary-dark: #226e7c;
+  --c-primary-hover: #0b7471;
+  --c-secondary: #c7487d;
+  --c-secondary-light: #d87fa4;
+  --c-secondary-hover: #b13267;
+  --c-chip: #387fc1;
+  --c-success: #1fa69d;
+  --c-warning: #ffb800;
+  --c-error: #ff370c;
+
+  --g-100: #fafafa;
+  --g-200: #f1f2f4;
+  --g-300: #ecedf0;
+  --g-400: #e0e3e8;
+  --g-500: #dbdde2;
+  --g-700: #9396a0;
+  --g-800: #8d919a;
+  --g-900: #737373;
+
+  --c-canvas: #226e7c;
+  --c-card-tint: #f3f0f4;
+
+  --radius-card: 8px 8px 4px 4px;
+  --radius-chip: 4px;
+  --shadow-1: 0 2px 2px rgba(0, 0, 0, 0.14);
+  --shadow-2: 0 4px 10px rgba(33, 41, 59, 0.16);
+
+  --sidebar-w: 80px;
+  --header-h: 56px;
+  --footer-h: 28px;
+
+  --font: "Source Sans 3", "Trebuchet MS", Helvetica, Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  font-family: var(--font);
+  color: #23262b;
+  background: var(--g-200);
+}
+
+a { color: var(--c-primary-dark); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+button { font-family: var(--font); cursor: pointer; }
+
+/* ---------------------------------------------------------------------- */
+/* App shell                                                               */
+/* ---------------------------------------------------------------------- */
+#app-shell {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) 1fr;
+  grid-template-rows: var(--header-h) 1fr var(--footer-h);
+  grid-template-areas:
+    "header header"
+    "sidebar main"
+    "sidebar footer";
+  height: 100vh;
+}
+
+/* Header */
+.app-header {
+  grid-area: header;
+  background: var(--c-navy);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  padding: 0 20px 0 20px;
+  gap: 12px;
+  box-shadow: var(--shadow-1);
+  position: relative;
+  z-index: 5;
+}
+.app-header__logo { width: 40px; height: 40px; flex: none; margin-right: 20px; }
+.app-header__titles { display: flex; flex-direction: column; line-height: 1.15; }
+.app-header__title { font-size: 1.25rem; font-weight: 700; }
+.app-header__subtitle { font-size: 0.7rem; color: var(--g-500); }
+.app-header__spacer { flex: 1; }
+.app-header__right { display: flex; align-items: center; gap: 18px; font-size: 0.85rem; }
+.app-header__hub { display: flex; align-items: center; gap: 6px; padding: 6px 8px; }
+.app-header__hub b { color: var(--c-primary); }
+.app-header__icon-btn {
+  background: none; border: none; color: #fff; opacity: 0.85;
+  display: flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px; border-radius: 5px; flex: none;
+}
+.app-header__icon-btn svg { flex-shrink: 0; }
+.app-header__icon-btn:hover { opacity: 1; background: rgba(255,255,255,0.08); }
+
+/* Sidebar */
+.app-sidebar {
+  grid-area: sidebar;
+  background: var(--c-navy);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: 2px;
+}
+.app-sidebar__link {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 8px;
+  color: var(--g-500);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  text-align: center;
+}
+.app-sidebar__link:hover, .app-sidebar__link:hover svg { color: var(--c-primary); text-decoration: none; }
+.app-sidebar__link.is-active, .app-sidebar__link.is-active svg { color: var(--c-primary); }
+.app-sidebar__link svg { width: 41px; height: 41px; fill: none; stroke: currentColor; stroke-width: 1.5; }
+
+/* Footer */
+.app-footer {
+  grid-area: footer;
+  background: var(--c-navy);
+  color: var(--g-500);
+  font-size: 0.68rem;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* Main — its own scroll region, so the sidebar/header/footer frame never
+   moves; only the content inside .app-main (or a nested split-panel) scrolls. */
+.app-main { grid-area: main; padding: 24px 28px; overflow-y: auto; overflow-x: hidden; min-height: 0; background: var(--c-canvas); }
+/* Catalog-style pages (Recipes/Apps browse) bleed edge-to-edge against the
+   sidebar and header, like the real app — the filter panel supplies its own
+   padding instead of relying on .app-main's inset. */
+.app-main.is-edge-to-edge { padding: 0; overflow: hidden; }
+/* Entity detail pages (Recipe Details, App Details, Edit Recipe) — full-bleed
+   white, no floating card, matching the real app. Only browse/filter tabs
+   (Compatible Data) get the teal canvas via .is-edge-to-edge instead. */
+.app-main.is-white-detail { padding: 0; background: #fff; overflow-y: auto; }
+.detail-shell { padding: 24px 28px; }
+
+/* A panel that scrolls independently of the page: a fixed header (buttons,
+   search) above a body that scrolls on its own — used for the Hubs browser
+   and any other master/detail layout. */
+.split-panel { background: #fff; border-radius: var(--radius-card); box-shadow: var(--shadow-1); height: 100%; display: flex; flex-direction: column; overflow: hidden; }
+.split-panel__header { flex: none; padding: 16px 16px 8px; }
+.split-panel__body { flex: 1; min-height: 0; overflow-y: auto; padding: 0 16px 16px; }
+.split-panel__body.is-padded-lg { padding: 0 26px 22px; }
+.split-panel__header.is-padded-lg { padding: 22px 26px 0; }
+/* Flush master panel (e.g. the Hubs tree) — no radius/shadow, sits directly
+   against the sidebar/header/footer like the real app's Data/Apps left rail. */
+.split-panel--flush { border-radius: 0; box-shadow: none; border-right: 1px solid var(--g-300); }
+/* Detail panel next to a flush master panel keeps its own breathing room
+   from the outer edges since .app-main has no padding on these routes. */
+.split-panel--inset { margin: 24px 24px 24px 0; height: auto; }
+.view-title { font-size: 1.4rem; font-weight: 700; margin: 0 0 18px; color: var(--c-navy); }
+.view-title.is-on-canvas { color: #fff; }
+.view-subtitle { font-size: 0.85rem; color: var(--g-900); margin: -12px 0 18px; }
+.view-subtitle.is-on-canvas { color: rgba(255,255,255,0.85); }
+
+/* Detail-style pages (Recipe/App/Hub detail, Edit Recipe) sit inside one big
+   white panel on the teal canvas, matching the wireframe's page layout. */
+.page-panel { background: #fff; border-radius: var(--radius-card); box-shadow: var(--shadow-2); padding: 22px 26px; }
+
+/* ---------------------------------------------------------------------- */
+/* Shared components                                                       */
+/* ---------------------------------------------------------------------- */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  border: none; border-radius: var(--radius-chip);
+  padding: 9px 16px; font-size: 0.875rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.02em;
+  box-shadow: var(--shadow-1);
+  color: #fff;
+  transition: background 0.15s ease;
+}
+.btn[disabled] { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+.btn-primary { background: var(--c-primary-light); }
+.btn-primary:hover:not([disabled]) { background: var(--c-primary-hover); }
+.btn-secondary { background: var(--c-secondary); height: 30px; }
+.btn-secondary:hover:not([disabled]) { background: var(--c-secondary-hover); }
+.btn-outline {
+  background: #fff; color: var(--c-primary-dark); box-shadow: none;
+  border: 1px solid var(--g-500);
+}
+.btn-outline:hover:not([disabled]) { background: var(--g-100); }
+.btn-sm { padding: 5px 12px; font-size: 0.8125rem; height: 30px; }
+
+.card {
+  background: #fff;
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-1);
+  padding: 16px 18px;
+}
+
+/* Subscription/pricing-style tile — matches the real platform's plan cards
+   (light tinted body, dark top accent bar, uppercase label, big headline). */
+.pricing-tile { background: #d7eef1; border-top: 5px solid var(--c-navy); border-radius: 4px; padding: 16px 18px; }
+.pricing-tile__label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; color: var(--c-navy); margin-bottom: 10px; }
+.pricing-tile__value { font-size: 1.5rem; font-weight: 700; color: #23262b; line-height: 1.2; }
+.pricing-tile__value small { font-size: 0.85rem; font-weight: 400; color: var(--g-900); }
+.pricing-tile__hint { font-size: 0.82rem; color: var(--g-900); margin: 8px 0 16px; }
+
+.chip {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--c-chip); color: #fff;
+  border-radius: var(--radius-chip);
+  padding: 4px 12px; font-size: 0.75rem; font-weight: 600;
+  height: 30px; min-width: 69px;
+  box-sizing: border-box;
+}
+.chip + .chip { margin-left: 6px; }
+.chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+
+/* Project-phase stepper: an ordered, clickable timeline instead of loose
+   chips, so it's clear which phase follows which and users can jump to one. */
+.phase-bar { display: flex; align-items: flex-start; margin: 4px 0 8px; max-width: 420px; }
+.phase-bar__step {
+  position: relative; flex: 1; display: flex; flex-direction: column; align-items: center;
+  background: none; border: none; padding: 4px 2px 0; cursor: pointer;
+}
+.phase-bar__dot {
+  width: 20px; height: 20px; border-radius: 50%; background: #fff;
+  border: 3px solid var(--g-500); z-index: 1; transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.phase-bar__line { position: absolute; top: 12px; left: -50%; width: 100%; height: 3px; background: var(--g-500); z-index: 0; }
+.phase-bar__label { margin-top: 8px; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.01em; color: var(--g-800); text-align: center; font-weight: 600; }
+.phase-bar__step.is-applicable .phase-bar__dot { background: var(--c-primary); border-color: var(--c-primary); }
+.phase-bar__step.is-applicable .phase-bar__line { background: var(--c-primary); }
+.phase-bar__step.is-applicable .phase-bar__label { color: var(--c-primary-dark); }
+/* Read-only variant (e.g. a specific recipe's own phases) — no click/hover
+   affordance, just the highlighted-dots-and-line visualization. */
+.phase-bar--readonly { pointer-events: none; }
+.phase-bar__step.is-current .phase-bar__dot { border-color: var(--c-secondary); background: var(--c-secondary); box-shadow: 0 0 0 4px rgba(199, 72, 125, 0.22); }
+.phase-bar__step.is-current .phase-bar__label { color: var(--c-secondary-hover); font-weight: 700; }
+.phase-bar__step:hover .phase-bar__dot { border-color: var(--c-secondary-hover); }
+.phase-bar__current { font-size: 0.8rem; color: var(--g-900); margin: 0 0 14px; }
+.phase-bar__current b { color: var(--c-secondary-hover); }
+
+.badge { display: inline-block; white-space: nowrap; font-size: 0.68rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; text-transform: uppercase; }
+.badge-public { background: #d3f3ef; color: var(--c-primary-dark); }
+.badge-muted { background: var(--g-300); color: var(--g-900); cursor: default; }
+
+.tabs { display: flex; gap: 24px; border-bottom: 1px solid var(--g-400); margin-bottom: 20px; flex-wrap: wrap; }
+.tab {
+  background: none; border: none; padding: 10px 2px; font-size: 1.125rem;
+  text-transform: uppercase; font-weight: 400; color: var(--g-800);
+  border-bottom: 2px solid transparent; letter-spacing: 0.01em;
+}
+.tab.is-active { color: var(--c-primary-dark); font-weight: 600; border-bottom-color: var(--c-primary-dark); }
+.tab:hover { color: var(--c-primary-dark); text-decoration: none; }
+
+.field-group { margin-bottom: 16px; }
+.field-label { display: block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.03em; color: var(--g-900); margin-bottom: 6px; }
+
+/* Mock-only "this looks editable" affordance — see detailsTabHtml()'s `mock`
+   option. Purely cosmetic: the click handler that wires it up always just
+   shows a "Mocked" toast, same convention as every other unwired button in
+   this app. */
+.field-edit-pencil {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px; margin-left: 6px; padding: 0;
+  background: none; border: none; border-radius: 4px; color: var(--g-700);
+  cursor: pointer; vertical-align: -3px;
+}
+.field-edit-pencil:hover { color: var(--c-primary); background: var(--g-200); }
+.field-edit-pencil svg { display: block; }
+.field-value { font-size: 0.95rem; color: #23262b; }
+.field-value.muted { color: var(--g-900); }
+.required-mark { color: var(--c-error); }
+
+/* A tab made of several stacked sections (Recipe pipeline / Data Ingredients
+   / Required Parameters, e.g. the live Status tab) needs its section starts
+   to actually read as section starts — .field-label alone is a single
+   field's caption, easy to mistake for just another field among the ones
+   above it. Same small-caps voice (so it doesn't introduce yet another text
+   style), plus a top rule and extra weight to mark "new group starts here". */
+.section-title { display: block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.03em; color: var(--g-900); font-weight: 700; margin: 26px 0 4px; padding-top: 18px; border-top: 1px solid var(--g-300); }
+.section-hint { font-size: 0.82rem; color: var(--g-900); margin: 0 0 14px; }
+
+/* Live Status tab's Deploy panel — Deployment state + the Deploy button
+   grouped into one visually intentional card at the top of the tab, instead
+   of a bare button sitting on its own between unrelated fields. Wide enough
+   screens put the button beside the badge (its natural "go" companion);
+   narrow ones wrap it below via flex-wrap rather than clipping/scrolling. */
+.status-deploy-panel { background: #fff; border: 1px solid var(--g-300); border-radius: var(--radius-card); box-shadow: var(--shadow-1); padding: 16px 18px; margin-bottom: 8px; }
+.status-deploy-panel__row { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.status-deploy-panel__row .field-group { margin-bottom: 0; }
+/* Separates the "not yet run" chip from the warnings below it without a full
+   opaque rule — a semi-transparent line reads as a soft division within the
+   one deploy card, not a hard break between two different sections. */
+.status-deploy-panel__divider { border: none; border-top: 1px solid rgba(33, 41, 59, 0.12); margin: 14px 0 12px; }
+/* Only the actual missing-field list needs to read as urgent/red — the
+   trailing "fill these in on the Recipe Wizard tab" instruction is routine copy,
+   not itself a warning, so it stays in the tab's normal text color. */
+.status-warning-text { font-size: 0.78rem; color: #23262b; margin: 4px 0 0; }
+.status-deploy-panel #live-run-output:not(:empty) { margin-top: 16px; }
+
+/* Recipe Schema graph — an actual node-link diagram (Data Inputs → Tool &
+   Engine → Outputs[ → Result]), laid out in layers left-to-right (a
+   Sugiyama-style layered DAG, the standard way to draw a pipeline as a
+   graph), shared by Recipe Details (the recipe's default, as-authored
+   blueprint) and the Status tab (what a hub actually built through the
+   Recipe Wizard — see js/recipeGraph.js). Nodes are vertices (a pill + a
+   status dot), not info cards; edges are directed (an arrowhead at the
+   target). Status color is the same resolved/pending/blocked language
+   already used by the Status tab's own list items. */
+/* Small top margin only — the section above already ends with real visual
+   breathing room (the "Get Started" side panel governs that row's actual
+   height), so stacking a large margin on top of it left a much bigger gap
+   here than between any other two fields on this tab. */
+.recipe-graph-wrap { margin: 6px 0 8px; }
+.recipe-graph__hint { font-size: 0.95rem; color: #23262b; margin: 6px 0 18px; }
+/* A recipe with enough chained stages lays out wider than the page panel
+   around it — .app-main clips horizontal overflow globally, so without its
+   own scroller here the extra columns would just be cut off with no way to
+   reach them. The fade bars are the only visible hint that there's more off
+   to the side (toggled by updateScrollShadows() in recipeGraph.js), since on
+   Windows/trackpad the scrollbar itself is often invisible until touched.
+   overflow-x is hidden by default, not auto — some browser/OS setups still
+   paint a scrollbar track for an overflow-x:auto element even when nothing
+   meaningfully overflows (a rounding-level scrollWidth/clientWidth gap), so
+   recipeGraph.js measures the real overflow itself and adds can-scroll-x
+   only once there's actually somewhere to scroll to. */
+/* The outer layer never scrolls itself — it only exists to anchor the two
+   fade bars to the diagram's true left/right edge. Putting overflow-x here
+   directly (the old, single-layer version) made the fades position:absolute
+   children of the SAME box that scrolls, so they scrolled away with the
+   content instead of staying pinned to the edge — see .recipe-graph__scroll-track
+   below for the actual scrolling box. */
+.recipe-graph__scroll { position: relative; overflow: hidden; }
+.recipe-graph__scroll::before,
+.recipe-graph__scroll::after {
+  content: ""; position: absolute; top: 0; bottom: 44px; width: 32px;
+  pointer-events: none; opacity: 0; transition: opacity 0.15s ease; z-index: 2;
+}
+/* A fade to white would be invisible here — the panel behind it is already
+   white, so a white-to-transparent gradient blends into it with no visible
+   edge at all. A soft dark vignette (the same navy-grey as the hint text
+   above, at low opacity) reads on the white card regardless. */
+.recipe-graph__scroll::before { left: 0; background: linear-gradient(to right, rgba(35, 38, 43, 0.14), transparent); }
+.recipe-graph__scroll::after { right: 0; background: linear-gradient(to left, rgba(35, 38, 43, 0.14), transparent); }
+.recipe-graph__scroll.can-scroll-left::before { opacity: 1; }
+.recipe-graph__scroll.can-scroll-right::after { opacity: 1; }
+/* The inner layer is the one that actually scrolls — kept separate from the
+   outer fade-anchor above for exactly that reason (see its comment). */
+.recipe-graph__scroll-track { overflow-x: hidden; overflow-y: hidden; }
+.recipe-graph__scroll-track.can-scroll-x { overflow-x: auto; }
+/* Extra bottom padding reserves room for the column-skipping lane
+   drawGraphConnectors() routes edges through in recipeGraph.js (below every
+   row, so a skipped-over column is never crossed) — without it, that lane
+   would draw past this container's own height into whatever follows it on
+   the page, since the SVG overlay itself has overflow: visible. */
+.recipe-graph { position: relative; display: flex; gap: 40px; padding: 4px 0 44px; }
+.recipe-graph__lines { position: absolute; inset: 0; pointer-events: none; overflow: visible; }
+.recipe-graph__edge { fill: none; stroke: var(--g-500); stroke-width: 1.5; }
+.recipe-graph__edge.is-muted { stroke: var(--g-400); stroke-dasharray: 4 4; }
+.recipe-graph__arrow { fill: var(--g-500); }
+.recipe-graph__arrow.is-muted { fill: var(--g-400); }
+/* flex: 0 0 auto (not flex: 1) so columns size to their own content and the
+   whole diagram packs left, instead of stretching to fill the page's full
+   width (which on the Details tab pushes the Outputs column out under the
+   "Get Started" panel above it). */
+/* width: auto (capped by max-width) instead of a flat width — a column
+   sizes to its own widest node instead of always claiming the full cap, so a
+   small graph (e.g. two short input pills + one tool step) fits inside the
+   panel without tripping .recipe-graph__scroll's overflow-x into showing a
+   scrollbar it doesn't actually need. No min-width here either — one was
+   tried, but it just reintroduced the same problem (every column padded out
+   to the same floor regardless of how short its own labels are); the node's
+   own padding already keeps a short label from collapsing to nothing.
+   max-width itself is generous (460px, not a tight 300px) because a node's
+   label and sublabel share one line (see .recipe-graph__node-sub) rather
+   than wrapping — a long one (e.g. an extra_required_input's own label
+   alongside "required by <app>") needs the room, or it truncates down to
+   almost nothing on both sides at once, which is illegible rather than just
+   terse. */
+.recipe-graph__col { flex: 0 0 auto; width: auto; min-width: 0; max-width: 460px; display: flex; flex-direction: column; align-items: flex-start; gap: 14px; position: relative; z-index: 1; }
+.recipe-graph__col-title { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.03em; color: var(--g-900); font-weight: 700; }
+/* The vertex itself: a pill, not a card — label (+ format, + app logo when
+   present) on one line, with a status dot doing the work a whole tinted
+   background used to. */
+/* min-height, not just padding: without it, a plain text node and a node
+   carrying the 20px app logo (tool nodes) come out at slightly different
+   heights. Nodes are top-aligned within their column, so their tops still
+   line up either way — but drawGraphConnectors() connects to each node's
+   *centre*, and top-aligned boxes of different heights have different
+   centres, which is what put a small, spurious kink even in a connector
+   between two nodes that really are both "row 1" of their column. */
+.recipe-graph__node {
+  display: inline-flex; align-items: center; gap: 7px; max-width: 100%;
+  background: #fff; border: 1.5px solid var(--g-500); border-radius: 999px;
+  padding: 7px 14px 7px 10px; font-size: 0.82rem; min-height: 20px;
+}
+.recipe-graph__node-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--g-500); flex: none; }
+.recipe-graph__node-logo { width: 20px; height: 20px; border-radius: 4px; object-fit: contain; background: var(--g-100); flex: none; }
+/* The label always wins the fight for space — a (small) fixed floor plus a
+   lower shrink priority than the sublabel, so a long "extra required input"
+   note truncates itself before it's ever allowed to crush the label down to
+   one letter (flex-shrink defaults to 1 on both, and without min-width:0 +
+   overflow:hidden the sublabel would not shrink at all). The floor is kept
+   low: min-width applies regardless of content, so a large one pads short
+   labels like "geometry" and pushes even a small graph wider than the panel,
+   into a permanent scrollbar. */
+.recipe-graph__node-label { font-weight: 700; color: var(--c-navy); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 40px; flex-shrink: 1; }
+.recipe-graph__node-sub { font-size: 0.74rem; color: var(--g-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex-shrink: 3; }
+.recipe-graph__node-sub::before { content: "·"; margin-right: 7px; color: var(--g-700); }
+/* Same resolved/pending/blocked palette as .status-list__item--*, carried by
+   the dot and a light border tint rather than a filled card background. */
+.recipe-graph__node.is-resolved { border-color: var(--c-success); }
+.recipe-graph__node.is-resolved .recipe-graph__node-dot { background: var(--c-success); }
+.recipe-graph__node.is-pending { border-color: var(--c-warning); }
+.recipe-graph__node.is-pending .recipe-graph__node-dot { background: var(--c-warning); }
+.recipe-graph__node.is-blocked { border-color: var(--c-error); }
+.recipe-graph__node.is-blocked .recipe-graph__node-dot { background: var(--c-error); }
+/* Data-input nodes are context — what's already flowing into the pipeline —
+   not a decision any single wizard step is asking the user to make right
+   now, so they shouldn't out-compete the tool/engine and destination nodes
+   for attention on, say, the Tool & Engine step. Dashed + slightly
+   translucent reads as "reference," not "action needed"; a genuinely
+   resolved (green) input still shows through unmuted, since "already
+   sorted" is worth confirming at a glance — only the attention-grabbing
+   blocked/pending colours are muted back to neutral grey. */
+.recipe-graph__node--input { border-style: dashed; opacity: 0.72; }
+.recipe-graph__node--input.is-blocked,
+.recipe-graph__node--input.is-pending {
+  border-color: var(--g-500);
+}
+.recipe-graph__node--input.is-blocked .recipe-graph__node-dot,
+.recipe-graph__node--input.is-pending .recipe-graph__node-dot {
+  background: var(--g-500);
+}
+@media (max-width: 900px) {
+  .recipe-graph { flex-direction: column; gap: 20px; }
+  .recipe-graph__lines { display: none; }
+  .recipe-graph__node { max-width: 100%; }
+  .recipe-graph__node-label { white-space: normal; }
+}
+
+input[type="text"], input[type="number"], input[type="datetime-local"], select, textarea {
+  width: 100%; max-width: 360px;
+  border: 1px solid var(--g-500); border-radius: 4px;
+  padding: 8px 10px; font-size: 0.85rem; font-family: var(--font);
+  background: #fff;
+}
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--c-primary); background: var(--g-100); }
+input[type="range"] { width: 100%; max-width: 360px; accent-color: var(--c-primary); }
+
+.grid { display: grid; gap: 18px; }
+.grid-2 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+.grid-3 { grid-template-columns: repeat(3, minmax(0,1fr)); }
+.grid-4 { grid-template-columns: repeat(4, minmax(0,1fr)); }
+@media (max-width: 1100px) { .grid-3, .grid-4 { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+@media (max-width: 700px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+
+.search-box {
+  display: flex; align-items: center; gap: 8px;
+  border: 1px solid var(--g-500); border-radius: 4px;
+  padding: 6px 10px; background: #fff; max-width: 340px; margin-bottom: 16px;
+}
+.search-box input { border: none; padding: 4px 0; max-width: none; }
+.search-box input:focus { background: transparent; }
+.search-box svg { width: 16px; height: 16px; stroke: var(--g-900); flex: none; }
+
+.two-col { display: grid; grid-template-columns: 280px 1fr; gap: 20px; align-items: stretch; height: 100%; min-height: 0; }
+@media (max-width: 900px) { .two-col { grid-template-columns: 1fr; height: auto; } }
+
+/* Detail page + narrow side rail (App/Recipe Details' Pricing / Get Started
+   panel) — matches the real platform's layout: the main content stays wide,
+   the panel is a fixed narrow column pinned to the far right, not a 50/50
+   split. */
+.detail-side-layout { display: grid; grid-template-columns: 1fr 300px; gap: 32px; align-items: start; }
+@media (max-width: 900px) { .detail-side-layout { grid-template-columns: 1fr; } }
+
+.list-nav { list-style: none; margin: 0; padding: 0; }
+.list-nav li { margin-bottom: 2px; }
+.list-nav button {
+  width: 100%; text-align: left; background: none; border: none;
+  padding: 10px 12px; border-radius: 4px; font-size: 0.88rem; color: #23262b;
+}
+.list-nav button:hover { background: var(--g-200); }
+.list-nav button.is-active { background: var(--g-200); color: var(--c-primary-dark); font-weight: 700; }
+
+.star { color: var(--c-secondary); }
+.star.is-empty { color: var(--g-500); }
+
+.checklist { list-style: none; margin: 0; padding: 0; }
+.checklist li { display: flex; align-items: flex-start; gap: 10px; padding: 7px 0; font-size: 0.9rem; }
+.checklist input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--c-success); margin-top: 1px; flex: none; }
+
+.json-viewer {
+  background: var(--c-navy); color: #d9e2e5; border-radius: var(--radius-card);
+  padding: 16px 18px; font-family: "Consolas", "Menlo", monospace; font-size: 0.8rem;
+  overflow-x: auto; line-height: 1.5; white-space: pre;
+}
+.json-viewer .jk { color: #7fd0e6; }
+.json-viewer .jv-str { color: #f0c987; }
+.json-viewer .jv-num { color: #9ad39f; }
+.json-viewer .jv-bool { color: #e293c4; }
+.json-viewer .jv-comment { color: #7a95a0; font-style: italic; }
+
+/* Editable code editor: a transparent-text textarea sits on top of a
+   read-only, syntax-highlighted <pre> (same .json-viewer look) so the CWL
+   stays genuinely editable while still showing colours and indent guides —
+   a plain <textarea> can't render coloured spans on its own. */
+/* The editor's own navy background (not just the highlight <pre>'s) — the
+   code layers stop short of the textarea's scrollbars (see layoutEditor in
+   liveRecipe.js), so something has to paint behind those. */
+.code-editor { position: relative; background: var(--c-navy); border-radius: var(--radius-card); }
+.code-editor--docked { border-top-left-radius: 0; border-top-right-radius: 0; }
+/* Horizontally scrolled text (and the guides/boxes that follow it) must
+   disappear at the gutter's edge, not slide underneath its translucent
+   background. Clips paint only — offsets inside stay expressed against
+   TEXT_LEFT as before. */
+.code-editor__highlight, .indent-guides, .step-frame-boxes { clip-path: inset(0 0 0 44px); }
+/* A barely-visible tinted outline around each step's whole run:/in:/out:
+   block (one colour per step — see STEP_COLORS in liveRecipe.js), in its own
+   layer that scrolls horizontally with the text. Width is set per render by
+   layoutEditor from the step's real line lengths, so a long href never runs
+   out of its box. */
+.step-frame-boxes { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 1; }
+.step-frame-box {
+  position: absolute; left: 50px; width: 640px;
+  border: 1px solid transparent; border-radius: 6px;
+}
+/* VS Code-style line-number gutter — a fixed-width column reserved down the
+   left edge. Its width (44px) plus the original 18px text inset is exactly
+   liveRecipe.js's own TEXT_LEFT (62px) constant, which every other overlay's
+   left offset below is expressed in terms of, so none of them can drift out
+   of sync with this one. Its own scrollTop is synced to the textarea's on
+   every scroll (see the "scroll" listener in renderOrchestratorEditTab),
+   same as the highlight overlay, so numbers never lag behind the text. */
+.code-editor__gutter {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 44px; overflow: hidden;
+  margin: 0; padding: 16px 10px 16px 0; box-sizing: border-box;
+  font-family: "Consolas", "Menlo", monospace; font-size: 0.8rem; line-height: 1.5;
+  text-align: right; white-space: pre; color: rgba(217, 226, 229, .38);
+  background: rgba(255, 255, 255, .03); border-right: 1px solid rgba(255, 255, 255, .08);
+  border-radius: var(--radius-card) 0 0 var(--radius-card); pointer-events: none;
+  /* Above .code-editor__highlight (z-index 0 below) — needed because that
+     <pre> spans the FULL width (inset: 0; its own left padding only pushes
+     where its *text* starts, not its box) and paints its own opaque
+     .json-viewer navy background. With both elements at the default z-index
+     (auto), later DOM order wins regardless of position, and the highlight
+     <pre> comes after this gutter in the markup — so without an explicit,
+     higher z-index here, that background silently painted straight over
+     the line numbers, hiding them completely. */
+  z-index: 3;
+}
+.code-editor__highlight {
+  position: absolute; inset: 0; margin: 0; overflow: hidden; pointer-events: none;
+  z-index: 0;
+  /* Left padding leaves room for .code-editor__gutter (see GUTTER_WIDTH) —
+     kept in lockstep with .code-editor__input's own padding-left below, so
+     the highlighted text and the real (invisible) typed text never drift
+     apart horizontally. */
+  padding-left: 62px;
+  /* Indent-guide background-image/position/size/repeat are set inline per
+     render (see indentGuideStyle in liveRecipe.js) — the guide count tracks
+     the CWL's actual max nesting depth, not a fixed column count. */
+}
+.code-editor__input {
+  position: relative; display: block; width: 100%; margin: 0;
+  padding: 16px 18px 16px 62px; font-family: "Consolas", "Menlo", monospace; font-size: 0.8rem; line-height: 1.5;
+  white-space: pre; border: none; border-radius: var(--radius-card);
+  background: transparent; color: transparent; caret-color: #d9e2e5;
+}
+.code-editor__input:focus { outline: none; background: transparent; color: transparent; }
+.code-editor__input::selection { background: rgba(127, 208, 230, .35); }
+
+/* Real, scroll-synced indent guides (VS Code / "indent-rainbow" style: solid
+   translucent bands, one per nesting depth, each spanning only the lines
+   where that depth is actually active) — rendered as absolutely-positioned
+   DOM elements repositioned on scroll in JS, NOT a CSS background-image on
+   the highlight <pre>. A background-image's position doesn't scroll with an
+   element's own overflow by default (background-attachment: scroll, despite
+   the confusing name, keeps it fixed relative to the viewport) — that was
+   the actual bug: the guides visually stayed put while the text scrolled
+   past them, looking like two decoupled layers. */
+/* Font-family/size set explicitly here (matching .code-editor__input exactly)
+   rather than left to inherit — the actual fix for a real reported bug: a
+   band's inline `left`/`width` (see renderIndentGuides in liveRecipe.js) are
+   expressed in `ch` units, and `ch` resolves against whatever font is
+   actually in effect on the element using it. Left unset, that was the
+   ambient sans-serif body font, not the editor's own monospace one — so a
+   "2ch" indent step measured a completely different character width than
+   the real 2-space indent it was meant to sit under, and every band drifted
+   further out of alignment with the text the deeper it nested. */
+.indent-guides {
+  position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+  font-family: "Consolas", "Menlo", monospace; font-size: 0.8rem;
+  /* Above .step-frame-boxes (z-index 1), not below it — the actual fix for
+     a real reported bug: a step-frame-box's own translucent tint (however
+     faint) painting OVER a guide band shifts the band's perceived hue
+     toward the frame's colour, and for two step/depth combinations whose
+     hues are already close (e.g. "multiply"'s amber frame over an
+     orange/yellow-ish depth guide) that shift was enough to wash the guide
+     out to the same dull brown as the frame, reading as "missing" even
+     though it was rendering. With guides on top, each band's own colour is
+     always what's actually seen, unaffected by whichever step's frame
+     happens to sit underneath it. */
+  z-index: 2;
+}
+.indent-guide-band { position: absolute; border-radius: 2px; }
+
+/* The Orchestrator tab's CWL toolbar — Add step / Compatible apps / Reset /
+   Validate / Save, all in one dark bar directly above the code editor (see
+   renderOrchestratorEditTab in liveRecipe.js), rather than scattered across
+   separate rows above it. Flush against the editor below it (no bottom
+   radius, no margin) so the two read as one continuous dark panel — see
+   .code-editor--docked, which zeroes the editor's own top corners to match. */
+.cwl-toolbar {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 10px 18px;
+  background: var(--c-navy); border-radius: var(--radius-card) var(--radius-card) 0 0;
+  border-bottom: 1px solid rgba(255, 255, 255, .1);
+  padding: 12px 16px; margin-bottom: 0;
+}
+.cwl-toolbar__group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.cwl-toolbar__spacer { flex: 1 1 auto; min-width: 8px; }
+.cwl-toolbar__label {
+  font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.03em;
+  color: rgba(217, 226, 229, .65); white-space: nowrap;
+}
+.cwl-toolbar select {
+  font-size: 0.78rem; padding: 5px 8px;
+  background: #1b2231; color: #d9e2e5; border: 1px solid rgba(255, 255, 255, .3); border-radius: 4px;
+}
+.cwl-toolbar select[disabled] { opacity: .5; }
+.cwl-toolbar__group--blocks .btn { white-space: nowrap; }
+.cwl-toolbar .help-tip { color: rgba(217, 226, 229, .55); }
+
+/* CWL + diagram / CWL only / Guided builder (see renderOrchestratorEditTab's
+   setView) — `hidden` has to win over the display these elements otherwise get. */
+.cwl-toolbar__group[hidden], .guided-builder[hidden], .code-editor[hidden],
+.recipe-split[hidden], .recipe-split__divider[hidden], .recipe-diagram[hidden] { display: none !important; }
+
+/* Split view: the CWL editor (left) and the live recipe diagram (right) as
+   one continuous dark panel under the toolbar, divided by a thin draggable
+   line whose position is --split-left. The diagram pane's content sits in an
+   absolutely positioned box so it never adds height of its own — the row is
+   exactly as tall as the editor (fillEditorHeight). Inside it only the
+   inspector scrolls (and the graph, if it outgrows its share); the pane
+   itself never does, so there's at most one scrollbar per pane. */
+.recipe-split.is-split { display: grid; grid-template-columns: minmax(0, var(--split-left, 54%)) 9px minmax(0, 1fr); background: var(--c-navy); border-radius: 0 0 var(--radius-card) var(--radius-card); }
+.recipe-split.is-split .code-editor { border-bottom-right-radius: 0; }
+.recipe-split.is-resizing { user-select: none; cursor: col-resize; }
+.recipe-split__divider { position: relative; cursor: col-resize; background: transparent; }
+.recipe-split__divider::before {
+  content: ""; position: absolute; top: 0; bottom: 0; left: 4px; width: 1px;
+  background: rgba(255, 255, 255, .08); transition: background .15s;
+}
+.recipe-split__divider:hover::before, .recipe-split__divider:focus-visible::before, .recipe-split.is-resizing .recipe-split__divider::before { background: #7fd0e6; }
+.recipe-split__divider:focus-visible { outline: none; }
+
+/* Full-screen toggle (see setExpanded in liveRecipe.js): the whole workspace
+   — toolbar, both panes, validate banner — as a fixed overlay filling the
+   window, below toasts (50), dialogs (100) and help bubbles (300). */
+.recipe-workspace__result { margin-top: 12px; }
+.btn-icon-toggle {
+  display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; margin-left: 4px;
+  border-radius: 5px; border: 1px solid rgba(255, 255, 255, .28); background: transparent; color: #d9e2e5; cursor: pointer;
+}
+.btn-icon-toggle:hover { background: rgba(255, 255, 255, .08); color: #fff; }
+.btn-icon-toggle:focus-visible { outline: 2px solid #7fd0e6; outline-offset: 2px; }
+.btn-icon-toggle[hidden] { display: none; }
+.btn-icon-toggle svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.btn-icon-toggle .when-expanded { display: none; }
+.recipe-workspace.is-expanded .btn-icon-toggle .when-expanded { display: block; }
+.recipe-workspace.is-expanded .btn-icon-toggle .when-collapsed { display: none; }
+.recipe-workspace.is-expanded {
+  position: fixed; inset: 0; z-index: 40; display: flex; flex-direction: column; background: var(--c-navy);
+}
+.recipe-workspace.is-expanded .cwl-toolbar { flex: none; border-radius: 0; }
+.recipe-workspace.is-expanded .recipe-split.is-split { flex: 1 1 auto; min-height: 0; grid-template-rows: minmax(0, 1fr); border-radius: 0; }
+.recipe-workspace.is-expanded .code-editor { height: auto !important; min-height: 0 !important; border-radius: 0; }
+.recipe-workspace.is-expanded .recipe-diagram { border-radius: 0; }
+.recipe-workspace.is-expanded .recipe-workspace__result { flex: none; margin: 0; max-height: 30vh; overflow: auto; }
+.recipe-workspace.is-expanded .recipe-workspace__result:not(:empty) { padding: 10px 12px 0; }
+
+/* Thin scrollbars that stay out of sight until the pointer is over the
+   panel they belong to (standard properties; ::-webkit-scrollbar as the
+   fallback for older Chromium). */
+.code-editor__input, .diagram-inspector, .recipe-diagram__graph, .recipe-diagram .recipe-graph__scroll-track {
+  scrollbar-width: thin; scrollbar-color: transparent transparent;
+}
+.code-editor:hover .code-editor__input, .diagram-inspector:hover,
+.recipe-diagram__graph:hover, .recipe-diagram__graph:hover .recipe-graph__scroll-track {
+  scrollbar-color: rgba(255, 255, 255, .22) transparent;
+}
+.code-editor__input::-webkit-scrollbar, .diagram-inspector::-webkit-scrollbar,
+.recipe-diagram__graph::-webkit-scrollbar, .recipe-diagram .recipe-graph__scroll-track::-webkit-scrollbar { width: 8px; height: 8px; }
+.code-editor__input::-webkit-scrollbar-track, .diagram-inspector::-webkit-scrollbar-track,
+.recipe-diagram__graph::-webkit-scrollbar-track, .recipe-diagram .recipe-graph__scroll-track::-webkit-scrollbar-track { background: transparent; }
+.code-editor__input::-webkit-scrollbar-thumb, .diagram-inspector::-webkit-scrollbar-thumb,
+.recipe-diagram__graph::-webkit-scrollbar-thumb, .recipe-diagram .recipe-graph__scroll-track::-webkit-scrollbar-thumb { background: transparent; border-radius: 8px; }
+.code-editor:hover .code-editor__input::-webkit-scrollbar-thumb, .diagram-inspector:hover::-webkit-scrollbar-thumb,
+.recipe-diagram__graph:hover::-webkit-scrollbar-thumb, .recipe-diagram__graph:hover .recipe-graph__scroll-track::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, .22); }
+.code-editor__input::-webkit-scrollbar-corner { background: transparent; }
+
+/* The diagram pane — same navy as the editor, text and controls in the
+   editor's own light-on-dark palette, so the two halves read as one tool. */
+.recipe-diagram {
+  --dg-text: #d9e2e5; --dg-muted: rgba(217, 226, 229, .6); --dg-line: rgba(255, 255, 255, .09);
+  --dg-surface: rgba(255, 255, 255, .035); --dg-control: #1b2231; --dg-accent: #7fd0e6;
+  position: relative; min-width: 0; background: var(--c-navy); color: var(--dg-text);
+  border-radius: 0 0 var(--radius-card) 0;
+}
+.recipe-diagram__scroll { position: absolute; inset: 0; overflow: hidden; padding: 14px 16px 16px 12px; display: flex; flex-direction: column; gap: 10px; }
+.recipe-diagram__head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex: none; }
+.recipe-diagram__head b { color: var(--dg-muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: .04em; }
+.recipe-diagram__head small { display: block; color: var(--dg-muted); font-size: 0.74rem; margin-top: 2px; }
+.recipe-diagram__graph {
+  flex: 0 1 auto; min-height: 120px; overflow: auto;
+  background: var(--dg-surface); border: 1px solid var(--dg-line); border-radius: 8px; padding: 10px 12px 0;
+}
+.recipe-diagram .guided__empty { background: var(--dg-surface); border-color: var(--dg-line); color: var(--dg-muted); }
+
+/* Graph nodes, re-themed for the dark pane (the shared light styles still
+   apply on the recipe details page). */
+.recipe-diagram .recipe-graph { gap: 20px; padding-bottom: 18px; }
+.recipe-diagram .recipe-graph__col { gap: 10px; }
+.recipe-diagram .recipe-graph__col-title { color: var(--dg-muted); font-size: 0.66rem; }
+.recipe-diagram .recipe-graph__node {
+  cursor: pointer; background: #2a3248; border-color: rgba(255, 255, 255, .2); opacity: 1;
+  font-size: 0.76rem; padding: 5px 11px 5px 9px; gap: 6px;
+  transition: border-color .15s, box-shadow .15s;
+}
+.recipe-diagram .recipe-graph__node-sub { font-size: 0.7rem; }
+.recipe-diagram .recipe-graph__node--input { background: transparent; border-color: rgba(255, 255, 255, .22); }
+.recipe-diagram .recipe-graph__node-label { color: #eef3f5; }
+.recipe-diagram .recipe-graph__node-sub { color: var(--dg-muted); }
+.recipe-diagram .recipe-graph__node-sub::before { color: var(--dg-muted); }
+.recipe-diagram .recipe-graph__node-dot { background: rgba(255, 255, 255, .35); }
+.recipe-diagram .recipe-graph__node.is-pending { border-color: var(--c-warning); }
+.recipe-diagram .recipe-graph__node.is-pending .recipe-graph__node-dot { background: var(--c-warning); }
+.recipe-diagram .recipe-graph__node.is-blocked { border-color: #ff7a5c; }
+.recipe-diagram .recipe-graph__node.is-blocked .recipe-graph__node-dot { background: #ff7a5c; }
+.recipe-diagram .recipe-graph__node:hover { border-color: rgba(127, 208, 230, .7); }
+.recipe-diagram .recipe-graph__node:focus-visible { outline: 2px solid var(--dg-accent); outline-offset: 2px; }
+.recipe-diagram .recipe-graph__node.is-selected { border-color: var(--dg-accent); box-shadow: 0 0 0 3px rgba(127, 208, 230, .22); }
+.recipe-diagram .recipe-graph__edge.is-muted, .recipe-diagram .recipe-graph__edge { stroke-opacity: .9; }
+.recipe-diagram .recipe-graph__scroll::before { background: linear-gradient(to right, rgba(0, 0, 0, .35), transparent); }
+.recipe-diagram .recipe-graph__scroll::after { background: linear-gradient(to left, rgba(0, 0, 0, .35), transparent); }
+
+/* "Recipe details" card above the graph (see recipeMetaCardHtml). */
+.recipe-meta-card {
+  flex: none; display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; cursor: pointer; font: inherit;
+  background: var(--dg-surface); border: 1px solid var(--dg-line); border-radius: 8px; padding: 9px 12px; color: var(--dg-text);
+  transition: border-color .15s, box-shadow .15s;
+}
+.recipe-meta-card:hover { border-color: rgba(127, 208, 230, .5); }
+.recipe-meta-card.is-selected { border-color: var(--dg-accent); box-shadow: 0 0 0 3px rgba(127, 208, 230, .18); }
+.recipe-meta-card__icon {
+  flex: none; width: 24px; height: 24px; border-radius: 50%; background: var(--dg-accent); color: var(--c-navy);
+  display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-style: italic; font-family: Georgia, serif;
+}
+.recipe-meta-card__text { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.recipe-meta-card__text b { color: #fff; font-size: 0.86rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.recipe-meta-card__text small { color: var(--dg-muted); font-size: 0.74rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Inspector — the settings for whatever's selected; the one part of the
+   pane that scrolls. */
+.diagram-inspector {
+  flex: 1 1 160px; min-height: 120px; overflow-y: auto; position: relative;
+  background: var(--dg-surface); border: 1px solid var(--dg-line); border-radius: 8px;
+  padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; font-size: 0.84rem;
+}
+.diagram-inspector__head { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding-right: 26px; }
+.diagram-inspector__head b { color: #fff; }
+.diagram-inspector__close {
+  position: absolute; top: 8px; right: 8px; width: 26px; height: 26px; border: none; background: transparent;
+  cursor: pointer; color: var(--dg-muted); display: inline-flex; align-items: center; justify-content: center; border-radius: 4px;
+}
+.diagram-inspector__close:hover { background: rgba(255, 255, 255, .08); color: #fff; }
+.diagram-inspector__close svg { width: 16px; height: 16px; }
+.diagram-inspector__section {
+  font-size: 0.7rem; text-transform: uppercase; letter-spacing: .05em; color: var(--dg-muted); font-weight: 700;
+  border-top: 1px solid var(--dg-line); padding-top: 9px;
+}
+.guided-row--compact { grid-template-columns: minmax(80px, 130px) auto minmax(0, 1fr); }
+.diagram-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 0.76rem; color: var(--dg-muted); }
+.diagram-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.diagram-legend__dot { width: 9px; height: 9px; border-radius: 50%; background: rgba(255, 255, 255, .35); display: inline-block; }
+.diagram-legend__dot.is-pending { background: var(--c-warning); }
+.diagram-legend__dot.is-blocked { background: #ff7a5c; }
+
+/* Shared form pieces (also used, light, by the Guided builder) re-themed
+   inside the dark pane. */
+.recipe-diagram .guided__intro, .recipe-diagram .guided__hint, .recipe-diagram .block-form__issues,
+.recipe-diagram .guided-card__io, .recipe-diagram .guided-field, .recipe-diagram .guided-check,
+.recipe-diagram .guided-row__arrow { color: var(--dg-muted); }
+.recipe-diagram .guided-card__num, .recipe-diagram .guided-label { color: var(--dg-muted); }
+.recipe-diagram .guided-check span, .recipe-diagram .guided-row__what code { color: var(--dg-text); }
+.recipe-diagram .guided-row__what { align-items: flex-start; }
+.recipe-diagram small { color: var(--dg-muted); }
+.recipe-diagram code { background: rgba(255, 255, 255, .07); color: var(--dg-accent); border-radius: 4px; padding: 1px 5px; }
+.recipe-diagram select, .recipe-diagram input[type="text"], .recipe-diagram textarea {
+  background: var(--dg-control); color: var(--dg-text); border: 1px solid rgba(255, 255, 255, .2); border-radius: 5px;
+}
+.recipe-diagram select:focus, .recipe-diagram input[type="text"]:focus, .recipe-diagram textarea:focus { border-color: var(--dg-accent); outline: none; }
+.recipe-diagram option, .recipe-diagram optgroup { background: var(--dg-control); color: var(--dg-text); }
+.recipe-diagram .btn-outline { background: transparent; color: var(--dg-text); border-color: rgba(255, 255, 255, .28); }
+.recipe-diagram .btn-outline:hover:not([disabled]) { background: rgba(255, 255, 255, .08); }
+.recipe-diagram .notice-banner { background: rgba(240, 201, 135, .1); color: #f0c987; border-color: rgba(240, 201, 135, .3); }
+.recipe-diagram .guided-chip--ok { background: rgba(154, 211, 159, .14); color: #9ad39f; }
+.recipe-diagram .guided-chip--todo { background: rgba(240, 201, 135, .14); color: #f0c987; }
+.recipe-diagram .cwl-parts li.is-ok .cwl-parts__mark { background: rgba(154, 211, 159, .16); color: #9ad39f; }
+.recipe-diagram .cwl-parts li.is-missing .cwl-parts__mark { background: rgba(240, 201, 135, .16); color: #f0c987; }
+.recipe-diagram .cwl-parts li.is-missing code { color: #f0c987; }
+.recipe-diagram .cwl-parts b { color: var(--dg-text); }
+
+/* A read-only (mockup) recipe definition — see liveRecipe.js::lockReadOnly:
+   its fields stay legible, just visibly locked. */
+.guided-builder :is(input, select, textarea):disabled,
+.recipe-diagram :is(input, select, textarea):disabled { cursor: not-allowed; opacity: .75; }
+.guided-check:has(input:disabled), .alt-tool:has(input:disabled) { cursor: default; }
+
+/* Alternative tools per step (see alternativesSectionHtml) — light by
+   default for the Guided builder, re-themed in the dark diagram pane. */
+.alt-tools { display: flex; flex-direction: column; gap: 6px; }
+.alt-tool {
+  display: flex; align-items: flex-start; gap: 9px; cursor: pointer;
+  border: 1px solid var(--g-300); border-radius: 7px; padding: 8px 10px; background: #fff;
+}
+.alt-tool:has(input:checked) { border-color: var(--c-navy); box-shadow: inset 3px 0 0 var(--c-navy); }
+.alt-tool input { margin-top: 3px; flex: none; }
+.alt-tool__body { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.alt-tool__body b { font-size: 0.84rem; color: var(--c-navy); }
+.alt-tool__body small { font-size: 0.76rem; color: var(--g-900); }
+.alt-tool__fit { display: flex; flex-wrap: wrap; gap: 4px; }
+.alt-tools__note { margin: 0; font-size: 0.76rem; color: var(--g-900); }
+.guided-chip--info { background: #e4eef8; color: #24527a; }
+.guided-alt { border-top: 1px solid var(--g-300); padding-top: 8px; }
+.guided-alt > summary { cursor: pointer; font-size: 0.82rem; font-weight: 600; color: var(--c-navy); list-style-position: inside; }
+.guided-alt > summary span { font-weight: 400; color: var(--g-900); margin-left: 6px; }
+.guided-alt[open] > summary { margin-bottom: 8px; }
+.guided-alt .alt-tools { margin: 6px 0; }
+.recipe-diagram .alt-tool { background: rgba(255, 255, 255, .03); border-color: var(--dg-line); }
+.recipe-diagram .alt-tool:has(input:checked) { border-color: var(--dg-accent); box-shadow: inset 3px 0 0 var(--dg-accent); }
+.recipe-diagram .alt-tool__body b { color: #fff; }
+.recipe-diagram .alt-tool__body small, .recipe-diagram .alt-tools__note { color: var(--dg-muted); }
+.recipe-diagram .alt-tools__note a { color: var(--dg-accent); }
+.recipe-diagram .guided-chip--info { background: rgba(127, 208, 230, .14); color: #7fd0e6; }
+
+/* The CWL-required-parts checklist (see recipeDetailsFormHtml) — light by
+   default, for the Guided builder. */
+.cwl-parts { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.cwl-parts li { display: flex; align-items: flex-start; gap: 8px; font-size: 0.82rem; }
+.cwl-parts li > span:last-child { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; }
+.cwl-parts small { flex-basis: 100%; color: var(--g-900); font-size: 0.76rem; }
+.cwl-parts__mark {
+  flex: none; width: 18px; height: 18px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
+  font-size: 0.7rem; font-weight: 700; margin-top: 1px;
+}
+.cwl-parts li.is-ok .cwl-parts__mark { background: #e3f4ea; color: #1f6b40; }
+.cwl-parts li.is-missing .cwl-parts__mark { background: #fdecd8; color: #8a4b0f; }
+.cwl-parts li.is-missing code { color: #8a4b0f; }
+.guided-field textarea { width: 100%; max-width: none; font: inherit; font-size: 0.84rem; resize: vertical; }
+.guided-field small[data-details-id-error] { color: var(--c-error); }
+/* The selected diagram node's step, outlined in the CWL editor too. */
+.step-frame-box.is-selected { border-width: 2px; border-color: rgba(127, 208, 230, .85) !important; }
+@media (max-width: 1000px) {
+  /* Too narrow to sit side by side — stack, giving the diagram a fixed height. */
+  .recipe-split.is-split { grid-template-columns: 1fr; }
+  .recipe-split__divider { display: none !important; }
+  .recipe-diagram { height: 560px; border-top: 1px solid rgba(255, 255, 255, .08); border-radius: 0 0 var(--radius-card) var(--radius-card); }
+  .recipe-split.is-split .code-editor { border-radius: 0; }
+  .recipe-workspace.is-expanded .recipe-split.is-split { grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); }
+  .recipe-workspace.is-expanded .recipe-diagram { height: auto; }
+}
+.recipe-def-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; }
+.view-switch { display: inline-flex; border: 1px solid var(--g-300); border-radius: 999px; padding: 3px; background: var(--g-200); flex: none; }
+.view-switch button {
+  border: none; background: transparent; border-radius: 999px; padding: 6px 14px; cursor: pointer;
+  font: inherit; font-size: 0.8rem; font-weight: 600; color: var(--g-900);
+}
+.view-switch button.is-active { background: var(--c-navy); color: #fff; }
+
+/* The Guided builder (see renderGuidedBuilder in liveRecipe.js): a stepper
+   over four stages, docked under the same dark toolbar as the CWL editor. */
+.guided-builder {
+  border: 1px solid var(--g-300); border-top: none; border-radius: 0 0 var(--radius-card) var(--radius-card);
+  background: var(--g-200); padding: 18px 20px 20px;
+}
+.guided__stepper { list-style: none; margin: 0 0 16px; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px; }
+.guided__stage {
+  width: 100%; display: flex; align-items: center; gap: 10px; text-align: left; cursor: pointer;
+  background: #fff; border: 1px solid var(--g-300); border-radius: 8px; padding: 10px 12px; font: inherit;
+}
+.guided__stage.is-active { border-color: var(--c-navy); box-shadow: inset 0 0 0 1px var(--c-navy); }
+.guided__num {
+  flex: none; width: 26px; height: 26px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
+  background: var(--g-300); color: var(--c-navy); font-weight: 700; font-size: 0.8rem;
+}
+.guided__stage.is-active .guided__num { background: var(--c-navy); color: #fff; }
+.guided__stage.is-done .guided__num { background: #2e8b57; color: #fff; }
+.guided__stage-text { display: flex; flex-direction: column; line-height: 1.25; }
+.guided__stage-text b { color: var(--c-navy); font-size: 0.86rem; }
+.guided__stage-text small { color: var(--g-900); font-size: 0.74rem; }
+.guided__body { display: flex; flex-direction: column; gap: 10px; }
+.guided__intro { margin: 0 0 4px; font-size: 0.86rem; color: var(--g-900); max-width: 820px; }
+.guided__explain { margin: 0 0 6px; padding-left: 20px; font-size: 0.84rem; color: var(--g-900); max-width: 820px; }
+.guided__explain li { margin: 3px 0; }
+.guided__empty { padding: 14px; border: 1px dashed var(--g-300); border-radius: 8px; background: #fff; font-size: 0.84rem; color: var(--g-900); }
+.guided__subhead { margin: 10px 0 0; font-size: 0.9rem; color: var(--c-navy); }
+.guided__overview { margin: 0; padding-left: 20px; font-size: 0.84rem; }
+.guided__overview li { margin: 3px 0; }
+.guided__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 4px; }
+.guided__hint { font-size: 0.8rem; color: var(--g-900); }
+.guided__nav { display: flex; justify-content: space-between; align-items: center; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--g-300); }
+.guided-card { background: #fff; border: 1px solid var(--g-300); border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.guided-card__head { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.guided-card__head code, .guided-row code, .guided-check code, .guided__overview code, .guided-card__io code { font-size: 0.8rem; }
+.guided-card__num { font-size: 0.72rem; text-transform: uppercase; letter-spacing: .04em; color: var(--g-900); }
+.guided-card__name { color: var(--g-900); }
+.guided-card__remove { margin-left: auto; }
+.guided-card__io { font-size: 0.84rem; display: flex; flex-direction: column; gap: 4px; }
+.guided-card__io select { max-width: 320px; }
+.guided-card small, .guided-check small { color: var(--g-900); }
+.guided-label { display: inline-block; min-width: 76px; font-size: 0.72rem; text-transform: uppercase; letter-spacing: .04em; color: var(--g-900); }
+.guided-row { display: grid; grid-template-columns: minmax(120px, 200px) auto minmax(0, 1fr) auto; align-items: center; gap: 10px; }
+.guided-row__what { display: flex; flex-direction: column; }
+.guided-row__what small { font-size: 0.74rem; }
+.guided-row__arrow { color: var(--g-900); }
+.guided-row select { width: 100%; max-width: none; }
+/* A long-form `in:` entry: its valueFrom, shown under the row, spanning it. */
+.guided-row__reshape { grid-column: 1 / -1; margin: -4px 0 2px; font-size: 0.76rem; color: var(--g-900); overflow-wrap: anywhere; }
+.guided-row__reshape code { font-size: 0.72rem; }
+.guided-chip { font-size: 0.72rem; font-weight: 600; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+/* Data input vs parameter (a CWL `type: File` workflow input) — the badge,
+   and the switch + media-type picker in the Guided builder / diagram. */
+.guided-chip--data { background: #e6f6f4; color: #135f59; }
+.recipe-diagram .guided-chip--data { background: rgba(154, 211, 159, .14); color: #9ad39f; }
+.guided-data-input { display: flex; flex-direction: column; gap: 8px; margin: 8px 0 4px; }
+.guided-data-input__switch { display: flex; align-items: flex-start; gap: 8px; font-size: 0.82rem; cursor: pointer; }
+.guided-data-input__switch input { margin-top: 2px; flex: none; }
+.guided-data-input__row { display: flex; flex-direction: column; gap: 8px; padding-left: 24px; }
+.guided-chip--ok { background: #e3f4ea; color: #1f6b40; }
+.guided-chip--todo { background: #fdecd8; color: #8a4b0f; }
+.guided-field { display: flex; flex-direction: column; gap: 4px; font-size: 0.78rem; color: var(--g-900); }
+.guided-field input { max-width: 420px; }
+.guided-check { display: flex; align-items: center; gap: 8px; font-size: 0.84rem; }
+@media (max-width: 720px) {
+  .guided-row { grid-template-columns: 1fr; }
+  .guided-row__arrow { display: none; }
+}
+
+/* Building-block modals (Add / Connect / Finalize — see openBlockModal in
+   liveRecipe.js): a plain stacked form. */
+.block-form { display: flex; flex-direction: column; gap: 12px; font-size: 0.85rem; }
+.block-form label { display: flex; flex-direction: column; gap: 4px; font-weight: 600; color: var(--c-navy); }
+.block-form label > span.block-form__hint { font-weight: 400; font-size: 0.78rem; color: var(--g-900); }
+.block-form select, .block-form input[type="text"] { width: 100%; max-width: none; }
+.block-form__checks { display: flex; flex-direction: column; gap: 6px; max-height: 220px; overflow-y: auto; }
+.block-form__checks label { flex-direction: row; align-items: center; gap: 8px; font-weight: 400; }
+.block-form__issues { margin: 0; padding-left: 18px; color: var(--g-900); font-size: 0.8rem; }
+.block-form__issues li { margin: 2px 0; }
+.block-form__divider { border: none; border-top: 1px solid var(--g-300); margin: 4px 0; }
+.cwl-toolbar .help-tip:hover, .cwl-toolbar .help-tip:focus { color: #fff; }
+
+/* Zeroes the code editor's own top corners when a .cwl-toolbar sits directly
+   above it (see renderOrchestratorEditTab) — without this, the highlight
+   layer's own full-corner radius (inherited from .json-viewer, shared with
+   several other read-only JSON displays elsewhere, so not touched globally)
+   would leave a visible rounded notch under the toolbar's square bottom. */
+.code-editor--docked .code-editor__gutter { border-top-left-radius: 0; }
+.code-editor--docked .code-editor__highlight { border-top-left-radius: 0; border-top-right-radius: 0; }
+
+.dashboard-tile { background: #fff; border-radius: var(--radius-card); box-shadow: var(--shadow-1); overflow: hidden; display: flex; flex-direction: column; min-height: 0; }
+.dashboard-tile__header { padding: 14px 18px; border-bottom: 1px solid var(--g-300); flex: none; }
+.dashboard-tile__header h3 { margin: 0; font-size: 1.05rem; color: var(--c-navy); }
+.dashboard-tile__body { background: var(--g-200); padding: 14px 18px; flex: 1; overflow-y: auto; min-height: 0; }
+.dashboard-tile__body.is-white { background: #fff; }
+.dashboard-tile__body .btn { margin-bottom: 10px; }
+.dashboard-tile__list { list-style: none; margin: 0; padding: 0; }
+.dashboard-tile__list li { display: flex; align-items: flex-start; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--g-300); font-size: 0.85rem; line-height: 1.5; }
+.dashboard-tile__list li:last-child { border-bottom: none; }
+.dashboard-tile__list .bullet { color: var(--c-primary); font-weight: 700; flex: none; }
+.dashboard-tile__list a, .welcome-links a, .feedback-link { color: var(--c-secondary); font-weight: 600; text-decoration: underline; }
+.dashboard-tile__list a:hover, .welcome-links a:hover, .feedback-link:hover { color: var(--c-secondary-hover); }
+.dashboard-tile__list .timestamp { color: var(--g-800); }
+
+/* Home page — a flex column so the top bar (auto height) and the two-column
+   layout below it (filling the rest) share space correctly; without this
+   wrapper, .home-main and .home-side started at different heights because
+   the top bar was pushing .home-main down inside its own column. */
+.home-page { display: flex; flex-direction: column; height: 100%; min-height: 0; }
+.home-layout { display: grid; grid-template-columns: 1fr 320px; gap: 20px; flex: 1; min-height: 0; }
+.home-main { display: flex; flex-direction: column; min-height: 0; overflow-y: auto; }
+.home-side { display: flex; flex-direction: column; gap: 20px; min-height: 0; }
+.home-side .dashboard-tile { min-height: 0; }
+.home-side .dashboard-tile.is-major { flex: 2; }
+.home-side .dashboard-tile.is-minor { flex: 1; }
+@media (max-width: 1000px) { .home-layout { grid-template-columns: 1fr; height: auto; } }
+
+.home-activity-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; min-height: 0; flex: 1; }
+.home-activity-grid .dashboard-tile { min-height: 0; }
+@media (max-width: 700px) { .home-activity-grid { grid-template-columns: 1fr; } }
+
+/* Recent Activity's title row, above the two-column layout, directly on the
+   teal canvas (hence .view-title.is-on-canvas). */
+.home-top-bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; flex: none; }
+.home-top-bar .view-title { margin: 0; }
+
+.welcome-links { list-style: none; margin: 0; padding: 0; background: #fff; }
+.welcome-links li { padding: 8px 0; font-size: 0.95rem; }
+.feedback-body { background: #fff; padding: 4px 0; font-size: 0.88rem; color: #3a3d42; line-height: 1.6; }
+
+.empty-state { text-align: center; padding: 60px 20px; color: var(--g-900); }
+
+.recipe-card, .app-card {
+  background: #fff; border-radius: var(--radius-card); box-shadow: var(--shadow-1);
+  padding: 16px 18px; display: flex; flex-direction: column; gap: 8px;
+}
+.recipe-card h3, .app-card h3 { margin: 0; font-size: 1.02rem; color: var(--c-navy); }
+.recipe-card p, .app-card p { margin: 0; font-size: 0.83rem; color: var(--g-900); flex: 1; }
+.recipe-card .meta, .app-card .meta { font-size: 0.75rem; color: var(--g-900); }
+.recipe-card .meta b, .app-card .meta b { color: var(--c-secondary-hover); font-weight: 600; }
+.card-actions { display: flex; gap: 8px; margin-top: 4px; flex-wrap: wrap; }
+
+/* Wraps a catalog-layout that also needs a tab bar above it (e.g. a recipe's
+   Compatible Data tab). The tab bar always renders at full width and the
+   exact same size as every other tab on that entity's page — only the
+   catalog-layout below it (filters + results) goes edge-to-edge. */
+.catalog-shell { display: flex; flex-direction: column; height: 100%; min-height: 0; }
+.catalog-shell__tabs { flex: none; background: #fff; padding: 24px 28px 0; }
+.catalog-shell .catalog-layout { flex: 1; min-height: 0; }
+
+/* Catalog-style cards (Recipes/Data/Apps browse pages in the real app):
+   white header row with a star toggle, a tinted body with stacked pink
+   pill actions, a plain footer with owner/license meta. */
+.catalog-layout {
+  display: grid; grid-template-columns: 260px 1fr; gap: 0; align-items: stretch;
+  height: 100%; min-height: 0;
+}
+@media (max-width: 900px) { .catalog-layout { grid-template-columns: 1fr; height: auto; } }
+.catalog-filters {
+  background: #fff; border-radius: 0; box-shadow: none;
+  border-right: 1px solid var(--g-300);
+  padding: 16px; overflow-y: auto; min-height: 0;
+}
+.catalog-results { padding: 24px 28px; overflow-y: auto; min-height: 0; }
+.catalog-results .view-title, .catalog-results .view-subtitle { max-width: none; }
+.catalog-filters .btn { width: 100%; justify-content: center; margin-bottom: 12px; }
+.filter-section { margin-top: 14px; }
+.filter-section__title {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 0.9rem; font-weight: 700; color: var(--c-navy);
+  padding: 6px 0; border-bottom: 1px solid var(--g-300);
+}
+.facet { border-bottom: 1px solid var(--g-300); }
+.facet__header {
+  width: 100%; display: flex; align-items: center; justify-content: space-between;
+  background: none; border: none; padding: 10px 2px; font-size: 0.85rem; color: var(--c-navy);
+  text-align: left;
+}
+.facet__header svg { color: var(--g-800); }
+.facet__header > svg { transition: transform 0.15s ease; }
+.facet.is-open .facet__header > svg { transform: rotate(180deg); }
+.facet__options { display: none; flex-direction: column; gap: 6px; padding: 0 2px 12px; font-size: 0.82rem; }
+.facet.is-open .facet__options { display: flex; }
+.facet__options input { accent-color: var(--c-primary); flex: none; }
+.facet__option { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.facet__option-label { flex: 1; }
+.facet__count { font-size: 0.72rem; color: var(--g-800); background: var(--g-200); border-radius: 8px; padding: 1px 7px; flex: none; }
+.facet__empty { font-size: 0.78rem; color: var(--g-800); margin: 4px 0; }
+
+/* Small dot on a facet's label when it has an active selection — whether the
+   user picked it or it was pre-set (e.g. a recipe's required data format). */
+.facet__header span:first-child { display: inline-flex; align-items: center; gap: 6px; }
+.facet__dot { width: 7px; height: 7px; border-radius: 50%; background: var(--c-secondary); display: inline-block; }
+
+/* Small "?" help balloon trigger (e.g. next to an execution pattern) — the
+   bubble itself is a single shared element positioned in JS (position:fixed)
+   so it can't get clipped by a scrolling ancestor like the filter sidebar. */
+.help-tip { display: inline-flex; align-items: center; margin-left: 5px; color: var(--g-800); cursor: help; vertical-align: middle; }
+.help-tip:hover, .help-tip:focus { color: var(--c-primary-dark); outline: none; }
+.help-tip svg { display: block; width: 14px; height: 14px; }
+.help-tip-bubble {
+  display: none; position: fixed; z-index: 300; max-width: 260px;
+  background: var(--c-navy); color: #fff; font-size: 0.76rem; font-weight: 400;
+  line-height: 1.5; padding: 10px 12px; border-radius: 6px; box-shadow: var(--shadow-2);
+  text-transform: none; letter-spacing: normal;
+}
+
+.facet__search { margin-bottom: 6px; }
+.facet__search input { padding: 6px 8px; font-size: 0.78rem; max-width: none; }
+
+.catalog-card { background: #fff; border-radius: var(--radius-card); box-shadow: var(--shadow-1); overflow: hidden; }
+.catalog-card__header { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; padding: 14px 16px 10px; }
+.catalog-card__header h3 { margin: 0; font-size: 1.02rem; }
+.catalog-card__header h3 a { color: var(--c-navy); }
+.star-toggle { background: none; border: none; padding: 2px; color: var(--c-secondary); flex: none; }
+.star-toggle svg { display: block; }
+.star-toggle:not(.is-fav) svg { fill: none; stroke: var(--c-secondary); stroke-width: 1.6; }
+.catalog-card__body { background: var(--c-card-tint); padding: 14px 16px; min-height: 60px; display: flex; align-items: stretch; gap: 14px; }
+.catalog-card__body p { margin: 0; font-size: 0.85rem; color: #3a3d42; flex: 1; }
+.catalog-card__side { display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; gap: 10px; margin-left: auto; flex: none; }
+.catalog-card__actions { display: flex; flex-direction: column; gap: 8px; margin-left: auto; }
+.app-logo { width: 64px; height: 64px; border-radius: 8px; flex: none; }
+.catalog-card__resources { display: flex; flex-wrap: wrap; gap: 6px; padding: 12px 16px; }
+.catalog-card__footer { padding: 10px 16px 14px; font-size: 0.78rem; color: var(--g-900); display: flex; gap: 18px; flex-wrap: wrap; }
+.catalog-card__footer b { color: var(--c-secondary-hover); font-weight: 600; }
+
+/* Participants-style data table */
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+.data-table th {
+  text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--g-300);
+  color: var(--g-900); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.02em;
+}
+.data-table td { padding: 10px 12px; border-bottom: 1px solid var(--g-200); vertical-align: middle; }
+.data-table tbody tr:hover td { background: var(--g-100); }
+.avatar {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 50%; background: var(--c-primary);
+  color: #fff; font-size: 0.68rem; font-weight: 700; margin-right: 10px; vertical-align: middle;
+}
+.kebab-btn { background: none; border: none; color: var(--g-800); font-size: 1.2rem; padding: 4px 8px; line-height: 1; }
+
+/* Hero welcome panel (e.g. Hubs page with no hub selected yet) */
+.hero-welcome {
+  height: 100%; display: flex; align-items: center; justify-content: center; text-align: center;
+  background: url("../assets/hubs-welcome-bg.svg") center/cover no-repeat, var(--c-canvas);
+  padding: 40px; overflow-y: auto;
+}
+.hero-welcome__inner { max-width: 720px; color: #fff; }
+.hero-welcome__inner p { font-size: 1.15rem; font-weight: 700; line-height: 1.7; margin: 0 0 18px; text-shadow: 0 1px 3px rgba(0,0,0,0.25); }
+.hero-welcome__inner p:first-child { font-size: 1.4rem; }
+
+.notice-banner {
+  background: #fdeadc; color: #7a4a0d; border: 1px solid #f4cfa0;
+  border-radius: 6px; padding: 10px 14px; font-size: 0.8rem; margin-bottom: 18px;
+}
+
+.crumbs { font-size: 0.78rem; color: var(--g-900); margin-bottom: 6px; }
+.crumbs a { color: var(--c-primary-dark); }
+
+.toast {
+  position: fixed; bottom: 20px; right: 20px; background: var(--c-navy); color: #fff;
+  padding: 10px 16px; border-radius: 6px; font-size: 0.82rem; box-shadow: var(--shadow-2);
+  opacity: 0; transform: translateY(8px); transition: all 0.2s ease; z-index: 50;
+}
+.toast.is-visible { opacity: 1; transform: translateY(0); }
+
+/* ---------------------------------------------------------------------- */
+/* Recipe Wizard — one step frame at a time + a persistent cart on the right. */
+/* ---------------------------------------------------------------------- */
+.wizard-layout { display: flex; gap: 18px; align-items: flex-start; }
+.wizard-main { flex: 1; min-width: 0; }
+@media (max-width: 900px) {
+  .wizard-layout { flex-direction: column; }
+}
+
+.wizard-stepper { display: flex; align-items: flex-start; margin-bottom: 20px; }
+.wizard-stepper__step { position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.wizard-stepper__step.is-reachable { cursor: pointer; }
+.wizard-stepper__line { position: absolute; top: 12px; left: -50%; width: 100%; height: 3px; background: var(--g-500); z-index: 0; }
+.wizard-stepper__step:first-child .wizard-stepper__line { display: none; }
+.wizard-stepper__dot {
+  width: 26px; height: 26px; border-radius: 50%; background: #fff; border: 3px solid var(--g-500);
+  display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.76rem;
+  color: var(--g-800); z-index: 1;
+}
+.wizard-stepper__label { margin-top: 8px; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.02em; color: var(--g-800); font-weight: 600; max-width: 150px; }
+.wizard-stepper__step.is-complete .wizard-stepper__dot { background: var(--c-success); border-color: var(--c-success); color: #fff; }
+.wizard-stepper__step.is-complete .wizard-stepper__label { color: #177a73; }
+.wizard-stepper__step.is-current .wizard-stepper__dot { border-color: var(--c-secondary); background: var(--c-secondary); color: #fff; box-shadow: 0 0 0 4px rgba(199, 72, 125, 0.22); }
+.wizard-stepper__step.is-current .wizard-stepper__label { color: var(--c-secondary-hover); font-weight: 700; }
+
+.wizard-step { background: none; box-shadow: none; padding: 0; }
+.wizard-step__title { font-size: 1.05rem; font-weight: 700; color: var(--c-navy); margin: 0 0 8px; }
+.wizard-step__hint { font-size: 0.85rem; color: var(--g-900); margin: 0 0 18px; }
+/* Marks where the step's header ends and the actual selection controls
+   begin (the step has no bordered box of its own). */
+.wizard-step .wizard-step__hint { padding-bottom: 16px; margin-bottom: 20px; border-bottom: 1px solid var(--g-400); }
+
+.wizard-step-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--g-300); }
+.wizard-step-nav__hint { font-size: 0.78rem; color: var(--g-800); font-style: italic; }
+
+/* Every control still missing a required decision gets a red frame plus an
+   inline warning line, right where the decision needs to be made — visible
+   immediately, no click required, and it's what actually blocks Next/Finish
+   (see isSlotDataResolved / isStepDone). Amber "pending" is one tier softer:
+   a decision has been made (partner engaged, or handled outside the
+   platform) but no real resource is registered yet, so Next stays open —
+   only Review & Deploy is blocked (see slotPendingReason). */
+.wizard-missing-hint { color: var(--c-error); font-size: 0.78rem; font-weight: 700; margin: 6px 0 10px; }
+.wizard-slot.is-missing { border-color: var(--c-error); background: #fff6f4; }
+.wizard-slot.is-pending { border-color: var(--c-warning); background: #fffaf0; }
+.wizard-ingredient.is-missing { box-shadow: inset 3px 0 0 0 var(--c-error); padding-left: 12px; background: #fff6f4; }
+.wizard-ingredient.is-pending { box-shadow: inset 3px 0 0 0 var(--c-warning); padding-left: 12px; background: #fffaf0; }
+.wizard-app-option.is-missing { box-shadow: inset 3px 0 0 0 var(--c-error); padding-left: 12px; background: #fff6f4; }
+select.is-missing, textarea.is-missing { border: 1px solid var(--c-error); outline: 1px solid var(--c-error); }
+
+/* "Deploy Recipe" in-flight state (#live-run-output while the Cook
+   Orchestrator request is out) — a small branded progress card, not a bare
+   line of text, so a real network round-trip reads as active work in
+   progress rather than a stalled page. */
+.deploy-progress { display: flex; align-items: center; gap: 14px; background: #fff; border: 1px solid var(--g-300); border-radius: var(--radius-card); box-shadow: var(--shadow-1); padding: 16px 18px; margin-bottom: 18px; }
+/* A soft comet-trail ring (conic-gradient faded via a radial mask) instead of
+   a hard-edged border spinner, plus a gentle breathing scale/opacity pulse —
+   reads as calm, alive work-in-progress rather than a mechanical loader.
+   `rotate`/`scale` are the individual CSS transform properties, not
+   `transform` itself, so the two animations can drive them independently
+   without one clobbering the other. */
+.deploy-progress__ring {
+  width: 28px;
+  height: 28px;
+  flex: none;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, transparent 0deg, var(--c-primary-light) 110deg, var(--c-primary) 320deg, transparent 360deg);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+  animation: deploy-spin 1.1s linear infinite, deploy-pulse 1.8s ease-in-out infinite;
+}
+@keyframes deploy-spin { to { rotate: 360deg; } }
+@keyframes deploy-pulse { 0%, 100% { scale: 0.9; opacity: 0.65; } 50% { scale: 1.05; opacity: 1; } }
+.deploy-progress__body { flex: 1; min-width: 0; }
+.deploy-progress__title { font-weight: 700; color: var(--c-navy); font-size: 0.9rem; }
+.deploy-progress__subtitle { font-size: 0.8rem; color: var(--g-900); margin-top: 2px; }
+
+/* A border-bottom + :last-child override would look right for a plain list,
+   but every one of these steps renders its ingredient(s) as a sibling of the
+   step-nav bar (Next/Back), not as the div's true last child — so
+   :last-child never actually matched and the "last" ingredient kept its
+   border, producing a second rule right above Next. Attaching the separator
+   to the following ingredient instead sidesteps that entirely: it only
+   appears between two real ingredients, never after the last one regardless
+   of what (if anything) follows it in the DOM. */
+.wizard-ingredient { padding-bottom: 16px; margin-bottom: 16px; }
+.wizard-ingredient + .wizard-ingredient { border-top: 1px solid var(--g-300); }
+.wizard-ingredient__title { font-size: 0.92rem; font-weight: 700; color: var(--c-navy); margin: 0 0 2px; display: flex; align-items: center; gap: 6px; }
+.wizard-ingredient__check { color: var(--c-primary); display: inline-flex; flex: none; }
+.wizard-ingredient.is-resolved .wizard-ingredient__title { color: var(--c-primary-dark); }
+.wizard-ingredient__hint { font-size: 0.78rem; color: var(--g-900); margin: 0 0 8px; }
+
+/* Structured data requirements — recipe-wide protocols/constraints above the
+   ingredient list, and per-ingredient spatial feature bullets inline. */
+.wizard-requirements {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px;
+  background: var(--g-100); border: 1px solid var(--g-300); border-radius: 6px;
+  padding: 14px 16px; margin-bottom: 18px;
+}
+@media (max-width: 700px) { .wizard-requirements { grid-template-columns: 1fr; } }
+.wizard-requirements ul, .wizard-requirement-block ul { margin: 4px 0 0; padding-left: 18px; font-size: 0.8rem; color: #3a3d42; line-height: 1.5; }
+.wizard-requirements li, .wizard-requirement-block li { margin-bottom: 4px; }
+.wizard-requirement-block { margin: 0 0 10px; }
+
+/* "Data Input Required" — a numbered list of the specific sub-layers an
+   ingredient needs, each paired with its own format (not the ingredient's
+   single, sometimes vendor-specific, data_format) and a plain description. */
+.wizard-data-input-list { margin: 6px 0 0; padding-left: 20px; }
+.wizard-data-input-list li { margin-bottom: 10px; }
+.wizard-data-input-list li:last-child { margin-bottom: 0; }
+.wizard-data-input-list__name { font-weight: 700; font-size: 0.85rem; color: var(--c-navy); margin-right: 6px; }
+.wizard-data-input-list__desc { font-size: 0.8rem; color: #3a3d42; line-height: 1.5; margin-top: 2px; }
+
+/* Each required format is its own independent "slot" — it gets its own
+   have/cleanup/missing choice, boxed off so a mixed-state ingredient (e.g.
+   two slots ready, one still missing) stays easy to scan. */
+.wizard-slot { border: 1px solid var(--g-300); border-radius: 6px; padding: 12px 14px; margin-bottom: 12px !important; background: #fff; }
+.wizard-slot:last-child { margin-bottom: 0 !important; }
+.wizard-radio-body { padding: 4px 0 12px 24px; display: flex; flex-direction: column; gap: 12px; }
+.wizard-radio-body .field-label { margin-bottom: 6px; }
+.wizard-radio-body > .btn { align-self: flex-start; }
+
+.wizard-selected { background: var(--g-100); border: 1px solid var(--g-400); border-radius: 6px; padding: 8px 10px; font-size: 0.82rem; }
+.wizard-selected small { display: block; color: var(--g-800); margin-top: 4px; }
+.wizard-selected--slot { margin: 0 0 4px 24px; }
+
+/* Wizard Parameters step: one card per app (see recipeWizard.js's
+   parametersStepHtml), each listing the settings that app needs. */
+.param-list { display: flex; flex-direction: column; gap: 20px; margin-top: 16px; }
+.param-field { max-width: 520px; }
+.param-field__head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
+.param-field__title { font-size: 0.88rem; font-weight: 600; color: var(--c-navy); }
+.param-field__name { font-size: 0.72rem; color: var(--g-900); background: var(--g-200); border-radius: 4px; padding: 1px 6px; }
+.param-chip { font-size: 0.7rem; font-weight: 600; padding: 1px 8px; border-radius: 999px; background: rgba(47, 161, 194, 0.12); color: var(--c-primary-dark); white-space: nowrap; }
+.param-chip.is-required { background: rgba(255, 55, 12, 0.1); color: #b3261e; }
+.param-chip.is-optional { background: var(--g-200); color: var(--g-900); }
+.param-field input[type="text"], .param-field input[type="number"], .param-field textarea { max-width: 100%; }
+.param-field__help { margin: 6px 0 0; font-size: 0.78rem; color: var(--g-900); line-height: 1.5; }
+.param-field__help b { color: #3a3d42; }
+/* "Definition" / "Process description" links to the app's own OGC API Process
+   description — small, so they inform without competing with the fields. */
+.param-field__source { display: inline-flex; align-items: center; gap: 3px; font-size: 0.72rem; font-weight: 600; color: var(--c-primary-dark); text-decoration: none; white-space: nowrap; }
+.param-field__source:hover { text-decoration: underline; color: var(--c-primary-hover); }
+.param-field__head .param-field__source { margin-left: auto; }
+.wizard-app-option .param-field__source { flex: none; }
+/* Read-only value on the Status tab. */
+.param-field__value { display: block; font-size: 0.9rem; color: #23262b; padding: 6px 10px; background: var(--g-100); border: 1px solid var(--g-300); border-radius: 4px; }
+.param-field__value.is-missing { color: #b3261e; background: #fff6f4; border-color: rgba(255, 55, 12, 0.3); }
+.param-field__value.is-empty { color: var(--g-900); }
+.param-field__value-note { font-size: 0.72rem; color: var(--g-900); margin-left: 6px; }
+
+.wizard-app-option { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--g-300); }
+.wizard-app-option:last-child { border-bottom: none; }
+.wizard-app-option img { width: 36px; height: 36px; border-radius: 6px; flex: none; object-fit: contain; background: var(--g-100); }
+.wizard-app-option__info { flex: 1; min-width: 0; }
+.wizard-app-option__info b { font-size: 0.88rem; color: var(--c-navy); }
+.wizard-app-option__info a { font-size: 0.88rem; color: var(--c-navy); font-weight: 700; }
+.wizard-app-option__info a:hover { color: var(--c-primary-dark); }
+
+/* Step 3's Data Destination / Visualization Experience cards — same stacked,
+   separated-by-rule look as the Step 1 ingredient cards. */
+/* Same fix as .wizard-ingredient above, same reason: this card is a sibling
+   of the step-nav bar, not its parent's true last child, so :last-child
+   never matched it. */
+.wizard-output-card { padding-bottom: 18px; margin-bottom: 18px; }
+.wizard-output-card + .wizard-output-card { border-top: 1px solid var(--g-300); }
+.wizard-output-card__title { font-size: 0.95rem; font-weight: 700; color: var(--c-navy); margin: 0 0 14px; }
+/* A destination fixed for the testbed: still reads as a dropdown (its text
+   at full strength, its arrow), just visibly not changeable. */
+.wizard-output-card select[aria-disabled="true"] { color: #23262b; background-color: var(--g-200); opacity: 1; cursor: not-allowed; }
+
+/* Tinted like .pricing-tile (the "Get Started" panel that launches this
+   wizard from Recipe Details) rather than boxed with a shadow — the color is
+   what sets it apart from the plain step area beside it now, not a border. */
+.wizard-cart {
+  flex: none; width: 320px;
+  background: #e6f5f8; border-top: 5px solid var(--c-navy);
+  border-radius: 4px; box-shadow: none; padding: 16px 18px;
+  position: sticky; top: 0;
+}
+@media (max-width: 900px) {
+  .wizard-cart { width: auto; }
+}
+.wizard-cart__title { display: flex; align-items: center; gap: 8px; font-size: 1.05rem; font-weight: 700; color: var(--c-navy); margin: 0 0 6px; }
+.wizard-cart__title svg { flex: none; }
+.wizard-cart__line { padding: 10px 0; border-bottom: 1px solid rgba(33, 41, 59, 0.15); }
+/* The total already has its own border-top separator right after — without
+   this, the last line's border-bottom sits right alongside it, reading as
+   two redundant divider lines (most obvious with just one line in the cart). */
+.wizard-cart__line:has(+ .wizard-cart__total) { border-bottom: none; }
+.wizard-cart__line-top { display: flex; justify-content: space-between; gap: 10px; font-size: 0.85rem; font-weight: 600; color: #23262b; }
+.wizard-cart__line-sub { font-size: 0.74rem; color: var(--g-800); margin-top: 2px; }
+.wizard-cart__total { display: flex; justify-content: space-between; font-size: 1rem; font-weight: 700; color: var(--c-navy); margin-top: 16px; padding-top: 14px; border-top: 2px solid rgba(33, 41, 59, 0.25); }
+
+/* ---------------------------------------------------------------------- */
+/* Generic modal overlay — used by the wizard's "Select Resources" popup.  */
+/* ---------------------------------------------------------------------- */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(20, 25, 35, 0.55);
+  display: flex; align-items: center; justify-content: center; z-index: 100; padding: 30px;
+}
+.modal-panel {
+  background: #fff; border-radius: var(--radius-card); box-shadow: var(--shadow-2);
+  width: min(1100px, 100%); max-height: 85vh; display: flex; flex-direction: column; overflow: hidden;
+}
+.modal-panel__header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid var(--g-300); flex: none; }
+.modal-panel__header h2 { margin: 0; font-size: 1.15rem; color: var(--c-navy); }
+.modal-panel__close { background: none; border: none; color: var(--g-800); cursor: pointer; padding: 4px; }
+.modal-panel__close:hover { color: var(--c-navy); }
+.modal-panel__body { display: flex; flex: 1; min-height: 0; }
+.modal-panel__filters { width: 260px; flex: none; border-right: 1px solid var(--g-300); padding: 16px; overflow-y: auto; }
+.modal-panel__filters .search-box { margin-bottom: 14px; }
+.modal-panel__results { flex: 1; min-width: 0; overflow-y: auto; }
+.modal-panel__footer { display: flex; justify-content: flex-end; gap: 10px; padding: 14px 24px; border-top: 1px solid var(--g-300); flex: none; }
+
+/* Layer list beside the map in a hub dataset's Preview (hubPreview.js): one
+   row per saved result — recipe name as the title, date and time under it. */
+.hub-layers { width: 270px; flex: none; overflow-y: auto; padding: 16px 12px; border-right: 1px solid var(--g-300); box-sizing: border-box; }
+.hub-layers__heading { display: flex; align-items: baseline; justify-content: space-between; padding: 0 6px 10px; }
+.hub-layers__heading h3 { margin: 0; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--g-900); }
+.hub-layers__count { font-size: 0.75rem; color: var(--g-800); }
+.hub-layer { display: flex; align-items: center; gap: 8px; padding: 8px 6px; border-radius: 6px; transition: background 0.15s; }
+.hub-layer + .hub-layer { margin-top: 2px; }
+.hub-layer:hover { background: var(--g-200); }
+.hub-layer.is-hidden .hub-layer__label { opacity: 0.5; }
+.hub-layer__label { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.hub-layer__label input { margin: 0; flex: none; }
+.hub-layer__swatch { width: 10px; height: 10px; border-radius: 50%; flex: none; box-shadow: 0 0 0 2px #fff, 0 0 0 3px rgba(0, 0, 0, 0.08); }
+.hub-layer__text { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.hub-layer__title { font-size: 0.9rem; font-weight: 600; color: var(--c-navy); line-height: 1.25; overflow-wrap: anywhere; }
+.hub-layer__meta { display: flex; gap: 10px; font-size: 0.75rem; color: var(--g-900); font-variant-numeric: tabular-nums; }
+.hub-layer__zoom {
+  flex: none; width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center;
+  background: none; border: 1px solid transparent; border-radius: 6px; color: var(--c-primary-dark); cursor: pointer;
+}
+.hub-layer__zoom svg { width: 16px; height: 16px; }
+.hub-layer__zoom:hover { background: #fff; border-color: var(--g-400); }
+.hub-layer__zoom:focus-visible { outline: 2px solid var(--c-primary); outline-offset: 1px; }
+/* "Are you sure?" dialog for destructive actions (hubPreview.js's confirmDialog). */
+.confirm-dialog { width: min(440px, 100%); }
+.confirm-dialog__body { display: flex; gap: 14px; padding: 22px 24px 18px; }
+.confirm-dialog__icon {
+  flex: none; width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
+  background: rgba(255, 55, 12, 0.1); color: var(--c-error);
+}
+.confirm-dialog__icon svg { width: 20px; height: 20px; }
+.confirm-dialog h2 { margin: 2px 0 6px; font-size: 1.05rem; color: var(--c-navy); }
+.confirm-dialog p { margin: 0; font-size: 0.9rem; line-height: 1.45; color: var(--g-900); }
+.confirm-dialog__body > div { min-width: 0; flex: 1; }
+.confirm-dialog__list {
+  list-style: none; margin: 12px 0 0; padding: 4px 0; max-height: 240px; overflow-y: auto;
+  border: 1px solid var(--g-300); border-radius: 6px; background: var(--g-100);
+}
+.confirm-dialog__list li { display: flex; flex-direction: column; gap: 1px; padding: 6px 12px; }
+.confirm-dialog__list li + li { border-top: 1px solid var(--g-300); }
+.confirm-dialog__more { font-size: 0.8rem; color: var(--g-900); }
+.confirm-dialog__danger { background: var(--c-error); border-color: var(--c-error); color: #fff; }
+.confirm-dialog__danger:hover { background: #d92d08; border-color: #d92d08; }
+.hub-layer-popup { display: flex; flex-direction: column; gap: 2px; font-family: var(--font); }
+.hub-layer-popup__details { display: flex; flex-direction: column; gap: 1px; margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--g-300, #ddd); font-size: 0.8rem; }
+.hub-layer__zoom[aria-disabled="true"] { color: var(--g-700); opacity: 0.45; cursor: not-allowed; background: none; border-color: transparent; }
+
+/* Dataset ▸ resource tree inside the Select Resources popup — a dataset
+   name as a parent row, with its selectable resources indented underneath. */
+.resource-tree { font-size: 0.85rem; }
+.resource-tree__header {
+  display: grid; grid-template-columns: 1fr 140px 200px; gap: 10px;
+  background: #fff; color: var(--g-900); padding: 10px 16px;
+  border-bottom: 1px solid var(--g-300);
+  font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em;
+  position: sticky; top: 0; z-index: 1;
+}
+.resource-tree__group { border-bottom: 1px solid var(--g-200); }
+.resource-tree__parent {
+  width: 100%; display: grid; grid-template-columns: 1fr 140px 200px; gap: 10px; align-items: center;
+  background: var(--g-200); border: none; padding: 10px 16px;
+  font-size: 0.85rem; font-weight: 700; color: var(--c-navy); text-align: left; cursor: pointer;
+}
+.resource-tree__parent-name { display: flex; align-items: center; gap: 8px; }
+.resource-tree__parent svg { flex: none; color: var(--g-800); }
+.resource-tree__parent-owner { font-size: 0.8rem; font-weight: 600; color: var(--g-900); }
+.resource-tree__child {
+  display: grid; grid-template-columns: 1fr 140px 200px; gap: 10px; align-items: center;
+  padding: 10px 16px 10px 40px; border-top: 1px solid var(--g-200);
+}
+label.resource-tree__child { cursor: pointer; }
+.resource-tree__child:hover { background: var(--g-100); }
+.resource-tree__child:has(input:checked) { background: var(--c-card-tint); }
+.resource-tree__child-name { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.resource-tree__child-name input { accent-color: var(--c-primary); flex: none; }
+/* One resource row can offer more than one slot to assign into (e.g. when
+   flagging cleanup data with no format filter) — each gets its own small
+   labeled radio so it's clear which requirement it would fill. */
+.resource-tree__slot-pick { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; }
+.resource-tree__slot-pick input:disabled { opacity: 0.4; cursor: not-allowed; }
+.resource-tree__slot-pick-label { font-size: 0.66rem; color: var(--g-800); text-transform: uppercase; letter-spacing: 0.02em; }
