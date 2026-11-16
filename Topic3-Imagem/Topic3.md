@@ -57,9 +57,9 @@ _Figure 4: A process result added to the map as a layer_
 
 ### Client implementation video
 
-<video controls src="videos/IMAGEM-TESTBED-2026-TEXT.mp4" width="100%">
-  Your browser does not support embedded videos.
-</video>
+[IMAGEM Testbed 2026 - Text version](https://github.com/wagenvoort-imagem/DTaaS-Testbed2026-Phase2/blob/IMAGEM-topic-3-report/Topic3-Imagem/videos/IMAGEM-TESTBED-2026-TEXT.mp4)
+
+[IMAGEM Testbed 2026 - Plain version](https://github.com/wagenvoort-imagem/DTaaS-Testbed2026-Phase2/blob/IMAGEM-topic-3-report/Topic3-Imagem/videos/IMAGEM-TESTBED-2026-PLAIN.mp4)
 
 ## Findings
 
