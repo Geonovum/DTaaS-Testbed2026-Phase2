@@ -6,8 +6,7 @@ Implement an OGC API Processes client, make it function within the nLDT ecosyste
 
 ## **Approach**
 
-For IMAGEM, the approach was to continue to build on the progress made in the previous testbeds (2024 & 2025). In these testbeds, first explorations were done to work with OGC API Processes. Where it all  
-started as a static implementation of OGC API Processes, a more complete implementation of the OGC API Processes (v2) was the aim for this testbed.
+For IMAGEM, the approach was to continue to build on the progress made in the previous testbeds (2024 & 2025). In these testbeds, first explorations were done to work with OGC API Processes. Where it all started as a static implementation of OGC API Processes, a more complete implementation of the OGC API Processes (v2) was the aim for this testbed.
 
 In this approach, some new features of the OGC API Processes were tested and implemented in the Digital Twin client (Planspace Simulator). On one side this meant an attempt to create a user interface based on the input and output descriptions of the OGC API Processes provided during this testbed. On the other hand a Job Management System had to be implemented to track the Async processes of this testbed (In previous testbeds, only Sync processes were part of the Adoption topics).
 
