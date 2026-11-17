@@ -1,11 +1,3 @@
-# Topic 2: Complete and validate an existing OGC API Processes service
-
-## Goal 
-
-Complete an existing API Processes implementation, ensure its functionality within the nLDT ecosystem, and enable interoperability with third-party software.
-
----
-
 # From WPS to OGC API - Processes: the MapMint routing service on ZOO-Project-DRU
 
 Geonovum Testbed 2026, phase 2. Adoption topic #2: Complete and validate an existing OGC API Processes service
