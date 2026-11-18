@@ -24,7 +24,14 @@ var documentConfig =
       name: "Niels Hoffmann",
       company: "Geonovum",
       companyURL: "https://www.geonovum.nl/"
-    }
+    },
+    {name: "uCrowds"},
+    {name: "Annivizion"},
+    {name: "The People Group"},
+    {name: "Collaboral"},
+    {name: "Varidian"},
+    {name: "Future Insight"},
+
   ],
   editors: [
     {
