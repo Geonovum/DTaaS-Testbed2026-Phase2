@@ -48,18 +48,18 @@ Our main findings and advice:
 
 We built a working, end-to-end App Store for recipes: a catalogue (OGC API Records over CKAN), a Cookbook Registry, a Cook that is itself an OGC API Process, and a web client. Recipes are written in CWL v1.2 and executed against our own processes and external testbed processes (roofer, Geolabs ZOO-Project, Varidian).
 
-Our main conclusion: **CWL works as a recipe format, but not unextended.** CWL describes ingredients, order and wiring well. It cannot say where a step's OGC API Process lives, which alternative processes a hub may use, or describe process inputs as precisely as JSON Schema does. We added three small extension fields in a declared `nldt:` namespace to close those gaps; with them, all five bundled recipes pass the reference validator, `cwltool --validate`.
+Our main conclusion: **CWL works as a recipe format, but not unextended.** CWL describes ingredients, order and wiring well. It cannot say where a step's OGC API Process lives, which alternative processes a hub may use, or describe process inputs as precisely as JSON Schema does. We added three small extension fields in a declared nldt: namespace to close those gaps; with them, all five bundled recipes pass the reference validator, cwltool --validate.
 
 Other key findings:
 
-* CWL's abstract `Operation` step maps one-to-one onto a remote OGC API Process.  
-* CWL's own `File` \+ `format` cleanly separates data ingredients from parameters, and maps onto OGC by-reference (`href`) inputs.  
-* OGC API Processes descriptions do not say machine-readably which inputs are datasets, so the recipe must declare it.  
-* Asynchronous execution with job polling is mandatory in practice for long-running processes.  
-* DCAT-AP-NL has no recipe concept yet; proposing the extension is the main open research item.  
-* Writing CWL by hand is hard for non-specialists; a guided editor is essential.  
-* Every part of the stack works from one plan: the Cookbook Registry turns a recipe into a DAG, and the editor, catalogue, Wizard, Status tab and Cook all ask it for that plan instead of reading the CWL themselves.  
-* An OGC API Process description already carries most of what a user needs to fill in a parameter (title, description, default, limits); the Wizard reads it when it shows the form, so recipes need not copy it.
+- CWL's abstract Operation step maps one-to-one onto a remote OGC API Process.
+- CWL's own File + format cleanly separates data ingredients from parameters, and maps onto OGC by-reference (href) inputs.
+- OGC API Processes descriptions do not say machine-readably which inputs are datasets, so the recipe must declare it.
+- Asynchronous execution with job polling is mandatory in practice for long-running processes.
+- DCAT-AP-NL has no recipe concept yet; proposing the extension is the main open research item.
+- Writing CWL by hand is hard for non-specialists; a guided editor is essential.
+- Every part of the stack works from one plan: the Cookbook Registry turns a recipe into a DAG, and the editor, catalogue, Wizard, Status tab and Cook all ask it for that plan instead of reading the CWL themselves.
+- An OGC API Process description already carries most of what a user needs to fill in a parameter (title, description, default, limits); the Wizard reads it when it shows the form, so recipes need not copy it.
 
 ## Research topic #4: Varidian
 
