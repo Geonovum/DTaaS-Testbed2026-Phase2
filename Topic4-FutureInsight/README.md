@@ -1,6 +1,6 @@
 # nLDT Sandbox Stack — Geonovum Testbed 2026, Research Topic #4: App-Store / Recipes
 
-> - **Final report:** [PDF](NLDT-TB2%20Final%20Report.pdf) · [Markdown](NLDT-TB2%20Final%20Report.md)
+> - **Final report:** [PDF](NLDT-TB2%20Final%20Report.pdf) · [Markdown](report/NLDT-TB2%20Final%20Report.md)
 > - **Demo video:** [`future_insight_demo.mp4`](future_insight_demo.mp4)
 
 This repository contains the software built for **Research topic #4 "App-Store / Recipes"** of
@@ -478,7 +478,7 @@ docker compose -f docker-compose.yml -f docker-compose.gateway.yml up -d --build
 ├── DECISIONS.md                 dated log of every architecture/scope decision
 ├── LICENSE                      licence of the code (EUPL-1.2)
 ├── NLDT-TB2 Final Report.pdf    the written testbed report
-├── NLDT-TB2 Final Report.md     the same report, as Markdown
+├── report/                      the same report as Markdown, with its images
 ├── future_insight_demo.mp4      demo video
 ├── docker-compose.yml           the whole stack, one port per service
 ├── docker-compose.gateway.yml   overlay: single-origin nginx gateway (TLS/Cloudflare)
