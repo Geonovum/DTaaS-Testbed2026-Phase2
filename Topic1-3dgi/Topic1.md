@@ -23,6 +23,8 @@ There are two versions of the Roofer Online processes API.
 | Execution      | Synchronous and asynchronous                                                  | Asynchronous only                                                               |
 | Testbed status | Tested                                                                        | Not tested because authentication is required                                   |
 
+The reusable components and v1 implementation are public on GitHub, with Apache-2.0 licence: https://github.com/3DGI/roofer-online-processes
+
 ## Roofer Online
 
 [Roofer Online](https://roofer-online.nl) is a web service for creating 3D building models from LAS/LAZ point clouds and BAG building polygons.
@@ -255,6 +257,20 @@ The runner treats failed or skipped tests as a failure. The run completed with *
 ```text
 OGC API - Processes ETS passed all 54 tests without skips. Report: artifacts/ogc-processes-ets.xml
 ```
+
+## Interoperability
+
+### Future Insight client
+
+During the first Plugfest, Future Insight successfully integrated the v1 demo API into their recipe orchestrator.
+The implementation succeeds in calling the v1 processes in order and passing the required input/output from one process to the next.
+
+### IMAGEM Planspace
+
+The IMAGEM Planspace client lists Roofer Online as one of the available OGC Processes API-s, with the three processes in the v1 and its input fields. 
+The screenshot below shows the reconstruction process.
+
+![imagem](images/imagem.png)
 
 ## Findings
 
