@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" width="960" height="560" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#444"/>
+    </marker>
+    <style>
+      .layer{font-size:13px;font-weight:bold;fill:#555;letter-spacing:1px}
+      .box{rx:8;ry:8;stroke-width:1.5}
+      .t{font-size:15px;font-weight:bold;fill:#1d1d1d}
+      .s{font-size:12px;fill:#333}
+      .e{font-size:11.5px;fill:#333;font-style:italic}
+      .ln{stroke:#444;stroke-width:1.6;fill:none;marker-end:url(#a)}
+    </style>
+  </defs>
+  <rect width="960" height="560" fill="#ffffff"/>
+
+  <!-- layer bands -->
+  <rect x="10" y="10" width="940" height="140" fill="#f3f6fb" rx="10"/>
+  <rect x="10" y="165" width="940" height="200" fill="#f4f9f3" rx="10"/>
+  <rect x="10" y="380" width="940" height="170" fill="#fbf7f0" rx="10"/>
+  <text class="layer" x="24" y="32">VISUALISATION / CLIENTS</text>
+  <text class="layer" x="24" y="187">PROCESSES — OGC API – Processes (ZOO-Project-DRU on Kubernetes)</text>
+  <text class="layer" x="24" y="402">DATA — Dutch open data (PDOK)</text>
+
+  <!-- clients -->
+  <rect class="box" x="120" y="45" width="300" height="90" fill="#dbe7f7" stroke="#4a78b5"/>
+  <text class="t" x="270" y="75" text-anchor="middle">NWB Route Explorer</text>
+  <text class="s" x="270" y="96" text-anchor="middle">GeoLabs demo application (/routing-ui/)</text>
+  <text class="s" x="270" y="114" text-anchor="middle">route + elevation profile on OSM</text>
+
+  <rect class="box" x="540" y="45" width="300" height="90" fill="#dbe7f7" stroke="#4a78b5"/>
+  <text class="t" x="690" y="75" text-anchor="middle">Breinstein client</text>
+  <text class="s" x="690" y="96" text-anchor="middle">third-party OGC API – Processes client</text>
+  <text class="s" x="690" y="114" text-anchor="middle">(Adoption topic #3) — displays the route</text>
+
+  <!-- processes -->
+  <rect class="box" x="60" y="205" width="840" height="40" fill="#e3f1df" stroke="#5a9a4c"/>
+  <text class="s" x="480" y="230" text-anchor="middle">https://host1.tb.geonovum.geolabs.fr/ogc-api/  —  Part 1: Core 1.0.0 · sync / async · job list · dismiss · callbacks</text>
+
+  <rect class="box" x="60" y="265" width="240" height="80" fill="#cfe8c8" stroke="#5a9a4c"/>
+  <text class="t" x="180" y="295" text-anchor="middle">routing</text>
+  <text class="s" x="180" y="315" text-anchor="middle">NWB shortest path (pgRouting)</text>
+  <text class="e" x="180" y="333" text-anchor="middle">→ GeoJSON route, EPSG:4326</text>
+
+  <rect class="box" x="360" y="265" width="240" height="80" fill="#cfe8c8" stroke="#5a9a4c"/>
+  <text class="t" x="480" y="295" text-anchor="middle">StageAHN</text>
+  <text class="s" x="480" y="315" text-anchor="middle">route → EPSG:28992,</text>
+  <text class="e" x="480" y="333" text-anchor="middle">fetch AHN4 dtm_05m subset</text>
+
+  <rect class="box" x="660" y="265" width="240" height="80" fill="#cfe8c8" stroke="#5a9a4c"/>
+  <text class="t" x="780" y="295" text-anchor="middle">GdalExtractProfile</text>
+  <text class="s" x="780" y="315" text-anchor="middle">sample elevation along route</text>
+  <text class="e" x="780" y="333" text-anchor="middle">→ elevation profile</text>
+
+  <path class="ln" d="M300,305 L358,305"/>
+  <path class="ln" d="M600,305 L658,305"/>
+
+  <!-- data -->
+  <rect class="box" x="60" y="420" width="380" height="115" fill="#f5e6cc" stroke="#b5873a"/>
+  <text class="t" x="250" y="447" text-anchor="middle">NWB road network (Rijkswaterstaat)</text>
+  <text class="s" x="250" y="468" text-anchor="middle">PDOK OGC API – Features, collection wegvakken</text>
+  <text class="s" x="250" y="487" text-anchor="middle">ogr2ogr (OAPIF) → PostGIS → pgr_createTopology</text>
+  <text class="e" x="250" y="507" text-anchor="middle">1,652,111 road segments · CC0 1.0</text>
+
+  <rect class="box" x="520" y="420" width="380" height="115" fill="#f5e6cc" stroke="#b5873a"/>
+  <text class="t" x="710" y="447" text-anchor="middle">AHN4 elevation model</text>
+  <text class="s" x="710" y="468" text-anchor="middle">PDOK WCS 2.0.1, coverage dtm_05m</text>
+  <text class="s" x="710" y="487" text-anchor="middle">0.5 m digital terrain model</text>
+  <text class="e" x="710" y="507" text-anchor="middle">subset requested on demand per route</text>
+
+  <!-- arrows clients -> API -->
+  <path class="ln" d="M270,135 L270,203"/>
+  <path class="ln" d="M690,135 L690,203"/>
+  <!-- data -> processes -->
+  <path class="ln" d="M180,418 L180,347"/>
+  <path class="ln" d="M600,418 L500,347"/>
+</svg>
