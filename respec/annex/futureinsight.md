@@ -1,12 +1,10 @@
-**Testbed 2026 Digital Twin as a Service (Phase 2)**
+# Topic 4: Future Insight
 
 **Research topic #4: App-Store / Recipes**
 
 **Final Report**
 
 Future Insight
-
-<nav id="toc"></nav>
 
 ## Summary {#summary}
 
@@ -25,7 +23,7 @@ Other key findings:
 - Every part of the stack works from one plan: the Cookbook Registry turns a recipe into a DAG, and the editor, catalogue, Wizard, Status tab and Cook all ask it for that plan instead of reading the CWL themselves.
 - An OGC API Process description already carries most of what a user needs to fill in a parameter (title, description, default, limits); the Wizard reads it when it shows the form, so recipes need not copy it.
 
-**Not finished:** DCAT-AP-NL recipe metadata is not implemented in the catalogue ([[[#recipe-metadata-in-dcat-ap-nl]]] sets out what a profile needs, based on what the testbed showed). Our OGC API Processes services were tested with OGC's official test suite, fixed where it found gaps, and re-tested on the live stack ([[[#plugfest-and-interoperability]]]).
+**Not finished:** DCAT-AP-NL recipe metadata is not implemented in the catalogue ([[#recipe-metadata-in-dcat-ap-nl](#recipe-metadata-in-dcat-ap-nl)] sets out what a profile needs, based on what the testbed showed). Our OGC API Processes services were tested with OGC's official test suite, fixed where it found gaps, and re-tested on the live stack ([[#plugfest-and-interoperability](#plugfest-and-interoperability)]).
 
 **Live client:** [fi-group.github.io/nldt-tb2](https://fi-group.github.io/nldt-tb2/)
 
@@ -40,7 +38,7 @@ The table maps each component the tender (§7.3) asks for to what we built.
 | **Tender task (§7.3)** | **What we built** | **Standard** |
 | --- | --- | --- |
 | Recipe | CWL Workflow; each step is an OGC API Process | CWL v1.2 + 3 nldt: extensions |
-| Recipe metadata in extended DCAT-AP-NL | Gap analysis and proposal ([[[#recipe-metadata-in-dcat-ap-nl]]]); not implemented | DCAT-AP-NL (open) |
+| Recipe metadata in extended DCAT-AP-NL | Gap analysis and proposal ([[#recipe-metadata-in-dcat-ap-nl](#recipe-metadata-in-dcat-ap-nl)]); not implemented | DCAT-AP-NL (open) |
 | Catalogue | Records Wrapper: OGC API Records façade over CKAN | OGC API Records Part 1: Core |
 | Cookbook | Cookbook Registry: stores CWL, derives input schema and DAG | Purpose-built REST |
 | Cook | Cook Orchestrator: itself an OGC API Process cook | OGC API Processes Part 1: Core 1.0 |
@@ -49,7 +47,7 @@ The table maps each component the tender (§7.3) asks for to what we built.
 
 The UI and its error messages call the Cookbook Registry "Cookbook API Registry"; both names mean the same service.
 
-**Out of scope:** authentication (of users, and of the apps a recipe calls), pricing, ownership and versioning of recipes, and production hardening. The stack is a sandbox ([[[#availability-licensing-and-running-the-stack]]]). [[[#findings]]] explains why authentication and pricing matter most for real use (findings 23–25).
+**Out of scope:** authentication (of users, and of the apps a recipe calls), pricing, ownership and versioning of recipes, and production hardening. The stack is a sandbox ([[#availability-licensing-and-running-the-stack](#availability-licensing-and-running-the-stack)]). [[#findings](#findings)] explains why authentication and pricing matter most for real use (findings 23–25).
 
 **Standards version.** The tender encourages OGC API Processes v2.0. We implement Part 1: Core 1.0 on the wire, because its conformance classes are stable. Chaining is done through CWL inside the Cook, not through Part 3 (Workflows) nested execution.
 
@@ -67,7 +65,7 @@ We proved the orchestration on a trivial recipe first, then moved to real geodat
 
 ![](media/image4.png)
 
-**Playground slots: the state at the time of writing.** The three playground slots were seeded for the plugfests, so participants could test their own processes in a recipe without our help. Anyone can open a playground recipe in the editor, change it and save it: there is no login, no ownership and no version history (_finding 21_). Saving overwrites the slot for everyone. The table above therefore describes the playground recipes _as they were when this report was written_. A reader who opens the live App Store later may find something else in these slots, or an earlier version. [[[#appendix-c]]] keeps all three as they were, in full and annotated.
+**Playground slots: the state at the time of writing.** The three playground slots were seeded for the plugfests, so participants could test their own processes in a recipe without our help. Anyone can open a playground recipe in the editor, change it and save it: there is no login, no ownership and no version history (_finding 21_). Saving overwrites the slot for everyone. The table above therefore describes the playground recipes _as they were when this report was written_. A reader who opens the live App Store later may find something else in these slots, or an earlier version. [[#appendix-c](#appendix-c)] keeps all three as they were, in full and annotated.
 
 Two things bring a playground slot back to a known state:
 
@@ -98,7 +96,7 @@ The stack is nine services of our own plus CKAN 2.11 (with its Postgres, Solr an
 | `ckan` (+ Postgres, Solr, Redis) | Not public: reached only through the Records Wrapper | CKAN 2.11, the real store behind the wrapper | CKAN Action API |
 | `gateway` | `https://nldt-tb2.clearly.app` | One origin: UI at `/`, services under `/api/*` | — |
 
-Every service and tool can be opened directly in a browser, and the whole solution can be tested without the UI ([[[#appendix-b]]] lists the endpoints, with examples). For example, the Cook's process description is at: <https://nldt-tb2.clearly.app/api/orchestrator/processes/cook>,
+Every service and tool can be opened directly in a browser, and the whole solution can be tested without the UI ([[#appendix-b](#appendix-b)] lists the endpoints, with examples). For example, the Cook's process description is at: <https://nldt-tb2.clearly.app/api/orchestrator/processes/cook>,
 
 and the buffer tool's at:
 
@@ -111,9 +109,9 @@ and the buffer tool's at:
 A run has five stages: find the recipe, bind it in the Wizard, start the cook job, execute the steps, and read the status and result.
 
 1. The client lists recipes from the Records Wrapper (`GET /collections/recipes/items`). Each record links to its CWL in the Cookbook Registry.
-2. The client asks the Registry for the recipe's input schema and DAG, lists matching Hub Datasets, and the user binds tools, data and parameters in the Recipe Wizard ([[[#the-recipe-wizard]]]).
+2. The client asks the Registry for the recipe's input schema and DAG, lists matching Hub Datasets, and the user binds tools, data and parameters in the Recipe Wizard ([[#the-recipe-wizard](#the-recipe-wizard)]).
 3. On the Status tab, Execute starts the cook process with `{recipeId, parameters, toolOverrides}`, asking for asynchronous execution, and gets a job back straight away.
-4. The Cook fetches the DAG from the Registry and executes each step in dependency order, independent steps in parallel, piping outputs into the next steps' inputs ([[[#what-happens-when-you-click-execute]]]).
+4. The Cook fetches the DAG from the Registry and executes each step in dependency order, independent steps in parallel, piping outputs into the next steps' inputs ([[#what-happens-when-you-click-execute](#what-happens-when-you-click-execute)]).
 5. The client polls `/jobs/{id}` every 2 seconds, showing each step's progress, then reads the result plus a per-step trace. The result is saved to Hub Datasets automatically.
 
 ### Design principle: one reader of the recipe, one plan for everyone {#design-principle}
@@ -122,7 +120,7 @@ A recipe is written once, as CWL, and then used in many places: the editor check
 
 So only the Cookbook Registry reads CWL. Everything else asks the Registry one question, "what is the plan for this recipe?", and gets back the same kind of answer: the recipe's **DAG** (directed acyclic graph) plus the JSON Schema of its inputs. Whether the reason for asking is to check a draft, explain the recipe to a person, draw a picture or run it, the answer is the same plan.
 
-**Why a DAG, and not the CWL itself?** CWL is written for people. Steps appear in whatever order the author wrote them, and the file carries labels, descriptions, comments and extension fields. The machine that runs a recipe needs something else: which step must wait for which, and where each input of each step comes from. For example, a step written _first_ in the file may need the output of a step written _second_. In CWL that dependency is only implied, by an input written as `x: add/sum` ("take output sum of step add"). In the DAG it is explicit: steps come in an order in which every step comes after the steps it depends on, and each input says whether it comes from a recipe input (`workflow_input`) or from another step's output (`step_output`). A cycle (two steps waiting for each other) cannot be put in such an order, so the Registry rejects it. [[[#what-the-dag-contains]]] shows the DAG's fields and an example.
+**Why a DAG, and not the CWL itself?** CWL is written for people. Steps appear in whatever order the author wrote them, and the file carries labels, descriptions, comments and extension fields. The machine that runs a recipe needs something else: which step must wait for which, and where each input of each step comes from. For example, a step written _first_ in the file may need the output of a step written _second_. In CWL that dependency is only implied, by an input written as `x: add/sum` ("take output sum of step add"). In the DAG it is explicit: steps come in an order in which every step comes after the steps it depends on, and each input says whether it comes from a recipe input (`workflow_input`) or from another step's output (`step_output`). A cycle (two steps waiting for each other) cannot be put in such an order, so the Registry rejects it. [[#what-the-dag-contains](#what-the-dag-contains)] shows the DAG's fields and an example.
 
 **Who asks for the plan, and when.** The Registry derives the DAG fresh on every request and never caches it, so every answer reflects the recipe as it is stored at that moment.
 
@@ -136,7 +134,7 @@ So only the Cookbook Registry reads CWL. Everything else asks the Registry one q
 | 6 | A hub on the Status tab | Opening the tab, right before Execute | `POST /recipes/{id}/effective` | Draw the graph, show the values that will be sent, block Execute while anything required is missing |
 | 7 | The Cook | **Execute** is clicked | `GET /recipes/{id}/dag`, or `POST …/effective` when the hub swapped an app | Run the steps in order, and know where each input comes from |
 
-"Effective" means the recipe with a hub's per-run app swaps applied ([[[#extensions-we-needed]]]), computed for that request and never stored. The Wizard, the Status tab and the Cook ask for the same effective plan, so what a hub sees is exactly what the Cook runs.
+"Effective" means the recipe with a hub's per-run app swaps applied ([[#extensions-we-needed](#extensions-we-needed)]), computed for that request and never stored. The Wizard, the Status tab and the Cook ask for the same effective plan, so what a hub sees is exactly what the Cook runs.
 
 **One exception, by design.** The editor's diagram and its guided builder read the CWL text in the browser, because their job is to edit that text line by line, including comments. They never decide what a recipe means: Validate and Save always go to the Registry.
 
@@ -175,7 +173,7 @@ CWL expressions are JavaScript; we never execute them. Four `valueFrom` forms ar
 
 CWL requires a recipe to declare the features it uses. A step input with `valueFrom` needs `StepInputExpressionRequirement`, and an expression that is real JavaScript, such as the map lines in the roofer recipe, also needs `InlineJavascriptRequirement`; a plain field path such as `$(self.model_3d_id)` does not.
 
-Neither the Registry nor the Cook reads these declarations: a recipe without them validates and runs the same in our stack. We declare them anyway, so that our recipes stay standard CWL: without them, `cwltool --validate` rejects a recipe that uses `valueFrom`. The Registry does not check for them either, another case of _finding 7_. Of the bundled recipes, only playground-1 (roofer) needs them ([[[#appendix-c]]]).
+Neither the Registry nor the Cook reads these declarations: a recipe without them validates and runs the same in our stack. We declare them anyway, so that our recipes stay standard CWL: without them, `cwltool --validate` rejects a recipe that uses `valueFrom`. The Registry does not check for them either, another case of _finding 7_. Of the bundled recipes, only playground-1 (roofer) needs them ([[#appendix-c](#appendix-c)]).
 
 The Registry checks structure and wiring, not types: it checks that every connection points at something that exists, but not that the value sent fits what the other end expects. The reference validator, `cwltool --validate`, does check this, and it caught a real mistake the Registry had accepted during the first Plugfest. In the roofer recipe (playground-1), the recipe input `formats` was declared as a list of fixed choices (a CWL enum: `gpkg` or `cityjson`), but the convert step declared the process input it feeds as a list of free text (`string[]`). For CWL those are different types, so the connection between them is invalid, even though roofer itself would have accepted the values. We fixed the step's declaration to the same list of fixed choices.
 
@@ -187,7 +185,7 @@ The Registry checks structure and wiring, not types: it checks that every connec
 | The Operation's `label` (under `run`) | `label: "Multiply two numbers"` | The app (OGC API Process) that does it | The app's name, everywhere: graphs, cards, the cost summary |
 | The Operation's `id` | `id: multiply-two-numbers` | The process identifier the Cook calls | Only where a technical id is useful |
 
-The split matters because a user may swap the app in a step ([[[#extensions-we-needed]]]). The step stays the same ("Step 2 — Multiply"), but the app changes ("Multiply three numbers"): the Registry rewrites the step's Operation, and with it its label. An early version of the UI showed whatever name was nearest at hand, so one step appeared as its key on one screen, its app on another, and the title from the remote process description on a third. Now the Registry passes the Operation's label to every client (`process_label` in the DAG), and every screen follows one rule:
+The split matters because a user may swap the app in a step ([[#extensions-we-needed](#extensions-we-needed)]). The step stays the same ("Step 2 — Multiply"), but the app changes ("Multiply three numbers"): the Registry rewrites the step's Operation, and with it its label. An early version of the UI showed whatever name was nearest at hand, so one step appeared as its key on one screen, its app on another, and the title from the remote process description on a third. Now the Registry passes the Operation's label to every client (`process_label` in the DAG), and every screen follows one rule:
 
 - **App name:** the Operation's label in the recipe; else the name of our own tool; else the title in the app's OGC API Process description; else its process id.
 - **Step name:** the step's label; else its key.
@@ -218,7 +216,7 @@ $namespaces:
 
 The second address exists because the Cook runs on the same private network as our own tools. Calling them there is direct: the request does not leave the server, and does not depend on the public gateway, its TLS certificate or the Cloudflare proxy in front of it. It is not a development shortcut; the deployed Cook uses it on every run.
 
-Still, it is a deployment detail that has leaked into the recipe. A recipe should say _which_ process a step uses, not how one particular installation reaches it: `http://tool-add:8000` means nothing to anyone reading the recipe, or to another cook running the same recipe elsewhere. A cleaner design keeps only the public `href` in the recipe and lets each cook map known public addresses to faster internal ones in its own configuration, the way it already does for data (`LOCATION_REWRITES`, [[[#data-inputs-vs-parameters]]]). We recommend that change ([[[#recommendations-and-future-work]]]).
+Still, it is a deployment detail that has leaked into the recipe. A recipe should say _which_ process a step uses, not how one particular installation reaches it: `http://tool-add:8000` means nothing to anyone reading the recipe, or to another cook running the same recipe elsewhere. A cleaner design keeps only the public `href` in the recipe and lets each cook map known public addresses to faster internal ones in its own configuration, the way it already does for data (`LOCATION_REWRITES`, [[#data-inputs-vs-parameters](#data-inputs-vs-parameters)]). We recommend that change ([[#recommendations-and-future-work](#recommendations-and-future-work)]).
 
 **From x- to nldt:.** Our first version used OpenAPI-style names: `x-process-link`, `x-compatible-tools`, `x-json-schema`. CWL allows extension fields only with a prefix declared in `$namespaces`, and `cwltool --validate` rejected every bundled recipe because it read the `x-` fields' contents as CWL. After renaming to a declared `nldt:` namespace, all five bundled recipes pass the reference validator, `cwltool --validate` (_cwltool 3.3.20260925135507_), and the derived schemas and DAGs are unchanged.
 
@@ -245,7 +243,7 @@ A recipe declares a data input with standard CWL, not an extension: `type: File`
 - Where a process expects its own shape, the recipe adapts the File with `valueFrom` on that step. Roofer, for example, wants `[{"kind": "url", "url": …}]`.
 - The Registry lists data inputs as `data_inputs` in the DAG. The Wizard builds its Data Ingredients step from that, so any recipe, including one just edited, shows its data needs.
 
-**Location rewriting.** A data input's location is the public Hub Datasets address the browser picked, under `https://nldt-tb2.clearly.app/api/hub/…`. For our own tools only, the Cook swaps that public prefix for Hub Datasets' address on the private network (`LOCATION_REWRITES`), for the same reason as `internalHref` ([[[#extensions-we-needed]]]). External processes always receive the public address, and fetch the data from there; this only works because Hub Datasets is publicly reachable.
+**Location rewriting.** A data input's location is the public Hub Datasets address the browser picked, under `https://nldt-tb2.clearly.app/api/hub/…`. For our own tools only, the Cook swaps that public prefix for Hub Datasets' address on the private network (`LOCATION_REWRITES`), for the same reason as `internalHref` ([[#extensions-we-needed](#extensions-we-needed)]). External processes always receive the public address, and fetch the data from there; this only works because Hub Datasets is publicly reachable.
 
 We considered and rejected two alternatives. A new `x-data-ingredient` field would duplicate a concept CWL already has. Inferring data inputs from the process description is impossible: roofer describes its point-cloud input as a LAS/LAZ URL only in prose.
 
@@ -273,7 +271,7 @@ So the Wizard fetches the description of each step's process (once per session, 
 
 ![](media/image12.png)
 
-This works for any recipe and any process, not only the ones in this testbed. Its limit is what process providers publish: the subsidence process gives no default or example for its GeoJSON input, so that field stays required, and the form can only show the expected shape (an empty FeatureCollection). A JSON Schema `example` entry would let the form show a real polygon ([[[#collaboration]]]).
+This works for any recipe and any process, not only the ones in this testbed. Its limit is what process providers publish: the subsidence process gives no default or example for its GeoJSON input, so that field stays required, and the form can only show the expected shape (an empty FeatureCollection). A JSON Schema `example` entry would let the form show a real polygon ([[#collaboration](#collaboration)]).
 
 ### Example {#example}
 
@@ -320,13 +318,13 @@ steps:
     out: [bufferedGeometry]
 ```
 
-[[[#appendix-c]]] gives the three playground recipes in full, with notes, including the roofer recipe's `valueFrom` chaining.
+[[#appendix-c](#appendix-c)] gives the three playground recipes in full, with notes, including the roofer recipe's `valueFrom` chaining.
 
 ## The Cookbook Registry {#the-cookbook-registry}
 
 The Cookbook Registry is the tender's cookbook: it stores each recipe's raw CWL and derives, on every request, its input JSON Schema and execution DAG.
 
-The tender suggests building the cookbook with OGC Building Blocks. We did not package the Registry's API as a Building Block: it is a small, purpose-built REST API and no existing block describes a recipe registry. The better candidates are the recipe format itself and the catalogue record. The `nldt:` CWL profile ([[[#the-recipe-format-a-cwl-profile]]]) and the recipe record ([[[#catalogue-and-recipe-metadata]]]) each have a schema and examples, which is what a Building Block contains. Publishing them through the OGC Building Blocks register is future work ([[[#recommendations-and-future-work]]]).
+The tender suggests building the cookbook with OGC Building Blocks. We did not package the Registry's API as a Building Block: it is a small, purpose-built REST API and no existing block describes a recipe registry. The better candidates are the recipe format itself and the catalogue record. The `nldt:` CWL profile ([[#the-recipe-format-a-cwl-profile](#the-recipe-format-a-cwl-profile)]) and the recipe record ([[#catalogue-and-recipe-metadata](#catalogue-and-recipe-metadata)]) each have a schema and examples, which is what a Building Block contains. Publishing them through the OGC Building Blocks register is future work ([[#recommendations-and-future-work](#recommendations-and-future-work)]).
 
 | **Endpoint** | **Purpose** |
 | --- | --- |
@@ -343,7 +341,7 @@ The tender suggests building the cookbook with OGC Building Blocks. We did not p
 
 Recipes are stored in SQLite in a Docker volume. Schema and DAG are derived fresh on every request, never cached.
 
-**CWL vs DAG.** CWL is a document written for people: order in the file is arbitrary and it carries labels, docs and extensions. The DAG is the machine form: steps in topological order, each input resolved to a workflow input or another step's output. [[[#design-principle]]] explains why every part of the stack works from the DAG.
+**CWL vs DAG.** CWL is a document written for people: order in the file is arbitrary and it carries labels, docs and extensions. The DAG is the machine form: steps in topological order, each input resolved to a workflow input or another step's output. [[#design-principle](#design-principle)] explains why every part of the stack works from the DAG.
 
 ![](media/image13.png)
 
@@ -354,10 +352,10 @@ Recipes are stored in SQLite in a Docker volume. Schema and DAG are derived fres
 | `steps` | Every step, in an order in which each step comes after the steps it depends on |
 | `steps[].id`, `label` | The step's key and its name (its CWL label, else its key) |
 | `steps[].process_id`, `process_label` | The OGC API Process the step calls, and the app's name (its Operation's label) |
-| `steps[].process_link` | The step's `nldt:processLink`: the process's public address (`href`) and the one the Cook calls (`internalHref`, [[[#extensions-we-needed]]]) |
+| `steps[].process_link` | The step's `nldt:processLink`: the process's public address (`href`) and the one the Cook calls (`internalHref`, [[#extensions-we-needed](#extensions-we-needed)]) |
 | `steps[].inputs` | For each input of the process: `{source_type: "workflow_input", name}` or `{source_type: "step_output", step, output}`, plus any `valueFrom` reshaping as a field path or object template |
 | `steps[].outputs` | The outputs the step declares |
-| `steps[].input_formats`, `output_formats` | Media types from CWL `format`, used for by-reference and qualified values ([[[#what-happens-when-you-click-execute]]]) |
+| `steps[].input_formats`, `output_formats` | Media types from CWL `format`, used for by-reference and qualified values ([[#what-happens-when-you-click-execute](#what-happens-when-you-click-execute)]) |
 | `workflow_inputs` | The recipe's inputs |
 | `input_defaults`, `optional_inputs` | What the Cook does with an input nobody sent: use its default, or leave it out |
 | `workflow_outputs` | What the recipe returns, and which step output each one is |
@@ -439,7 +437,7 @@ In detail:
 
 **1. In the browser (Status tab).** Execute collects three things:
 
-- **Parameters:** each value entered in the Wizard; for an empty field, its default (the recipe's own, else the app's, see [[[#parameters-cwl-types-vs-json-schema]]]).
+- **Parameters:** each value entered in the Wizard; for an empty field, its default (the recipe's own, else the app's, see [[#parameters-cwl-types-vs-json-schema](#parameters-cwl-types-vs-json-schema)]).
 - **Data ingredients:** each dataset picked in the Wizard, as a CWL File, `{"class": "File", "location": "<URL of the dataset>", "format": "<media type>"}`. The location is a link; the data itself is never sent.
 - **App swaps:** `toolOverrides`, `{stepId: toolId}`, if the hub swapped an app for this run.
 
@@ -462,13 +460,13 @@ It posts these to the Cook, `POST /processes/cook/execution` with the header `Pr
 - **Synchronously:** `200 OK` with the results in the response. Our own four tools always do this; they ignore the header.
 - **Asynchronously:** `201` or `202` with a job of its own. Roofer, the Geolabs ZOO-Project processes and Varidian's subsidence process support this. The Cook finds the job's address (the `Location` header, else the job's `self` or `monitor` link, else `/jobs/{jobID}`), then asks it for its status every 2 seconds, copying the remote status, progress and message into the step's own progress. When the job reports `successful`, the Cook fetches `…/results`. When it reports `failed`, the Cook fetches the error document from the same address, because some servers (ZOO-Project) leave their status message at "accepted" even after failing.
 
-**6. In the Cook: read the outputs.** Processes return results in different shapes: our own tools as `{"outputs": {…}}`, standard OGC results as `{name: value}` or `{name: {"value": …}}`, ZOO-Project as multipart text when a process has several outputs, and some servers as the bare value of a single-output process. The Cook turns each of these into one shape, `{outputName: value}`, and stores it. Every step waiting for this step's outputs may now be ready (back to point 3). The Cook also records a trace entry: exactly what the step was sent, what it returned, and whether its process was found through its `nldt:processLink` or the fallback table ([[[#where-a-step-runs]]]).
+**6. In the Cook: read the outputs.** Processes return results in different shapes: our own tools as `{"outputs": {…}}`, standard OGC results as `{name: value}` or `{name: {"value": …}}`, ZOO-Project as multipart text when a process has several outputs, and some servers as the bare value of a single-output process. The Cook turns each of these into one shape, `{outputName: value}`, and stores it. Every step waiting for this step's outputs may now be ready (back to point 3). The Cook also records a trace entry: exactly what the step was sent, what it returned, and whether its process was found through its `nldt:processLink` or the fallback table ([[#where-a-step-runs](#where-a-step-runs)]).
 
-**7. In the Cook: finish, or stop on the first failure.** When all steps are done, the Cook picks out the recipe's outputs (`workflow_outputs`) and marks the job `successful`. If a step fails, the Cook starts no new steps, stops the ones still running, dismisses their remote jobs, and marks the job `failed`, saying where the failure came from ([[[#where-a-failure-came-from]]]). Time limits apply to each HTTP call, each remote job and the whole run ([[[#sync-and-async]]]).
+**7. In the Cook: finish, or stop on the first failure.** When all steps are done, the Cook picks out the recipe's outputs (`workflow_outputs`) and marks the job `successful`. If a step fails, the Cook starts no new steps, stops the ones still running, dismisses their remote jobs, and marks the job `failed`, saying where the failure came from ([[#where-a-failure-came-from](#where-a-failure-came-from)]). Time limits apply to each HTTP call, each remote job and the whole run ([[#sync-and-async](#sync-and-async)]).
 
 **8. Back in the browser.** While the Cook works, the browser asks `GET /jobs/{jobID}` every 2 seconds. The answer has the overall status, a progress from 0 to 100 (finished steps count fully, a running step by its remote job's own progress if it reports one), a one-line message such as "_Step 2 of 3: Reconstruct buildings — running_", and the status of every step. The Status tab shows this as a list of steps. A Cancel button sends `DELETE /jobs/{jobID}`; the Cook stops between steps, or within 2 seconds while waiting on a remote job, and dismisses that job too.
 
-When the job is successful, the browser fetches `GET /jobs/{jobID}/results`: the recipe's outputs plus the trace. It shows each output (a GeoJSON output as a summary, since it may be large) and immediately saves the result to the Sandbox Stack Recipe Results dataset in Hub Datasets, named after the recipe with the date and time. If any output is GeoJSON, that output is saved, so it can be shown on a map; otherwise the whole result is saved as JSON. [[[#status-tab-and-saved-results]]] describes where saved results can be viewed.
+When the job is successful, the browser fetches `GET /jobs/{jobID}/results`: the recipe's outputs plus the trace. It shows each output (a GeoJSON output as a summary, since it may be large) and immediately saves the result to the Sandbox Stack Recipe Results dataset in Hub Datasets, named after the recipe with the date and time. If any output is GeoJSON, that output is saved, so it can be shown on a map; otherwise the whole result is saved as JSON. [[#status-tab-and-saved-results](#status-tab-and-saved-results)] describes where saved results can be viewed.
 
 The Cook is non-agentic throughout: it never decides which process to call or how to combine results. Everything it does follows from the DAG.
 
@@ -476,7 +474,7 @@ The Cook is non-agentic throughout: it never decides which process to call or ho
 
 There are two layers. The **outer layer** is how the caller experiences waiting: sync (hold the connection) or async (`Prefer: respond-async`, get a job, poll `/jobs/{id}`). The **inner layer** is how the Cook calls each step: it always asks for asynchronous execution (`Prefer: respond-async`). A process that answers synchronously anyway is used as-is; one that returns a job is polled. Our own four tools always answer synchronously.
 
-Sync is the protocol default (a caller that sends no `Prefer` header) and returns `{result, trace}` in one response; the App Store UI always uses async ([[[#what-happens-when-you-click-execute]]]). Async returns `201` with a `Location` header; job status includes per-step progress, a 0–100 progress and a message. Each asynchronous cook job runs on its own background thread, so the Cook accepts new jobs while others are running. The job store is in memory, so a restart loses jobs.
+Sync is the protocol default (a caller that sends no `Prefer` header) and returns `{result, trace}` in one response; the App Store UI always uses async ([[#what-happens-when-you-click-execute](#what-happens-when-you-click-execute)]). Async returns `201` with a `Location` header; job status includes per-step progress, a 0–100 progress and a message. Each asynchronous cook job runs on its own background thread, so the Cook accepts new jobs while others are running. The job store is in memory, so a restart loses jobs.
 
 Async is mandatory in practice. Roofer's building reconstruction outlives any HTTP or proxy timeout. Remote jobs are polled every 2 s, and the time limits are configurable:
 
@@ -492,7 +490,7 @@ When a job times out or is cancelled, the remote job is dismissed (best-effort `
 
 ### Where a step runs {#where-a-step-runs}
 
-A step names its process by an abstract id. The Cook resolves it to a URL in this order: the step's own `nldt:processLink.internalHref`, then a static fallback table (`TOOL_REGISTRY`) for the four built-in tools. `href` is never called; [[[#extensions-we-needed]]] explains why there are two addresses, and why we would drop the internal one. The fallback keeps older recipes working; there is no dynamic discovery service.
+A step names its process by an abstract id. The Cook resolves it to a URL in this order: the step's own `nldt:processLink.internalHref`, then a static fallback table (`TOOL_REGISTRY`) for the four built-in tools. `href` is never called; [[#extensions-we-needed](#extensions-we-needed)] explains why there are two addresses, and why we would drop the internal one. The fallback keeps older recipes working; there is no dynamic discovery service.
 
 We tested the vendor-agnostic claim through the real UI in an early build (early September): replacing the multiply step's process with a divide process, without code changes, returned `(2 + 3) / 4 = 1.25`, with the trace showing the new process was called. The divide tool was later replaced by `multiply3`; today the Wizard offers the equivalent swap, `multiply` → `multiply3`, on `recipe-add-multiply-demo`.
 
@@ -514,7 +512,7 @@ Figure below shows the banner for a run whose tool could not be reached. It was 
 
 ## Catalogue and recipe metadata {#catalogue-and-recipe-metadata}
 
-The catalogue implements OGC API Records Part 1: Core over a real CKAN 2.11 instance. Recipe metadata in DCAT-AP-NL is not implemented; [[[#recipe-metadata-in-dcat-ap-nl]]] gives a first proposal.
+The catalogue implements OGC API Records Part 1: Core over a real CKAN 2.11 instance. Recipe metadata in DCAT-AP-NL is not implemented; [[#recipe-metadata-in-dcat-ap-nl](#recipe-metadata-in-dcat-ap-nl)] gives a first proposal.
 
 ### Records Wrapper over CKAN {#records-wrapper-over-ckan}
 
@@ -548,7 +546,7 @@ Two gaps in the records today:
 
 ### Recipe metadata in DCAT-AP-NL: what is missing, and what to add {#recipe-metadata-in-dcat-ap-nl}
 
-The catalogue we built carries discovery metadata only ([[[#what-a-record-contains]]]); we did not implement a DCAT-AP-NL profile for recipes. But building and running recipes end to end showed clearly what such metadata has to say. This section sets that out: what DCAT-AP-NL already offers, what a recipe needs that it does not cover, and what we propose to add.
+The catalogue we built carries discovery metadata only ([[#what-a-record-contains](#what-a-record-contains)]); we did not implement a DCAT-AP-NL profile for recipes. But building and running recipes end to end showed clearly what such metadata has to say. This section sets that out: what DCAT-AP-NL already offers, what a recipe needs that it does not cover, and what we propose to add.
 
 **What DCAT-AP-NL already offers.** DCAT-AP-NL is the Dutch profile of DCAT-AP, itself a profile of W3C DCAT. It describes catalogues and what is in them: **datasets**, their **distributions** (a downloadable or accessible form of the data, with a media type and an access address), and **data services** (an API, with an endpoint address and an endpoint description). Around these it has the usual descriptive metadata: title, description, keywords, theme, spatial and temporal coverage, publisher, contact point, licence, access rights, conformance to a standard (`dct:conformsTo`), version, dates, and general relations between resources.
 
@@ -559,19 +557,19 @@ That covers much of a recipe's _discovery_ metadata. A recipe has a title, a des
 | **A recipe needs to say** | **Why (section / finding)** | **In DCAT-AP-NL today** | **What to add** |
 | --- | --- | --- | --- |
 | That it is a recipe | It is neither a dataset nor a data service | No class for it | A class `Recipe`, a subclass of `dcat:Resource`, catalogued next to datasets and services |
-| Where its executable definition is, and in which format | The CWL is the recipe ([[[#the-recipe-format-a-cwl-profile]]], [[[#what-a-record-contains]]]) | Partly: a distribution with a media type and `dct:conformsTo` | Use a distribution for the CWL, conforming to CWL v1.2 and to a published recipe profile (the `nldt:` extensions). Register a media type for CWL, which IANA does not have |
-| Which apps it uses, one per step, by name | A recipe _is_ a chain of apps ([[[#standard-cwl-we-use]]], [[[#what-the-dag-contains]]]) | Partly: a data service can describe one API endpoint | Steps: for each step its name and the data service (OGC API Process) it calls, including the app's name and the address of its process description |
-| In which order the steps run, and which step feeds which | The DAG ([[[#design-principle]]], [[[#what-the-dag-contains]]]) | No | Either the step dependencies, or simply a pointer to the definition; we recommend the pointer, so the CWL stays the single source and the metadata cannot contradict it |
-| Which alternative apps may replace a step's app | `nldt:compatibleTools` ([[[#extensions-we-needed]]]) | No | Per step, the allowed alternative data services |
-| Which datasets it needs, in which format | Data inputs ([[[#data-inputs-vs-parameters]]], finding 11) | No: a media type exists only on a distribution | Data inputs: name, description, required or optional, accepted media types, and optionally example or recommended datasets from the catalogue |
-| Which parameters it takes, with their type, default and limits | Parameters ([[[#parameters-cwl-types-vs-json-schema]]], [[[#the-recipe-wizard]]], finding 17) | No | Parameters: name, title, description, required or optional, default, and a JSON Schema, by reference to the app's own input schema rather than a copy |
-| What it produces, in which format | Outputs ([[[#what-the-dag-contains]]]) | No | Outputs: name, description, media type |
-| How it runs | Sync and async, duration ([[[#sync-and-async]]], finding 12) | No | Expected execution mode (synchronous or job-based) and typical duration |
+| Where its executable definition is, and in which format | The CWL is the recipe ([[#the-recipe-format-a-cwl-profile](#the-recipe-format-a-cwl-profile)], [[#what-a-record-contains](#what-a-record-contains)]) | Partly: a distribution with a media type and `dct:conformsTo` | Use a distribution for the CWL, conforming to CWL v1.2 and to a published recipe profile (the `nldt:` extensions). Register a media type for CWL, which IANA does not have |
+| Which apps it uses, one per step, by name | A recipe _is_ a chain of apps ([[#standard-cwl-we-use](#standard-cwl-we-use)], [[#what-the-dag-contains](#what-the-dag-contains)]) | Partly: a data service can describe one API endpoint | Steps: for each step its name and the data service (OGC API Process) it calls, including the app's name and the address of its process description |
+| In which order the steps run, and which step feeds which | The DAG ([[#design-principle](#design-principle)], [[#what-the-dag-contains](#what-the-dag-contains)]) | No | Either the step dependencies, or simply a pointer to the definition; we recommend the pointer, so the CWL stays the single source and the metadata cannot contradict it |
+| Which alternative apps may replace a step's app | `nldt:compatibleTools` ([[#extensions-we-needed](#extensions-we-needed)]) | No | Per step, the allowed alternative data services |
+| Which datasets it needs, in which format | Data inputs ([[#data-inputs-vs-parameters](#data-inputs-vs-parameters)], finding 11) | No: a media type exists only on a distribution | Data inputs: name, description, required or optional, accepted media types, and optionally example or recommended datasets from the catalogue |
+| Which parameters it takes, with their type, default and limits | Parameters ([[#parameters-cwl-types-vs-json-schema](#parameters-cwl-types-vs-json-schema)], [[#the-recipe-wizard](#the-recipe-wizard)], finding 17) | No | Parameters: name, title, description, required or optional, default, and a JSON Schema, by reference to the app's own input schema rather than a copy |
+| What it produces, in which format | Outputs ([[#what-the-dag-contains](#what-the-dag-contains)]) | No | Outputs: name, description, media type |
+| How it runs | Sync and async, duration ([[#sync-and-async](#sync-and-async)], finding 12) | No | Expected execution mode (synchronous or job-based) and typical duration |
 | Whether its apps need a login or a key | Authenticated apps (findings 23, 24) | Only `dct:accessRights`, as free text or a public/restricted code | Per app: whether access is needed, from which identity provider, and whether access can be delegated to a cook |
 | What a run costs | Commercial apps (finding 25) | No; DCAT allows an ODRL policy on a distribution, which could carry terms | Per app and per recipe: the price model (per run, subscription, free), possibly as an ODRL policy |
-| Who may change it, and which version this is | Shared, unversioned editing (finding 21, [[[#use-cases-and-bundled-recipes]]]) | Partly: version and dates exist, rights to edit do not | Version, version history, owner; editing rights belong in the catalogue's access control rather than in metadata |
-| Where a result came from | Saved results ([[[#status-tab-and-saved-results]]]) | No; PROV-O can express this but is not part of the profile | For a dataset produced by a recipe run: the recipe (and its version), the apps used and the input values, as provenance (`prov:wasGeneratedBy` a run that `prov:used` the recipe and its inputs) |
-| Who it is for, and in which project phase | Facets shown in the UI ([[[#catalogue-recipe-pages-and-home-page]]]) | Theme and coverage yes; target roles and project phase no | Two facets: target roles and project phase, each with an agreed code list |
+| Who may change it, and which version this is | Shared, unversioned editing (finding 21, [[#use-cases-and-bundled-recipes](#use-cases-and-bundled-recipes)]) | Partly: version and dates exist, rights to edit do not | Version, version history, owner; editing rights belong in the catalogue's access control rather than in metadata |
+| Where a result came from | Saved results ([[#status-tab-and-saved-results](#status-tab-and-saved-results)]) | No; PROV-O can express this but is not part of the profile | For a dataset produced by a recipe run: the recipe (and its version), the apps used and the input values, as provenance (`prov:wasGeneratedBy` a run that `prov:used` the recipe and its inputs) |
+| Who it is for, and in which project phase | Facets shown in the UI ([[#catalogue-recipe-pages-and-home-page](#catalogue-recipe-pages-and-home-page)]) | Theme and coverage yes; target roles and project phase no | Two facets: target roles and project phase, each with an agreed code list |
 
 **Proposal.** Extend DCAT-AP-NL with a small recipe module rather than bending datasets or data services to fit:
 
@@ -582,7 +580,7 @@ That covers much of a recipe's _discovery_ metadata. A recipe has a title, a des
 - The CWL file is the recipe's distribution, conforming to CWL v1.2 and to the recipe profile.
 - Results produced by a recipe run carry provenance back to the recipe.
 
-Most of this metadata can be generated from the recipe itself: the Registry already derives the steps, their apps, the data inputs with media types, the parameters and the outputs ([[[#what-the-dag-contains]]]), and the apps' process descriptions provide titles, descriptions and defaults ([[[#parameters-cwl-types-vs-json-schema]]]). Only discovery facets (theme, target roles, phase), access, cost and ownership need to be written by people. That makes a recipe record cheap to keep accurate.
+Most of this metadata can be generated from the recipe itself: the Registry already derives the steps, their apps, the data inputs with media types, the parameters and the outputs ([[#what-the-dag-contains](#what-the-dag-contains)]), and the apps' process descriptions provide titles, descriptions and defaults ([[#parameters-cwl-types-vs-json-schema](#parameters-cwl-types-vs-json-schema)]). Only discovery facets (theme, target roles, phase), access, cost and ownership need to be written by people. That makes a recipe record cheap to keep accurate.
 
 In CKAN, the extra fields would come from `ckanext-scheming` and the RDF output from `ckanext-dcat`. Neither is installed today; CKAN runs only the `envvars` and `datastore` plugins.
 
@@ -631,21 +629,21 @@ We chose this deliberately. It shows recipes in the setting where they would act
 
 ### How the UI uses the recipe {#how-the-ui-uses-the-recipe}
 
-The UI never interprets CWL itself ([[[#design-principle]]]). Everything it shows about a recipe comes from the Registry's answer (DAG and input schema), from the catalogue record, or from the OGC API Process descriptions of the recipe's apps:
+The UI never interprets CWL itself ([[#design-principle](#design-principle)]). Everything it shows about a recipe comes from the Registry's answer (DAG and input schema), from the catalogue record, or from the OGC API Process descriptions of the recipe's apps:
 
 | **What the user sees** | **Where it comes from** |
 | --- | --- |
 | Recipe title, description | The catalogue record (seeded from the CWL's `label` and `doc`) |
 | The recipe graph (every Wizard step, Recipe Details, Status) | The DAG: inputs, steps and their wiring, outputs |
 | A step's name | The CWL step label (`label` in the DAG) |
-| An app's name | The CWL Operation label (`process_label` in the DAG), with fallbacks ([[[#standard-cwl-we-use]]]) |
+| An app's name | The CWL Operation label (`process_label` in the DAG), with fallbacks ([[#standard-cwl-we-use](#standard-cwl-we-use)]) |
 | Which inputs need a dataset, and of which media type | `data_inputs` in the DAG (CWL `File` + `format`) |
 | The parameter form: field types, required fields, defaults | The input schema (CWL types, `default`, `nldt:jsonSchema`) |
-| Parameter titles, descriptions, limits and defaults the recipe doesn't give | The app's own OGC API Process description, read at display time ([[[#parameters-cwl-types-vs-json-schema]]]) |
+| Parameter titles, descriptions, limits and defaults the recipe doesn't give | The app's own OGC API Process description, read at display time ([[#parameters-cwl-types-vs-json-schema](#parameters-cwl-types-vs-json-schema)]) |
 | Which alternative apps a step allows | `compatible_tools` in the DAG (`nldt:compatibleTools`) |
 | A swapped app's own inputs | The effective DAG and schema (`POST …/effective`) |
 | Links to an app's definition | The step's `nldt:processLink` (or our own tool's address) |
-| Run progress, errors, result | The Cook's job status and results ([[[#what-happens-when-you-click-execute]]]) |
+| Run progress, errors, result | The Cook's job status and results ([[#what-happens-when-you-click-execute](#what-happens-when-you-click-execute)]) |
 
 ### Catalogue, recipe pages and home page {#catalogue-recipe-pages-and-home-page}
 
@@ -668,11 +666,11 @@ The UI never interprets CWL itself ([[[#design-principle]]]). Everything it show
 The Wizard binds a recipe to a hub in four steps. Every step shows the same **recipe graph** above its own controls, so the user always sees the whole recipe while setting up one part of it:
 
 - **Inputs:** each data input (marked "data · GeoJSON" and so on) and each parameter, by its readable title.
-- **Apps:** the app of each step, named as in [[[#standard-cwl-we-use]]], with the step's name beside it.
+- **Apps:** the app of each step, named as in [[#standard-cwl-we-use](#standard-cwl-we-use)], with the step's name beside it.
 - **Results:** the recipe's outputs, always in their own column at the end, even when a step's output is also used by a later step.
 - **Saved to:** where the result is stored.
 
-Colours show the state of the setup: green for ready (a dataset picked, a value or default set), red for still needed, amber for an app swapped for this run. The graph is drawn from the effective DAG ([[[#design-principle]]]), so it always shows what the Cook will actually run.
+Colours show the state of the setup: green for ready (a dataset picked, a value or default set), red for still needed, amber for an app swapped for this run. The graph is drawn from the effective DAG ([[#design-principle](#design-principle)]), so it always shows what the Cook will actually run.
 
 ![](media/image24.png)
 
@@ -688,7 +686,7 @@ Each field shows the parameter's readable title, its technical name as a small t
 
 ![](media/image26.png)
 
-A default is shown as grey placeholder text: an untouched field sends it, typing replaces it, clearing the field brings it back. Structured values (objects, lists, GeoJSON) are typed as JSON in the same way, with the expected shape as placeholder; there are no special template buttons. [[[#parameters-cwl-types-vs-json-schema]]] explains where titles, descriptions and defaults come from. A parameter used by two apps appears once, under the first, with "_Also used by …_"; one no app reads appears under "_Not used by any app_".
+A default is shown as grey placeholder text: an untouched field sends it, typing replaces it, clearing the field brings it back. Structured values (objects, lists, GeoJSON) are typed as JSON in the same way, with the expected shape as placeholder; there are no special template buttons. [[#parameters-cwl-types-vs-json-schema](#parameters-cwl-types-vs-json-schema)] explains where titles, descriptions and defaults come from. A parameter used by two apps appears once, under the first, with "_Also used by …_"; one no app reads appears under "_Not used by any app_".
 
 4. **Output.** Where the result is saved. In this testbed every result is saved to the Sandbox Stack Recipe Results dataset in the nLDT Sandbox Hub, so the hub and dataset dropdowns are shown, as they would be in a full App Store, but locked to that destination, with a note saying why.
 
@@ -698,7 +696,7 @@ Every step can be opened at any time; nothing forces completing one step before 
 
 ### Status tab and saved results {#status-tab-and-saved-results}
 
-**Status.** Shows the recipe graph, the data ingredients, and the parameters grouped per app exactly as in the Wizard, read-only, each with the value that will be sent (marked "default" when it is one). It also works when the Wizard was never opened: missing values fall back to their defaults, the same way the Wizard does. Execute stays disabled, with a warning naming what is missing, until every required parameter and data ingredient has a value. Execute, progress, cancelling, the result and saving it are described in [[[#what-happens-when-you-click-execute]]]; a failure says whose it is ([[[#where-a-failure-came-from]]]).
+**Status.** Shows the recipe graph, the data ingredients, and the parameters grouped per app exactly as in the Wizard, read-only, each with the value that will be sent (marked "default" when it is one). It also works when the Wizard was never opened: missing values fall back to their defaults, the same way the Wizard does. Execute stays disabled, with a warning naming what is missing, until every required parameter and data ingredient has a value. Execute, progress, cancelling, the result and saving it are described in [[#what-happens-when-you-click-execute](#what-happens-when-you-click-execute)]; a failure says whose it is ([[#where-a-failure-came-from](#where-a-failure-came-from)]).
 
 ![](media/image28.png)
 
@@ -730,8 +728,8 @@ At the first plugfest, we executed recipes against external processes from other
 
 **What we learned from participants:**
 
-- Writing a recipe was not user-friendly: users had to know how we had structured the CWL. This led to the guided builder ([[[#the-client-app-store-ui]]]).
-- A participant asked to parameterise the buffer recipe by city name instead of always using Rotterdam's outline. This is future work ([[[#recommendations-and-future-work]]]).
+- Writing a recipe was not user-friendly: users had to know how we had structured the CWL. This led to the guided builder ([[#the-client-app-store-ui](#the-client-app-store-ui)]).
+- A participant asked to parameterise the buffer recipe by city name instead of always using Rotterdam's outline. This is future work ([[#recommendations-and-future-work](#recommendations-and-future-work)]).
 - A participant asked whether a client can read a process's inputs automatically when adding it as a step. The guided builder now does this from the process description.
 - By-reference data must be reachable from the process, not just the browser. An external process can only fetch data at a public address, which is why Hub Datasets is published.
 
@@ -755,7 +753,7 @@ Skipped tests cover features the services do not offer (bounding-box or binary i
 - **The tools had no job list at all.** They run synchronously and never have jobs, but the suite expects the endpoint; it now answers with an empty list. The suite still marks this as failed because it wants at least one job, which a synchronous-only service cannot have.
 - **Live only: links lost the gateway prefix.** The Cook's job `Location` header and its advertised links left out `/api/orchestrator` and used `http`. The suite followed them, got the App Store's HTML page instead of JSON, and failed 8 job tests. The cause: the gateway strips each service's `/api/<service>` prefix before passing a request on, so a service never sees it, and the services did not trust the gateway's "this came in over https" header. Fixed in the gateway setup: each service now starts with its public prefix (`uvicorn --root-path`) and trusts the gateway's forwarded headers. Live, the Cook now scores the same as on its own (32 passed). Our App Store UI was never affected, because it builds its own addresses.
 
-**What still fails, and why.** Almost all remaining failures are the suite's _execute_ tests. They expect the server to host OGC's test process, `echo`, which accepts every kind of input (text, numbers, objects, files by reference) and returns it unchanged. Our processes take specific inputs: two numbers, a geometry and a distance, or a recipe id. So the suite's test values are rejected, as they should be (the Cook, for example, is asked to run the recipe `"teststring"`), and these tests cannot pass. They test the server's execution machinery with a process it does not have, not whether our processes behave correctly. Hosting a small `echo` process next to the Cook would let the suite test the Cook's job handling end to end ([[[#recommendations-and-future-work]]]).
+**What still fails, and why.** Almost all remaining failures are the suite's _execute_ tests. They expect the server to host OGC's test process, `echo`, which accepts every kind of input (text, numbers, objects, files by reference) and returns it unchanged. Our processes take specific inputs: two numbers, a geometry and a distance, or a recipe id. So the suite's test values are rejected, as they should be (the Cook, for example, is asked to run the recipe `"teststring"`), and these tests cannot pass. They test the server's execution machinery with a process it does not have, not whether our processes behave correctly. Hosting a small `echo` process next to the Cook would let the suite test the Cook's job handling end to end ([[#recommendations-and-future-work](#recommendations-and-future-work)]).
 
 **Conformance: the Geonovum OGC checker.** We also ran Geonovum's OGC checker (`@geonovum/ogc-checker` 1.3.2, the command-line version of <https://geonovum.github.io/ogc-checker/>), on the live OpenAPI documents of all six services: the Cook and the four tools against OGC API - Processes 1.0, and the Records Wrapper against OGC API - Records 1.0. Unlike OGC's test suite, this checker does not call the service. It reads only the service's OpenAPI document (`/openapi.json`) and checks that the document describes what the standard requires.
 
@@ -780,10 +778,10 @@ Other risks, from reading the code (not covered by the Processes test suite):
 - **Records conformance URIs.** The declared `…/conf/core` and `…/conf/json` may not match the published Records 1.0 class names, and records declare `conformsTo: …/ogcapi-records-1/1.0/req/record-core`, a requirement URI, not a conformance-class URI. Check both against the standard, and run OGC's Records test suite.
 - **Items parameters.** `items` lack `bbox`, `datetime`, `type` and `ids`.
 
-**Second plugfest.** Varidian put a recipe around their own _Subsidence Analysis_ process (`registry.playground.planspace.nl`) into the `playground-3` slot and ran it through our Wizard and Cook; two results are saved in Hub Datasets ([[[#use-cases-and-bundled-recipes]]]). It showed two things we then built:
+**Second plugfest.** Varidian put a recipe around their own _Subsidence Analysis_ process (`registry.playground.planspace.nl`) into the `playground-3` slot and ran it through our Wizard and Cook; two results are saved in Hub Datasets ([[#use-cases-and-bundled-recipes](#use-cases-and-bundled-recipes)]). It showed two things we then built:
 
-- A user facing someone else's process does not know what to enter. The process description already says it, in standard fields (titles, descriptions, defaults, limits), so the Wizard now reads it ([[[#parameters-cwl-types-vs-json-schema]]]) and links to it.
-- Names drifted between screens: the step's key on one, the Operation's label nowhere, and the process description's title on another. One naming rule now applies everywhere ([[[#standard-cwl-we-use]]]).
+- A user facing someone else's process does not know what to enter. The process description already says it, in standard fields (titles, descriptions, defaults, limits), so the Wizard now reads it ([[#parameters-cwl-types-vs-json-schema](#parameters-cwl-types-vs-json-schema)]) and links to it.
+- Names drifted between screens: the step's key on one, the Operation's label nowhere, and the process description's title on another. One naming rule now applies everywhere ([[#standard-cwl-we-use](#standard-cwl-we-use)]).
 
 ## Findings {#findings}
 
@@ -799,8 +797,8 @@ Twenty-five findings, grouped by the standard or theme they concern.
 6. **CWL's extension rule is enforced by tooling.** Extension fields need a namespace prefix declared in `$namespaces`. Our first, OpenAPI-style `x-` names made every recipe invalid for `cwltool --validate`; with a declared `nldt:` namespace, all pass.
 7. **A purpose-built cook checks less than a CWL validator.** `cwltool` caught a real type error our Registry had accepted (an enum list wired into a `string[]` input in the roofer recipe). Our reader validates structure and wiring, not types; running the reference validator alongside is cheap.
 8. **CWL has no field for media types of non-File values.** `format` is only defined for Files, so requesting the media type of a non-File process input or output has no standard CWL field; our use of `format` there only means something to our Cook.
-9. **One reader of the recipe avoids drift.** Only the Registry parses CWL; everything else asks it for the DAG and schema ([[[#design-principle]]]). The tool catalogue was not centralised, and now exists in four copies ([[[#extensions-we-needed]]]).
-10. **A step and its app need separate names.** CWL already gives a step two labels: the step's own, for what it does in the recipe, and its Operation's, for the app that does it. Showing them consistently ([[[#standard-cwl-we-use]]]) matters once apps can be swapped: the step stays, the app changes. Without one rule, a user sees three different names for the same thing.
+9. **One reader of the recipe avoids drift.** Only the Registry parses CWL; everything else asks it for the DAG and schema ([[#design-principle](#design-principle)]). The tool catalogue was not centralised, and now exists in four copies ([[#extensions-we-needed](#extensions-we-needed)]).
+10. **A step and its app need separate names.** CWL already gives a step two labels: the step's own, for what it does in the recipe, and its Operation's, for the app that does it. Showing them consistently ([[#standard-cwl-we-use](#standard-cwl-we-use)]) matters once apps can be swapped: the step stays, the app changes. Without one rule, a user sees three different names for the same thing.
 
 ### OGC API Processes {#ogc-api-processes}
 
@@ -810,7 +808,7 @@ Twenty-five findings, grouped by the standard or theme they concern.
 14. **Version.** We implement Part 1: Core 1.0 and chain through CWL, not Part 3 (Workflows) nested execution.
 15. **A recipe can itself be a process.** Wrapping the whole Cook as one OGC API Process (`cook`) lets any Processes client run any recipe without knowing CWL.
 16. **By-reference data must be reachable from the process, not the browser.** An address that only the user's own machine or a private network can reach is useless to an external process. The Cook rewrites URLs only for its own tools.
-17. **Process descriptions already carry what a parameter form needs.** Titles, descriptions, defaults and limits are standard fields of an OGC API Process description and its JSON Schema. A client can read them at display time and fill a recipe's parameter form with them, without copying them into the recipe ([[[#parameters-cwl-types-vs-json-schema]]]).
+17. **Process descriptions already carry what a parameter form needs.** Titles, descriptions, defaults and limits are standard fields of an OGC API Process description and its JSON Schema. A client can read them at display time and fill a recipe's parameter form with them, without copying them into the recipe ([[#parameters-cwl-types-vs-json-schema](#parameters-cwl-types-vs-json-schema)]).
 18. **They rarely carry an example for structured inputs.** A default works for a number; a GeoJSON area has no sensible default. JSON Schema's `examples` keyword exists for this, but the processes we used do not provide it, so a user still has to know the shape of the value.
 
 ### Catalogue and metadata {#catalogue-and-metadata}
@@ -827,9 +825,9 @@ Twenty-five findings, grouped by the standard or theme they concern.
 
 These three were outside the scope of this research, but became clear while building it, and they decide whether a recipe App Store can work in practice.
 
-23. **Apps behind a login need delegated access, and we did not research it.** Every app in this testbed is open: anyone may call it, without an account, key or token. Real apps, commercial or governmental, usually sit behind a secure gateway and need credentials. In a recipe, it is not the user who calls an app but the Cook, on the user's behalf. So the Cook would need to receive, hold and pass on access for each app in the recipe: a token for the user, valid for that app, for the duration of the run (which may be long, [[[#sync-and-async]]]), without the Cook ever seeing the user's own credentials. General-purpose mechanisms for delegation exist (for example OAuth 2.0 Token Exchange, RFC 8693), but we know of no agreed way to apply them across a chain of OGC API Processes run by a third-party cook. OGC API Processes leaves authentication to each deployment.
-24. **Cooks are only interchangeable once access can be delegated.** The recipe architecture separates the recipe (the cookbook) from whoever runs it (the cook), so that in principle any cook can run any recipe, as our `cook` process allows. With authenticated apps, choosing a cook means handing it access to every app in the recipe, and a cook that calls another cook (as Varidian's process is, [[[#use-cases-and-bundled-recipes]]]) would have to pass that access on again. Until there is a trusted, standard way to delegate access to a cook, a real deployment would effectively be tied to one cook it trusts. We see this as the main blocker between this prototype and real-life use.
-25. **Commercial apps need a price, and a way to pay.** An App Store implies that some apps cost money. A recipe combines apps from several providers, so a run may have several prices: per run, per amount of data, or by subscription. Who pays whom, when the price is known (before the run, or only after), and how a cook that calls a paid app on the user's behalf is billed, are all open. The Wizard's setup summary, a basket with an execution fee per app ([[[#the-recipe-wizard]]]), only gives a feeling of this; the fees are illustrative and nothing is charged.
+23. **Apps behind a login need delegated access, and we did not research it.** Every app in this testbed is open: anyone may call it, without an account, key or token. Real apps, commercial or governmental, usually sit behind a secure gateway and need credentials. In a recipe, it is not the user who calls an app but the Cook, on the user's behalf. So the Cook would need to receive, hold and pass on access for each app in the recipe: a token for the user, valid for that app, for the duration of the run (which may be long, [[#sync-and-async](#sync-and-async)]), without the Cook ever seeing the user's own credentials. General-purpose mechanisms for delegation exist (for example OAuth 2.0 Token Exchange, RFC 8693), but we know of no agreed way to apply them across a chain of OGC API Processes run by a third-party cook. OGC API Processes leaves authentication to each deployment.
+24. **Cooks are only interchangeable once access can be delegated.** The recipe architecture separates the recipe (the cookbook) from whoever runs it (the cook), so that in principle any cook can run any recipe, as our `cook` process allows. With authenticated apps, choosing a cook means handing it access to every app in the recipe, and a cook that calls another cook (as Varidian's process is, [[#use-cases-and-bundled-recipes](#use-cases-and-bundled-recipes)]) would have to pass that access on again. Until there is a trusted, standard way to delegate access to a cook, a real deployment would effectively be tied to one cook it trusts. We see this as the main blocker between this prototype and real-life use.
+25. **Commercial apps need a price, and a way to pay.** An App Store implies that some apps cost money. A recipe combines apps from several providers, so a run may have several prices: per run, per amount of data, or by subscription. Who pays whom, when the price is known (before the run, or only after), and how a cook that calls a paid app on the user's behalf is billed, are all open. The Wizard's setup summary, a basket with an execution fee per app ([[#the-recipe-wizard](#the-recipe-wizard)]), only gives a feeling of this; the fees are illustrative and nothing is charged.
 
 ### Questions raised in the stand-ups {#questions-raised-in-the-stand-ups}
 
@@ -843,12 +841,12 @@ The recommendations below are addressed to the parties who can act on them.
 
 **To Geonovum (nLDT):**
 
-- Define recipe metadata in an extended DCAT-AP-NL profile, building on this testbed's proposal ([[[#recipe-metadata-in-dcat-ap-nl]]]).
+- Define recipe metadata in an extended DCAT-AP-NL profile, building on this testbed's proposal ([[#recipe-metadata-in-dcat-ap-nl](#recipe-metadata-in-dcat-ap-nl)]).
 - Publish the recipe profile and the recipe record as OGC Building Blocks, so other cookbooks can validate against them.
 - Agree a small shared vocabulary for recipe extensions (process link, compatible tools, input schema) so cooks and cookbooks from different vendors can exchange recipes.
 - Agree media types for 3D and point-cloud formats, starting with LAZ.
 - Research delegated access for recipes: how a hub lets a cook use authenticated apps on its behalf, for one run, without handing over its own credentials (findings 23, 24). This is the main step between a sandbox and real use, and is best done together with OGC.
-- Explore how pricing and payment would work for recipes that combine paid apps from several providers (finding 25), and how prices appear in recipe metadata ([[[#recipe-metadata-in-dcat-ap-nl]]]).
+- Explore how pricing and payment would work for recipes that combine paid apps from several providers (finding 25), and how prices appear in recipe metadata ([[#recipe-metadata-in-dcat-ap-nl](#recipe-metadata-in-dcat-ap-nl)]).
 
 **To OGC:**
 
@@ -863,16 +861,16 @@ The recommendations below are addressed to the parties who can act on them.
 - Publish a document at the `nldt` namespace IRI defining the three terms (it returns 404 today).
 - Reference process schemas instead of copying them into `nldt:jsonSchema`.
 - Let `nldt:compatibleTools` reference external processes, resolving their inputs and outputs from the process description instead of a built-in catalogue, and match inputs by meaning rather than position.
-- Drop `internalHref` from the recipe format: keep only the public `href`, and let the Cook map known public addresses to internal ones in its own configuration, as it already does for data ([[[#extensions-we-needed]]]).
+- Drop `internalHref` from the recipe format: keep only the public `href`, and let the Cook map known public addresses to internal ones in its own configuration, as it already does for data ([[#extensions-we-needed](#extensions-we-needed)]).
 - Let the Rotterdam recipe take a municipality name and fetch its outline from PDOK.
 - Let a recipe declare its preferred execution mode and have the client honour it.
 - Add versioning, ownership and authentication, plus SSRF protection on process URLs and on the description-fetch endpoint.
 - Persist the Cook's job store.
 - Retry publishing to the catalogue when CKAN is briefly unavailable, and give the Records Wrapper more than 10 seconds for writes to CKAN: after the redeployment, some catalogue writes failed while CKAN was slow, although the recipes themselves were stored.
-- Host a small `echo` test process next to the Cook, so OGC's test suite can check its execution and job handling end to end ([[[#plugfest-and-interoperability]]]).
-- Serve an OpenAPI 3.0 document that declares every answer the services give (response schemas, 201, the OGC 404s), and close the gaps the Geonovum checker found: `limit` on the process list, the job-list filters on the Cook, job endpoints on the tools, and the Records media types on the catalogue ([[[#plugfest-and-interoperability]]]).
+- Host a small `echo` test process next to the Cook, so OGC's test suite can check its execution and job handling end to end ([[#plugfest-and-interoperability](#plugfest-and-interoperability)]).
+- Serve an OpenAPI 3.0 document that declares every answer the services give (response schemas, 201, the OGC 404s), and close the gaps the Geonovum checker found: `limit` on the process list, the job-list filters on the Cook, job endpoints on the tools, and the Records media types on the catalogue ([[#plugfest-and-interoperability](#plugfest-and-interoperability)]).
 - Express recipe metadata in DCAT-AP-NL in the catalogue.
-- Give every step in the bundled and playground recipes a short label, and short Operation labels (the playground-2 ones are copied sentences such as "Create a welcome message string."), since these are the names users see ([[[#standard-cwl-we-use]]]).
+- Give every step in the bundled and playground recipes a short label, and short Operation labels (the playground-2 ones are copied sentences such as "Create a welcome message string."), since these are the names users see ([[#standard-cwl-we-use](#standard-cwl-we-use)]).
 - Show a JSON Schema `examples` value as the placeholder of a structured field, once processes provide one.
 
 ## Collaboration {#collaboration}
@@ -908,7 +906,7 @@ The client and backend stay online for at least six months after the testbed end
 | --- | --- |
 | Live client (App Store UI) | [fi-group.github.io/nldt-tb2](https://fi-group.github.io/nldt-tb2/) |
 | Live backend | [nldt-tb2.clearly.app](https://nldt-tb2.clearly.app), services under `/api/*` |
-| Testing without the UI | The same APIs, directly; endpoints and examples in [[[#appendix-b]]] |
+| Testing without the UI | The same APIs, directly; endpoints and examples in [[#appendix-b](#appendix-b)] |
 | Source code | <https://github.com/Geonovum/DTaaS-Testbed2026-Phase2/tree/main/Topic4-FutureInsight> |
 | Demo video | <https://github.com/Geonovum/DTaaS-Testbed2026-Phase2/blob/main/Topic4-FutureInsight/future_insight_demo.mp4>, in the same folder |
 
@@ -939,27 +937,27 @@ The decisions that shaped the solution, oldest first. Most are a turning point: 
 | **Date (2026)** | **Decision** | **What came before, and what we learned** |
 | --- | --- | --- |
 | 8 Sep | Build the infrastructure as the real system; only the apps a recipe calls may stay trivial. Start with (a + b) × c | The infrastructure is the deliverable; the apps are interchangeable by design. A trivial recipe proves the whole chain (discovery, parameters, two steps, piping, result) before any domain complexity |
-| 8 Sep | CWL as the recipe format, rather than Arazzo or our own JSON format | CWL is a mature, externally governed standard for chaining discrete steps. Our own format would have needed its own tooling and governance ([[[#the-recipe-format-a-cwl-profile]]]) |
+| 8 Sep | CWL as the recipe format, rather than Arazzo or our own JSON format | CWL is a mature, externally governed standard for chaining discrete steps. Our own format would have needed its own tooling and governance ([[#the-recipe-format-a-cwl-profile](#the-recipe-format-a-cwl-profile)]) |
 | 8 Sep | Each step is an inline CWL Operation, one per OGC API Process; recipes are read by a small purpose-built parser, not a full CWL engine | Operation is CWL's own "abstract step that calls something elsewhere". Later we learned the parser is too lenient: it missed a type error that `cwltool` caught, and silently ignores `scatter` and `when` (finding 7) |
 | 8 Sep | OGC API Processes Part 1: Core 1.0, with chaining done by CWL inside the Cook | We first chose v2.0 with Part 3 (Workflows) for chaining. Part 3 was a draft whose conformance classes we could not verify; Part 1 is stable, and CWL already describes the chain |
 | 8 Sep | The Cook is itself an OGC API Process (`cook`), reading the recipe's plan fresh on every run | Any OGC API Processes client can run any recipe without knowing CWL, and a saved recipe needs no redeployment. The cost: a recipe never appears as its own process with typed inputs; clients only see `cook` (finding 15) |
 | 8 Sep | Recipes carry their own process link (`nldt:processLink`); a static table of our tools is only a fallback | First, the Cook looked every process up in a static table: every new app meant a code change. With the link in the recipe, we swapped multiply for a divide app through the UI without touching code: (2 + 3) / 4 = 1.25 |
-| 9 Sep | Shared "playground" recipe slots for the plugfests, instead of a recipe-creation UI | Every mechanism needed (edit, validate, save, run) already existed; the gap was only "not enough recipes to hand out". The price: anyone can overwrite a slot, and there is no version history (finding 21, [[[#use-cases-and-bundled-recipes]]]) |
+| 9 Sep | Shared "playground" recipe slots for the plugfests, instead of a recipe-creation UI | Every mechanism needed (edit, validate, save, run) already existed; the gap was only "not enough recipes to hand out". The price: anyone can overwrite a slot, and there is no version history (finding 21, [[#use-cases-and-bundled-recipes](#use-cases-and-bundled-recipes)]) |
 | 10 Sep | Catalogue backend: real CKAN 2.11 behind the Records Wrapper, instead of our own SQLite store | The tender's architecture names CKAN. The switch touched only the wrapper's storage module, which proved the seam. CKAN's 2.9 and 2.10 images would not start; 2.11 did |
 | Sep–Oct | The Cook always asks each process for asynchronous execution and follows its job; independent steps run in parallel | The first roofer recipe (28 Sep) failed on a 10-second synchronous timeout, and on inputs that were not plain numbers or text. Real processes outlive any HTTP timeout, so async became the default for every step (finding 12). The same attempt showed that the Cook could not send credentials: the first sign of the access problem in findings 23–24 |
 | 16 Oct | In the recipe editor, the CWL text is the single source of truth: text and diagram side by side, kept in sync, with the guided builder as an optional help, and nothing wired automatically | We first made the guided builder the default. But people arrive with CWL to paste, and automatic wiring connects things behind their backs. The builder itself answered the first plugfest's lesson: writing a recipe required knowing how we had structured the CWL |
-| Oct | One public address for everything (UI and `/api/*` behind one gateway), and the UI also on GitHub Pages | Cloudflare's proxy only forwards a fixed list of ports, so per-service ports could not work behind TLS. The UI has no server logic, so it can run anywhere. The side effect, found only on 28 October with OGC's test suite: services built links without their `/api/…` prefix, until each was told its public prefix ([[[#plugfest-and-interoperability]]]) |
+| Oct | One public address for everything (UI and `/api/*` behind one gateway), and the UI also on GitHub Pages | Cloudflare's proxy only forwards a fixed list of ports, so per-service ports could not work behind TLS. The UI has no server logic, so it can run anywhere. The side effect, found only on 28 October with OGC's test suite: services built links without their `/api/…` prefix, until each was told its public prefix ([[#plugfest-and-interoperability](#plugfest-and-interoperability)]) |
 | 22 Oct | The repository was narrowed to this testbed only, removing earlier mock-only flows | Flows such as vendor binding, semantic alignment and partner pricing only ever existed as mock-ups. Removing them makes clear what the testbed actually demonstrates |
 | 22 Oct | Data ingredients are declared with standard CWL `File` + `format` and passed by reference: the process fetches the data itself | Before, the UI knew a recipe's data inputs from a hard-coded list per recipe, so a recipe saved in a playground slot could never have one; the roofer recipe looked as if it ran without data. We rejected a new extension field (CWL already has File) and reading it from process descriptions (roofer states it only in prose, finding 11) |
 | 22 Oct | Process-specific input shapes are handled in the recipe, with standard CWL `valueFrom`; the Cook recognises a fixed set of patterns and never runs JavaScript | Even with File, roofer wanted `[{"kind": "url", "url": …}]` rather than an OGC `href`. CWL expressions are JavaScript; a small cook either embeds a JavaScript engine or, like ours, supports a subset (finding 5) |
 | 22 Oct | `nldt:jsonSchema`: an optional bridge for parameters CWL's types cannot describe | CWL cannot express `oneOf`, `const` or `pattern`, which roofer's inputs use. Its weakness, a pasted copy that goes stale, led to the 28 October change below |
 | 22 Oct | Extension fields renamed from `x-…` to a declared `nldt:` namespace; the old names are rejected outright | `cwltool --validate` rejected every recipe: CWL only allows extension fields with a declared prefix. Silently ignoring the old names would have dropped a step's process link and failed only at run time. Lesson: deploying a format change means re-storing every recipe (finding 6) |
-| 27 Oct | A failed run says whose failure it is: the Cook's, the Registry's or a step's app | A recipe calls processes the hub does not control; users could not tell a platform fault from a third-party one ([[[#where-a-failure-came-from]]]) |
+| 27 Oct | A failed run says whose failure it is: the Cook's, the Registry's or a step's app | A recipe calls processes the hub does not control; users could not tell a platform fault from a third-party one ([[#where-a-failure-came-from](#where-a-failure-came-from)]) |
 | 27 Oct | Job addresses returned by a remote process are resolved relative to that process's own address | Some servers answer with a relative `/jobs/{jobID}`, which breaks polling. Chaining processes from different vendors surfaces small differences like this |
-| 28 Oct | One naming rule: an app is named by its CWL Operation label, a step by its step label | Each screen showed whatever name was nearest: the step's key, or a title from the remote process description; the recipe's own app name never reached the UI. Once apps can be swapped, the step and its app must have separate names ([[[#standard-cwl-we-use]]], finding 10) |
-| 28 Oct | The Wizard completes the parameter form from each app's own OGC API Process description, at display time; the recipe always wins | Copying schemas into recipes goes stale. Process descriptions already carry titles, descriptions, defaults and limits in standard fields ([[[#parameters-cwl-types-vs-json-schema]]], finding 17) |
-| 28 Oct | Our OGC API Processes services tested with OGC's official test suite, and fixed: OGC's error format, links to the API definition, complete process and job lists, result-not-ready | Until then we had only checked them by hand and with our own clients, which were lenient. The suite found gaps every service shared; it also showed that most of its execute tests need OGC's `echo` test process, which a service with specific inputs cannot replace ([[[#plugfest-and-interoperability]]]) |
-| 28 Oct (realisation) | `internalHref` is a deployment detail that leaked into the recipe format; we recommend dropping it (not yet done) | It works, but a recipe should name _which_ process to call, not how one installation reaches it ([[[#extensions-we-needed]]]) |
+| 28 Oct | One naming rule: an app is named by its CWL Operation label, a step by its step label | Each screen showed whatever name was nearest: the step's key, or a title from the remote process description; the recipe's own app name never reached the UI. Once apps can be swapped, the step and its app must have separate names ([[#standard-cwl-we-use](#standard-cwl-we-use)], finding 10) |
+| 28 Oct | The Wizard completes the parameter form from each app's own OGC API Process description, at display time; the recipe always wins | Copying schemas into recipes goes stale. Process descriptions already carry titles, descriptions, defaults and limits in standard fields ([[#parameters-cwl-types-vs-json-schema](#parameters-cwl-types-vs-json-schema)], finding 17) |
+| 28 Oct | Our OGC API Processes services tested with OGC's official test suite, and fixed: OGC's error format, links to the API definition, complete process and job lists, result-not-ready | Until then we had only checked them by hand and with our own clients, which were lenient. The suite found gaps every service shared; it also showed that most of its execute tests need OGC's `echo` test process, which a service with specific inputs cannot replace ([[#plugfest-and-interoperability](#plugfest-and-interoperability)]) |
+| 28 Oct (realisation) | `internalHref` is a deployment detail that leaked into the recipe format; we recommend dropping it (not yet done) | It works, but a recipe should name _which_ process to call, not how one installation reaches it ([[#extensions-we-needed](#extensions-we-needed)]) |
 | 28 Oct (realisation) | Authentication, delegated access and pricing are the main gaps between this sandbox and real use | Out of scope by design, but every step of the build assumed open, free apps. A real cook would need delegated access to each app, and cooks are only interchangeable once that can be delegated (findings 23–25) |
 
 </section>
@@ -985,10 +983,10 @@ All requests and answers are JSON, except the raw CWL (`application/cwl+yaml`). 
 | 3 | List recipes in the cookbook | `GET /cookbook/recipes` | Ids, titles, descriptions |
 | 4 | A recipe's CWL | `GET /cookbook/recipes/{recipeId}` | The stored text, verbatim |
 | 5 | What parameters it takes | `GET /cookbook/recipes/{recipeId}/schema` | JSON Schema of the recipe's inputs |
-| 6 | Its execution plan | `GET /cookbook/recipes/{recipeId}/dag` | [[[#what-the-dag-contains]]] |
+| 6 | Its execution plan | `GET /cookbook/recipes/{recipeId}/dag` | [[#what-the-dag-contains](#what-the-dag-contains)] |
 | 7 | Its plan with an app swapped | `POST /cookbook/recipes/{recipeId}/effective` | Body `{"toolOverrides": {"<stepId>": "<toolId>"}}`; returns `{schema, dag}`; nothing is stored |
 | 8 | Check a CWL draft | `POST /cookbook/recipes/validate` | Body `{"cwl": "<CWL text>"}`; always 200, with `valid` true or false |
-| 9 | Describe one of our apps | `GET /tools/{tool}/processes/{processId}` | `{tool}` is `add`, `multiply`, `multiply3` or `geo-buffer` ([[[#our-own-apps]]]) |
+| 9 | Describe one of our apps | `GET /tools/{tool}/processes/{processId}` | `{tool}` is `add`, `multiply`, `multiply3` or `geo-buffer` ([[#our-own-apps](#our-own-apps)]) |
 | 10 | Call one of our apps directly | `POST /tools/{tool}/processes/{processId}/execution` | Body `{"inputs": {…}}`; answers at once (synchronous) |
 | 11 | Describe the Cook | `GET /orchestrator/processes/cook` | Its inputs: `recipeId`, `parameters`, `toolOverrides` |
 | 12 | Run a recipe and wait for the result | `POST /orchestrator/processes/cook/execution` | Body `{"inputs": {"recipeId": …, "parameters": {…}, "toolOverrides": {…}}}`; answers `{result, trace}` when the run is done |
@@ -998,9 +996,9 @@ All requests and answers are JSON, except the raw CWL (`application/cwl+yaml`). 
 | 16 | List all jobs | `GET /orchestrator/jobs` | Every job since the Cook last started (jobs are kept in memory only) |
 | 17 | Cancel a job | `DELETE /orchestrator/jobs/{jobID}` | Stops the run and dismisses any remote job |
 | 18 | List datasets (ingredients and saved results) | `GET /hub/datasets`, then `GET /hub/datasets/{datasetId}/resources` | |
-| 19 | A dataset's data, as a process would fetch it | `GET /hub/datasets/{datasetId}/resources/{resourceId}/data` | Use this address as a data input ([[[#examples]]]) |
+| 19 | A dataset's data, as a process would fetch it | `GET /hub/datasets/{datasetId}/resources/{resourceId}/data` | Use this address as a data input ([[#examples](#examples)]) |
 
-**Links in answers.** The addresses the services return (a job's `Location` header, `self`, `monitor`, `results` and `execute` links) can be followed directly. Until the October 2026 redeployment, they left out the `/api/<service>` part of the address ([[[#plugfest-and-interoperability]]]); with an older deployment, build the address yourself: `/api/orchestrator/jobs/{jobID}`.
+**Links in answers.** The addresses the services return (a job's `Location` header, `self`, `monitor`, `results` and `execute` links) can be followed directly. Until the October 2026 redeployment, they left out the `/api/<service>` part of the address ([[#plugfest-and-interoperability](#plugfest-and-interoperability)]); with an older deployment, build the address yourself: `/api/orchestrator/jobs/{jobID}`.
 
 ### Our own apps {#our-own-apps}
 
@@ -1109,7 +1107,7 @@ curl "$B/orchestrator/jobs"
 # → {"jobs": [{"jobID": "…", "status": "successful", "recipeId": "playground-1", …}, …]}
 ```
 
-Runs started through the API are not saved to Hub Datasets; saving the result is something the App Store UI does after a run ([[[#what-happens-when-you-click-execute]]]).
+Runs started through the API are not saved to Hub Datasets; saving the result is something the App Store UI does after a run ([[#what-happens-when-you-click-execute](#what-happens-when-you-click-execute)]).
 
 </section>
 
@@ -1117,7 +1115,7 @@ Runs started through the API are not saved to Hub Datasets; saving the result is
 
 ## The playground recipes, annotated
 
-The three playground slots can be overwritten by anyone ([[[#use-cases-and-bundled-recipes]]]), so this appendix keeps them as they were at the time of writing. These are the bundled versions, the ones Reset restores, from `services/cookbook-registry/recipes/` in the repository. The files' own comments are replaced by short notes marked `# ←`; nothing else differs. The CWL constructs themselves are explained in [[[#the-recipe-format-a-cwl-profile]]].
+The three playground slots can be overwritten by anyone ([[#use-cases-and-bundled-recipes](#use-cases-and-bundled-recipes)]), so this appendix keeps them as they were at the time of writing. These are the bundled versions, the ones Reset restores, from `services/cookbook-registry/recipes/` in the repository. The files' own comments are replaced by short notes marked `# ←`; nothing else differs. The CWL constructs themselves are explained in [[#the-recipe-format-a-cwl-profile](#the-recipe-format-a-cwl-profile)].
 
 ### playground-1: roofer building reconstruction {#playground-1-roofer-building-reconstruction}
 
@@ -1446,7 +1444,7 @@ steps:
 
 ### playground-3: Varidian's Subsidence Analysis {#playground-3-varidians-subsidence-analysis}
 
-One step around Varidian's own OGC API Process ([[[#use-cases-and-bundled-recipes]]]): where subsidence stays below a threshold, and so where construction is possible. Every input is passed through unchanged, so this recipe needs no `valueFrom` and no `requirements`.
+One step around Varidian's own OGC API Process ([[#use-cases-and-bundled-recipes](#use-cases-and-bundled-recipes)]): where subsidence stays below a threshold, and so where construction is possible. Every input is passed through unchanged, so this recipe needs no `valueFrom` and no `requirements`.
 
 ```yaml
 cwlVersion: v1.2

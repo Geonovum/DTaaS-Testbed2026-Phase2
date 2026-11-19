@@ -8,6 +8,19 @@ In this chapter only the summaries of the participants are included. The full re
 
 ## Adoption topic #2: GeoLabs
 
+__Results at a glance__
+
+| Question | Answer |
+|---|---|
+| Is the service available through OGC API - Processes? | Yes, at https://host1.tb.geonovum.geolabs.fr/ogc-api/ and https://host2.tb.geonovum.geolabs.fr/ogc-api/ |
+| Does it pass the official OGC test suite (Part 1: Core 1.0)? | Yes: 3 of 3 conformance classes; 53 tests passed, 0 failed, 1 skipped for `host1` |
+| Does it pass the Geonovum `ogc-checker`? | Yes: 0 diagnostics of any kind, with the version 1.0.0 rules on `host1` and with the version 2.0.0 rules on the second Server Instance `host2` |
+| Does it support sync and async execution and job management? | Yes, on all three processes on the two server instances |
+| Does it work with version 2.0 of the standard (draft)? | Yes, as far as the tools can tell: the `host2` Server Instance passes `ogc-checker` 2.0.0 with 0 diagnostics; available in the ZOO-Project-DRU Helm chart since version 0.10.5. However, some endpoints are not yet implemented. |
+| Can other participants’ clients use the service? | Partly, they can discover, describe, and run its processes. One client could also display the route on a map; another had issues detecting the input data types/formats, as discussed in Section 5. |
+| What did the testbed deliver beyond the service? | The routing service working as a process accessible from an OGC API - Processes - Part 1: Core Server Instance, three corrections merged into the official OGC schemas, Docker packaging merged into `ogc-checker`, two Server Instances for testing, and six recommendations (Section 9). |
+
+
 ## Adoption topic #3: Breinstein
 
 ## Adoption topic #3: Imagem

@@ -39,6 +39,10 @@ var respecConfig =
     {name: "Collaboral"},
     {name: "Varidian"},
     {name: "Future Insight"},
+    {name: "Gérald Fenoy",
+    company: "GeoLabs SARL",
+    companyURL: "https://www.geolabs.fr"
+    }
 
   ],
   editors: [
