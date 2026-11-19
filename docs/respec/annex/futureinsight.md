@@ -1,4 +1,3 @@
-![](media/image1.png)
 
 **Testbed 2026 Digital Twin as a Service (Phase 2)**
 
