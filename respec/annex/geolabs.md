@@ -401,7 +401,6 @@ docker run --rm -v "$PWD/test.json:/data/openapi.json:ro" \
 ## Appendix B. Resources {#gl-appendix-b}
 
 * Demonstration video: provided with this report, in this folder.
-* Informal account: [Topic2-blog.md](Topic2-blog.md)
 * Live endpoints: <https://host1.tb.geonovum.geolabs.fr/ogc-api/> and <https://host2.tb.geonovum.geolabs.fr/ogc-api/>
 * NWB Route Explorer: <https://host1.tb.geonovum.geolabs.fr/routing-ui/>
 * Deployment files and demonstration application: <https://github.com/GeoLabs/tb-geonovum-pgrouting>
