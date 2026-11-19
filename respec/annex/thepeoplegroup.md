@@ -1,4 +1,4 @@
-**Geonovum Testbed 2026 · Topic 5 "Web 3D Context" — SCX Scene Context JSON: Findings from implementation and cross-viewer testing**
+# Geonovum Testbed 2026 · Topic 5 "Web 3D Context" — SCX Scene Context JSON: Findings from implementation and cross-viewer testing
 
 | | |
 |---|---|
