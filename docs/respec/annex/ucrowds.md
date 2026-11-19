@@ -245,7 +245,7 @@ The demonstration used an event design for Huntenpop 2025, a two-day music festi
 
 AniVizzion prepared the event scene in SCAD Re-Event. The scene included the site environment, walkable areas, obstacles, entrances, exits, queues, and waypoints. These elements provided the geographic and functional information needed to evaluate the transfer of the event design into SimCrowds.
 
-![Demo environment](./media/walkable_demo_scx.pdf)
+![Demo environment](./media/walkable_demo_scx.png)
 *Figure 1: Huntenpop 2025 event design in SCAD Re-Event, showing the festival layout and functional areas.
 
 ### 6.2 Export output and JSON-FG validation
@@ -277,7 +277,7 @@ This capability already existed in SimCrowds before the iCAD project. The projec
 
 The WMS output was successfully displayed in QGIS (Figure 3) and Esri Map Viewer. This allows the spatial distribution of simulated crowds to be viewed alongside other geographic information without requiring the receiving application to support the SimCrowds simulation format.
 
-![QGIS](./Figures/QGIS_wms_densities.png)
+![QGIS](./media/QGIS_wms_densities.png)
 *Figure 3: WMS density map visualization in QGIS. The colors indicate the density levels, e.g. blue areas have low-density and orange areas (in this case, near the entry) are high-density.*
 
 ### 6.5 Summary of demonstrated results
