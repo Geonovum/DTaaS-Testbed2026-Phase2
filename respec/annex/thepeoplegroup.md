@@ -72,13 +72,7 @@ Each finding describes the observation, the evidence it is based on, our proposa
 
 **What we built and tested.** The findings come from three parts of our work, referred to below as sources A, B and C: (A) an SCX exporter in the TPG DigitalTwin (Unreal Engine 5 with Cesium for Unreal), (B) an SCX importer in the same DigitalTwin, and (C) a cross-viewer test in which the exported document was opened side by side in CesiumJS 1.120 and ArcGIS Maps SDK for JavaScript 4.33.
 
-```mermaid
-flowchart LR
-    DT["TPG DigitalTwin<br/>Unreal Engine 5 + Cesium for Unreal"] -->|"A · SCX exporter"| SCX[("scene.scx.json")]
-    SCX -->|"B · SCX importer"| DT2["TPG DigitalTwin"]
-    SCX -->|"C · cross-viewer test"| CJS["CesiumJS 1.120"]
-    SCX -->|"C · cross-viewer test"| AGS["ArcGIS Maps SDK<br/>for JavaScript 4.33"]
-```
+![](media/flowchart-lr.png)
 
 **Test scene.** The Rotterdam / Merwehaven twin: 28 resources in 12 dataset groups. Export of 16 Oct 2026 06:38 UTC:
 
