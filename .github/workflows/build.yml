@@ -1,0 +1,333 @@
+name: Build / check
+on:
+  workflow_call:
+jobs:
+  build:
+    name: Snapshot + Checks
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+
+      - name: Bepaal branch voor terugschrijven
+        id: commit-target
+        if: ${{ github.event_name == 'push' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          TARGET_BRANCH="${GITHUB_REF#refs/heads/}"
+          TARGET_BRANCH="${TARGET_BRANCH#refs/heads/}"
+
+          if [[ -z "$TARGET_BRANCH" ]]; then
+            echo "::error title=Doelbranch ontbreekt::Kan geen branch bepalen om de gegenereerde documenten naar terug te schrijven."
+            exit 1
+          fi
+
+          if ! git fetch --no-tags origin "refs/heads/$TARGET_BRANCH:refs/remotes/origin/$TARGET_BRANCH"; then
+            echo "::error title=Doelbranch niet gevonden::Kan branch '$TARGET_BRANCH' niet ophalen om de gegenereerde documenten terug te schrijven."
+            exit 1
+          fi
+
+          TARGET_SHA="$(git rev-parse "refs/remotes/origin/$TARGET_BRANCH")"
+          if [[ "$TARGET_SHA" != "$GITHUB_SHA" ]]; then
+            echo "::error title=Doelbranch is gewijzigd::Branch '$TARGET_BRANCH' staat op $TARGET_SHA, maar deze workflow draait voor commit $GITHUB_SHA. De gegenereerde documenten worden daarom niet automatisch teruggeschreven."
+            exit 1
+          fi
+
+          git checkout -B "$TARGET_BRANCH" "refs/remotes/origin/$TARGET_BRANCH"
+          echo "should_commit=true" >> "$GITHUB_OUTPUT"
+          echo "target_branch=$TARGET_BRANCH" >> "$GITHUB_OUTPUT"
+
+      - name: Prepare directories
+        run: |
+          mkdir -p static "$RUNNER_TEMP/nl-respec-validation"
+
+      - name: Blokkeer raw.githubusercontent.com-links in bronbestand
+        shell: bash
+        run: |
+          set -euo pipefail
+          MATCH_FILE="$(mktemp)"
+          trap 'rm -f "$MATCH_FILE"' EXIT
+
+          GREP_STATUS=0
+          grep -nE 'raw\.githubusercontent\.com' index.html > "$MATCH_FILE" || GREP_STATUS=$?
+
+          if [[ "$GREP_STATUS" -gt 1 ]]; then
+            echo "Zoeken naar raw.githubusercontent.com-links in index.html mislukte."
+            exit "$GREP_STATUS"
+          fi
+
+          if [[ -s "$MATCH_FILE" ]]; then
+            if [[ "${{ github.event_name }}" == "release" ]]; then
+              echo "::error title=Publicatie geblokkeerd::index.html bevat verwijzingen naar raw.githubusercontent.com. Vervang deze links door verwijzingen naar docs.geostandaarden.nl."
+              echo "Gevonden verwijzingen in index.html:"
+              cat "$MATCH_FILE"
+              exit 1
+            fi
+
+            echo "::warning title=Controlewaarschuwing::index.html bevat verwijzingen naar raw.githubusercontent.com. Vervang deze links door verwijzingen naar docs.geostandaarden.nl."
+            echo "Gevonden verwijzingen in index.html:"
+            cat "$MATCH_FILE"
+          fi
+
+      - name: Generate HTML snapshot
+        run: npx --yes respec@37.3.2 --localhost --disable-sandbox --timeout 120 --src index.html --out snapshot.html
+
+      - name: Check localized header links
+        run: |
+          if [ -f scripts/check-localized-header-links.mjs ]; then
+            node scripts/check-localized-header-links.mjs snapshot.html
+          fi
+
+      - name: Prepare publication for validation
+        run: |
+          set -euo pipefail
+
+          PUBLICATION_DIR="$GITHUB_WORKSPACE/publication-validation"
+          rm -rf "$PUBLICATION_DIR"
+          mkdir -p "$PUBLICATION_DIR"
+          cp snapshot.html "$PUBLICATION_DIR/index.html"
+
+          for dir in data media js css; do
+            if [[ -d "$dir" ]]; then
+              cp -R "$dir" "$PUBLICATION_DIR/"
+            fi
+          done
+
+          find "$PUBLICATION_DIR" -type f \
+            \( -name '*.respec.html' -o -name '*.respec.catalog.xhtml' \) \
+            -delete
+
+      - name: Validate publication HTML
+        id: publication-html
+        uses: anishathalye/proof-html@f060b7619c2410bd85d970459a60ef431cf47ed5 # v2.2.5
+        with:
+          directory: publication-validation
+          check_html: true
+          check_css: false
+          disable_external: true
+          check_external_hash: false
+          enforce_https: false
+          ignore_empty_alt: true
+
+      - name: Check for alternateFormats via Node
+        id: config
+        run: |
+          # Maak config require-baar
+          cp ./js/config.js config.js
+          echo "module.exports = { respecConfig };" >> config.js
+
+          # Laat Node bepalen of er een PDF entry is (en exitcode gebruiken)
+          if node -e "const {respecConfig}=require('./config.js');
+            const ok = Array.isArray(respecConfig.alternateFormats)
+              && respecConfig.alternateFormats.some(f => f && f.label==='pdf' && f.uri);
+            if (!ok) process.exit(1);" ; then
+            echo "grep=true" >> $GITHUB_OUTPUT
+          else
+            echo "grep=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Copy pdf.js if needed
+        if: ${{ steps.config.outputs.grep == 'true' }}
+        run: cp .github/workflows/pdf.js .
+
+      - name: Generate PDF(s)
+        if: ${{ steps.config.outputs.grep == 'true' }}
+        run: |
+          cp ./js/config.js config.js
+          echo "module.exports = { respecConfig };" >> config.js
+          echo "var window = {respecMermaid:{createFigures:null}};" | cat - config.js > temp && mv temp config.js
+          npm install puppeteer
+          python3 -m http.server 8081 >/dev/null 2>&1 &
+          # wacht tot de lokale server draait
+          for i in {1..30}; do
+            if curl -sf http://localhost:8081/snapshot.html > /dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          curl -sf http://localhost:8081/snapshot.html > /dev/null || (echo "Local HTTP server on 8081 not reachable"; exit 1)
+          rm -f *.pdf
+          PDF_SNAPSHOT_URL=http://localhost:8081/snapshot.html node pdf.js
+          mv *.pdf static/
+
+      - name: Serve snapshot over HTTP
+        run: |
+          cd "${{ github.workspace }}"
+          python3 -m http.server 8080 >/dev/null 2>&1 &
+          echo "SNAPSHOT_SERVER_PID=$!" >> "$GITHUB_ENV"
+
+      - name: Locate Chrome and ChromeDriver for WCAG check
+        id: browser
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          CHROME_BIN="$(command -v google-chrome)"
+          CHROMEDRIVER_BIN="${CHROMEWEBDRIVER}/chromedriver"
+
+          test -x "$CHROME_BIN"
+          test -x "$CHROMEDRIVER_BIN"
+
+          "$CHROME_BIN" --version
+          "$CHROMEDRIVER_BIN" --version
+
+          echo "chrome_bin=$CHROME_BIN" >> "$GITHUB_OUTPUT"
+          echo "chromedriver_bin=$CHROMEDRIVER_BIN" >> "$GITHUB_OUTPUT"
+
+      - name: Run WCAG 2.2 check
+        run: |
+          for i in {1..30}; do
+            if curl -sf http://localhost:8080/snapshot.html > /dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          curl -sf http://localhost:8080/snapshot.html > /dev/null || (echo "Local HTTP server on 8080 not reachable"; exit 1)
+
+          set -o pipefail
+          VALIDATION_DIR="$RUNNER_TEMP/nl-respec-validation"
+          RAW_WCAG="$VALIDATION_DIR/wcag-raw.json"
+          if npx --yes @axe-core/cli@latest --stdout \
+            --chrome-path "${{ steps.browser.outputs.chrome_bin }}" \
+            --chromedriver-path "${{ steps.browser.outputs.chromedriver_bin }}" \
+            --tags wcag2a,wcag2aa,wcag21a,wcag21aa,wcag22a,wcag22aa \
+            http://localhost:8080/snapshot.html > "$RAW_WCAG"; then
+            if jq '
+                  [
+                    .[] as $page |
+                    $page.violations[] |
+                    {
+                      url: $page.url,
+                      id,
+                      impact,
+                      description,
+                      helpUrl,
+                      nodes: [
+                        .nodes[] |
+                        {
+                          target,
+                          html,
+                          failureSummary
+                        }
+                      ]
+                    }
+                  ]
+                ' "$RAW_WCAG" > "$VALIDATION_DIR/wcag-report.json"; then
+              echo "WCAG output saved to $VALIDATION_DIR/wcag-report.json"
+            else
+              echo "{\"error\":\"WCAG-check mislukt: axe-output was geen geldige JSON. Zie logs voor details.\"}" > "$VALIDATION_DIR/wcag-report.json"
+              echo "WCAG output saved to $VALIDATION_DIR/wcag-report.json (error)"
+            fi
+          else
+            echo "{\"error\":\"WCAG-check mislukt (axe-cli). Zie logs voor details.\"}" > "$VALIDATION_DIR/wcag-report.json"
+            echo "WCAG output saved to $VALIDATION_DIR/wcag-report.json (error)"
+          fi
+          rm -f "$RAW_WCAG"
+
+      - name: Validate publication links
+        id: publication-links
+        if: ${{ !cancelled() }}
+        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
+        with:
+          args: >-
+            --offline
+            --root-dir "${{ github.workspace }}/publication-validation"
+            './index.html'
+          fail: true
+          failIfEmpty: true
+          format: markdown
+          jobSummary: true
+          output: ${{ runner.temp }}/nl-respec-validation/link-check.txt
+          workingDirectory: ${{ github.workspace }}/publication-validation
+
+      - name: Summarize publication preflight
+        if: ${{ always() }}
+        run: |
+          HTML_OUTCOME="${{ steps.publication-html.outcome }}"
+          LINK_OUTCOME="${{ steps.publication-links.outcome }}"
+          BUILD_STATUS="${{ job.status }}"
+
+          {
+            echo "## Publicatiepreflight"
+            echo
+            echo "| Controle | Resultaat |"
+            echo "| --- | --- |"
+            echo "| HTML | $HTML_OUTCOME |"
+            echo "| Links | $LINK_OUTCOME |"
+            echo "| Build | $BUILD_STATUS |"
+            echo
+
+            if [[ "$BUILD_STATUS" == "success" && "$HTML_OUTCOME" == "success" && "$LINK_OUTCOME" == "success" ]]; then
+              echo "✅ **Publicatiegereed: ja**"
+            else
+              echo "❌ **Publicatiegereed: nee**"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Stop snapshot HTTP server
+        if: always()
+        run: |
+          if [[ -n "${SNAPSHOT_SERVER_PID:-}" ]]; then
+            kill "$SNAPSHOT_SERVER_PID" || true
+          fi
+
+      - name: Remove validation working directory
+        if: ${{ always() }}
+        run: rm -rf "$GITHUB_WORKSPACE/publication-validation"
+
+      - name: Commit all results
+        if: ${{ steps.commit-target.outputs.should_commit == 'true' }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          if [[ "${{ steps.config.outputs.grep }}" == "true" ]] && ls static/*.pdf 1>/dev/null 2>&1; then
+            mv static/*.pdf .
+          fi
+
+          git add snapshot.html
+
+          if compgen -G "*.pdf" > /dev/null; then
+            git add *.pdf
+          fi
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+
+          git commit -m "Snapshot gegenereerd"
+
+          TARGET_BRANCH="${{ steps.commit-target.outputs.target_branch }}"
+          git push origin HEAD:"$TARGET_BRANCH"
+
+      - name: Upload snapshot artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: snapshot
+          path: |
+            snapshot.html
+            static/*.pdf
+            media/**/*
+            js/**/*
+            data/**/*
+
+      - name: Upload validation reports
+        if: ${{ always() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: validation-reports
+          path: |
+            ${{ runner.temp }}/nl-respec-validation/wcag-report.json
+            ${{ runner.temp }}/nl-respec-validation/link-check.txt
+          if-no-files-found: warn

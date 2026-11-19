@@ -1,0 +1,113 @@
+name: Update workflows in document repos
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run — toon wijzigingen maar commit niet'
+        type: boolean
+        default: false
+
+jobs:
+  # ── Stap 1: repos.json bijhouden ────────────────────────────────────────────
+  sync-repos-json:
+    name: Sync repos.json
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+
+      - name: Maak GitHub App token aan voor Geonovum
+        id: token-geonovum
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ secrets.GH_APP_ID }}
+          private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
+          owner: Geonovum
+
+      - name: Maak GitHub App token aan voor BROprogramma
+        id: token-broprogramma
+        continue-on-error: true
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ secrets.GH_APP_ID }}
+          private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
+          owner: BROprogramma
+
+      - name: Sync repos.json
+        env:
+          GH_TOKEN_GEONOVUM: ${{ steps.token-geonovum.outputs.token }}
+          GH_TOKEN_BROPROGRAMMA: ${{ steps.token-broprogramma.outputs.token }}
+          SELF_OWNER: ${{ github.repository_owner }}
+          SELF_REPO: ${{ github.event.repository.name }}
+        run: >
+          node scripts/sync-repos.mjs
+          --repos-file .github/repos.json
+          --self-owner "$SELF_OWNER"
+          --self-repo "$SELF_REPO"
+
+      - name: Commit repos.json indien gewijzigd
+        env:
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git add .github/repos.json
+          if git diff --staged --quiet; then
+            echo "Geen wijzigingen in repos.json."
+          elif [[ "$DRY_RUN" == "true" ]]; then
+            echo "🔍 Dry run — repos.json zou als volgt wijzigen:"
+            git diff --staged -- .github/repos.json
+          else
+            git commit -m "chore: sync repos.json"
+            git push
+          fi
+
+  # ── Stap 2: workflows bijwerken ─────────────────────────────────────────────
+  update:
+    name: ${{ matrix.org }}
+    needs: sync-repos-json
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        org: [Geonovum, BROprogramma]
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.ref }}
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+
+      - name: Maak GitHub App token aan voor ${{ matrix.org }}
+        id: token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ secrets.GH_APP_ID }}
+          private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
+          owner: ${{ matrix.org }}
+
+      - name: Update workflows in ${{ matrix.org }} repos
+        env:
+          GH_TOKEN: ${{ steps.token.outputs.token }}
+          ORG: ${{ matrix.org }}
+          DRY_RUN: ${{ inputs.dry_run }}
+          TEMPLATE_GITHUB_DIR: ${{ github.workspace }}/.github
+          SELF_OWNER: ${{ github.repository_owner }}
+          SELF_REPO: ${{ github.event.repository.name }}
+        run: >
+          node scripts/update-document-repos.mjs
+          --org "$ORG"
+          --repos-file .github/repos.json
+          --template-github-dir "$TEMPLATE_GITHUB_DIR"
+          --self-owner "$SELF_OWNER"
+          --self-repo "$SELF_REPO"

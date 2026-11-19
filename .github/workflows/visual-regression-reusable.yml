@@ -1,0 +1,240 @@
+name: Visual regression reusable
+
+on:
+  workflow_call:
+    inputs:
+      source:
+        description: ReSpec source file
+        required: false
+        type: string
+        default: index.html
+      snapshot:
+        description: Generated snapshot file
+        required: false
+        type: string
+        default: snapshot.html
+      base_ref:
+        description: Optional base ref, branch, tag, or SHA
+        required: false
+        type: string
+        default: ""
+      head_ref:
+        description: Optional head ref, branch, tag, or SHA
+        required: false
+        type: string
+        default: ""
+      diff_threshold:
+        description: Difference ratio above which a viewport is marked changed
+        required: false
+        type: string
+        default: "0.01"
+      ignore_selectors:
+        description: Comma or newline separated CSS selectors to hide before screenshots
+        required: false
+        type: string
+        default: ""
+      fail_on_difference:
+        description: Fail the workflow when a viewport exceeds diff_threshold
+        required: false
+        type: boolean
+        default: false
+  workflow_dispatch:
+    inputs:
+      source:
+        description: ReSpec source file
+        required: false
+        default: index.html
+      snapshot:
+        description: Generated snapshot file
+        required: false
+        default: snapshot.html
+      base_ref:
+        description: Optional base ref, branch, tag, or SHA
+        required: false
+        default: ""
+      head_ref:
+        description: Optional head ref, branch, tag, or SHA
+        required: false
+        default: ""
+      diff_threshold:
+        description: Difference ratio above which a viewport is marked changed
+        required: false
+        default: "0.01"
+      ignore_selectors:
+        description: Comma or newline separated CSS selectors to hide before screenshots
+        required: false
+        default: ""
+      fail_on_difference:
+        description: Fail the workflow when a viewport exceeds diff_threshold
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  visual-regression:
+    name: Compare ReSpec snapshots
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    env:
+      WORK_DIR: visual-regression
+    steps:
+      - name: Determine refs
+        id: refs
+        shell: bash
+        env:
+          BASE_REF_INPUT: ${{ inputs.base_ref }}
+          HEAD_REF_INPUT: ${{ inputs.head_ref }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          CURRENT_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          BASE_REF="$BASE_REF_INPUT"
+          HEAD_REF="$HEAD_REF_INPUT"
+
+          if [[ -z "$BASE_REF" && -n "${PR_BASE_SHA:-}" ]]; then
+            BASE_REF="$PR_BASE_SHA"
+          fi
+
+          if [[ -z "$HEAD_REF" && -n "${PR_HEAD_SHA:-}" ]]; then
+            HEAD_REF="$PR_HEAD_SHA"
+          fi
+
+          if [[ -z "$BASE_REF" ]]; then
+            BASE_REF="$DEFAULT_BRANCH"
+          fi
+
+          if [[ -z "$HEAD_REF" ]]; then
+            HEAD_REF="$CURRENT_SHA"
+          fi
+
+          echo "base_ref=$BASE_REF" >> "$GITHUB_OUTPUT"
+          echo "head_ref=$HEAD_REF" >> "$GITHUB_OUTPUT"
+          echo "Base ref: $BASE_REF"
+          echo "Head ref: $HEAD_REF"
+
+      - name: Determine tooling ref
+        id: tooling
+        shell: bash
+        env:
+          WORKFLOW_REF: ${{ job.workflow_ref }}
+        run: |
+          set -euo pipefail
+
+          TOOLING_REPOSITORY="${WORKFLOW_REF%%/.github/workflows/*}"
+          TOOLING_REF="${WORKFLOW_REF##*@}"
+
+          if [[ -z "$TOOLING_REPOSITORY" || -z "$TOOLING_REF" ]]; then
+            echo "::error title=Workflow ref ontbreekt::Kan job.workflow_ref niet parsen: $WORKFLOW_REF"
+            exit 1
+          fi
+
+          echo "repository=$TOOLING_REPOSITORY" >> "$GITHUB_OUTPUT"
+          echo "ref=$TOOLING_REF" >> "$GITHUB_OUTPUT"
+          echo "Tooling repository: $TOOLING_REPOSITORY"
+          echo "Tooling ref: $TOOLING_REF"
+
+      - name: Checkout base
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ steps.refs.outputs.base_ref }}
+          path: ${{ env.WORK_DIR }}/base
+
+      - name: Checkout head
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ steps.refs.outputs.head_ref }}
+          path: ${{ env.WORK_DIR }}/head
+
+      - name: Checkout visual regression tooling
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ steps.tooling.outputs.repository }}
+          ref: ${{ steps.tooling.outputs.ref }}
+          path: ${{ env.WORK_DIR }}/template
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+
+      - name: Prepare ReSpec snapshots
+        shell: bash
+        env:
+          SOURCE: ${{ inputs.source }}
+          SNAPSHOT: ${{ inputs.snapshot }}
+        run: |
+          set -euo pipefail
+
+          build_snapshot() {
+            local label="$1"
+            local dir="$2"
+
+            echo "Building $label snapshot in $dir"
+            cd "$GITHUB_WORKSPACE/$dir"
+
+            if [[ ! -f "$SOURCE" ]]; then
+              echo "::error title=Source file missing::$SOURCE not found in $dir"
+              exit 1
+            fi
+
+            npx --yes respec --localhost --disable-sandbox --src "$SOURCE" --out "$SNAPSHOT"
+          }
+
+          if [[ -f "$GITHUB_WORKSPACE/$WORK_DIR/base/$SNAPSHOT" ]]; then
+            echo "Using committed base snapshot: $SNAPSHOT"
+          else
+            echo "Base snapshot missing; building fallback base snapshot."
+            build_snapshot "base" "$WORK_DIR/base"
+          fi
+
+          build_snapshot "head" "$WORK_DIR/head"
+
+      - name: Install comparison tooling
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mkdir -p "$RUNNER_TEMP/visual-regression-tools"
+          cp "$GITHUB_WORKSPACE/$WORK_DIR/template/scripts/visual-regression/compare.mjs" \
+            "$RUNNER_TEMP/visual-regression-tools/compare.mjs"
+
+          cd "$RUNNER_TEMP/visual-regression-tools"
+          npm init -y
+          npm install --no-audit --no-fund @playwright/test pixelmatch pngjs
+          npx playwright install --with-deps chromium
+
+      - name: Compare screenshots
+        shell: bash
+        env:
+          SNAPSHOT: ${{ inputs.snapshot }}
+          DIFF_THRESHOLD: ${{ inputs.diff_threshold }}
+          IGNORE_SELECTORS: ${{ inputs.ignore_selectors }}
+          FAIL_ON_DIFFERENCE: ${{ inputs.fail_on_difference }}
+        run: |
+          set -euo pipefail
+
+          mkdir -p "$GITHUB_WORKSPACE/$WORK_DIR/report"
+          cd "$RUNNER_TEMP/visual-regression-tools"
+
+          node compare.mjs \
+            --base-dir "$GITHUB_WORKSPACE/$WORK_DIR/base" \
+            --head-dir "$GITHUB_WORKSPACE/$WORK_DIR/head" \
+            --out-dir "$GITHUB_WORKSPACE/$WORK_DIR/report" \
+            --path "$SNAPSHOT" \
+            --threshold "$DIFF_THRESHOLD" \
+            --ignore-selectors "$IGNORE_SELECTORS" \
+            --fail-on-difference "$FAIL_ON_DIFFERENCE"
+
+          cat "$GITHUB_WORKSPACE/$WORK_DIR/report/summary.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload visual regression report
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: always()
+        with:
+          name: visual-regression-report
+          path: ${{ env.WORK_DIR }}/report
+          if-no-files-found: error

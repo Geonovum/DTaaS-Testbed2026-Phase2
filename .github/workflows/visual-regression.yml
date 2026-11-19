@@ -1,0 +1,11 @@
+name: Visual regression
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  visual-regression:
+    uses: Geonovum/NL-ReSpec-template/.github/workflows/visual-regression-reusable.yml@main
+    with:
+      fail_on_difference: false
