@@ -1,12 +1,6 @@
-**Testbed 2026 Digital Twin as a Service (Phase 2)**
+# Topic 4: App-Store / Recipes — Future Insight
 
-**Research topic #4: App-Store / Recipes**
-
-**Final Report**
-
-Future Insight
-
-<nav id="toc"></nav>
+*Testbed 2026 Digital Twin as a Service (Phase 2) · research topic #4 · final report*
 
 ## Summary {#summary}
 
