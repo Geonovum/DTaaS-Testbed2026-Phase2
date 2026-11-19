@@ -117,7 +117,7 @@ Content-Type: application/json
 }
 ```
 
-The `startPoint` and `endPoint` inputs are `lon,lat` strings. The `corridorMeters` input defines the buffer around the two points for selecting candidate roads (default: 5000 m). The server returns the route as GeoJSON. If the `Prefer: respond-async` header is used, the server returns a job, which the client follows until the result is ready. The [article version](Topic2-article.md) provides the full job status document and result.
+The `startPoint` and `endPoint` inputs are `lon,lat` strings. The `corridorMeters` input defines the buffer around the two points for selecting candidate roads (default: 5000 m). The server returns the route as GeoJSON. If the `Prefer: respond-async` header is used, the server returns a job, which the client follows until the result is ready. The [article version] provides the full job status document and result.
 
 ### Demonstration application {#gl-sec-2-5}
 
@@ -401,7 +401,6 @@ docker run --rm -v "$PWD/test.json:/data/openapi.json:ro" \
 ## Appendix B. Resources {#gl-appendix-b}
 
 * Demonstration video: provided with this report, in this folder.
-* Scientific-article version of this report: [Topic2-article.md](Topic2-article.md)
 * Informal account: [Topic2-blog.md](Topic2-blog.md)
 * Live endpoints: <https://host1.tb.geonovum.geolabs.fr/ogc-api/> and <https://host2.tb.geonovum.geolabs.fr/ogc-api/>
 * NWB Route Explorer: <https://host1.tb.geonovum.geolabs.fr/routing-ui/>

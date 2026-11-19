@@ -34,7 +34,7 @@ var respecConfig =
       companyURL: "https://www.geonovum.nl/"
     },
     {name: "uCrowds"},
-    {name: "Annivizion"},
+    {name: "Anivizion"},
     {name: "The People Group"},
     {name: "Collaboral"},
     {name: "Varidian"},
