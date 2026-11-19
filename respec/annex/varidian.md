@@ -564,7 +564,7 @@ We have the following endpoints:
 
 ## Appendix C: Facet analysis
 
-Spreadsheet with full facet analysis: [facet_analysis.xlsx](./attachments/facet_analysis.xlsx)
+Spreadsheet with full facet analysis: [facet_analysis.xlsx](https://github.com/Geonovum/DTaaS-Testbed2026-Phase2/blob/main/Topic4-Varidian/attachments/facet_analysis.xlsx)
 
 ## Appendix D: Sources
 
