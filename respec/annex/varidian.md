@@ -1,45 +1,5 @@
-# Testbed 2026 – Phase 2 | Varidian
+# Topic 4: Varidian
 
-### *Research topic #4: App-Store / Recipes*
-
-# Table of Contents
-
-- [Introduction](#introduction)
-    - [Research question](#research-question)
-    - [Use case](#use-case)
-- [Approach](#approach)
-    - [The platform](#the-platform)
-    - [Recipe definition language](#recipe-definition-language)
-        - [Language selection](#language-selection)
-        - [Requirements](#requirements)
-        - [Best suited: WDL and Sprocket runner](#best-suited-wdl-and-sprocket-runner)
-    - [Created recipes](#created-recipes)
-        - [Subsidence Analysis Recipe](#subsidence-analysis-recipe)
-        - [Expert Site Analysis Recipe](#expert-site-analysis-recipe)
-        - [Soil-Guided Site Analysis Recipe](#soil-guided-site-analysis-recipe)
-    - [Platform expanded with recipes](#platform-expanded-with-recipes)
-- [Results](#results)
-    - [Facet analysis: what does an end user need to trust a workflow result?](#facet-analysis-what-does-an-end-user-need-to-trust-a-workflow-result)
-        - [Recommendations](#recommendations)
-- [Discussion](#discussion)
-    - [How do we see the lifecycle of a recipe](#how-do-we-see-the-lifecycle-of-a-recipe)
-        - [Writing a recipe](#writing-a-recipe)
-        - [Installation](#installation)
-        - [Usage](#usage)
-    - [From recipes to triggered workflows](#from-recipes-to-triggered-workflows)
-        - [Workflows as the design, triggers as the mechanism](#workflows-as-the-design-triggers-as-the-mechanism)
-        - [Context conditions](#context-conditions)
-        - [Outcomes](#outcomes)
-        - [Joining paths](#joining-paths)
-        - [Records as the basis for trust](#records-as-the-basis-for-trust)
-- [Conclusions](#conclusions)
-    - [Plugfests](#plugfests)
-    - [OGC standards](#ogc-standards)
-- [Appendices](#appendices)
-    - [Appendix A: Recipe definition language](#appendix-a-recipe-definition-language)
-    - [Appendix B: Registry playground](#appendix-b-registry-playground)
-    - [Appendix C: Facet analysis](#appendix-c-facet-analysis)
-    - [Appendix D: Sources](#appendix-d-sources)
 
 # Introduction
 
