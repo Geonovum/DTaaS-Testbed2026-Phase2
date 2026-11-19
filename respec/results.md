@@ -1,6 +1,6 @@
 # Results
 
-In this chapter only the summaries of the participants are included. The full reports from the participants are included in the Annex.
+In this chapter only the summaries of the participants are included. The full reports from the participants are included in the annexes.
 
 ## Adoption topic #1: 3dgi
 
@@ -12,11 +12,11 @@ In this chapter only the summaries of the participants are included. The full re
 
 ## Adoption topic #3: Imagem
 
-## Research topic #4: Collaboral
+## Research topic #4: Collaborall
 
 Collaborall investigated how a *recipe* — a combination of data sources and an ordered
 list of processes — can be described, found and executed in a national digital-twin App
-Store, using OGC API Processes, OGC API Records and DCAT-AP-NL. We built the answer on ANT,
+Store, using OGC API – Processes, OGC API – Records and DCAT-AP-NL. We built the answer on ANT,
 our existing workflow platform, because that is the realistic case: an organisation adopts
 these standards on the platform it already runs.
 
@@ -44,17 +44,17 @@ Our main findings and advice:
    concept set for a *scenario* — an area and a building programme — would let one input
    serve many recipes. We built a proof of concept on an existing OGC keyword.
 
-## Research topic #4: FutureInsight
+## Research topic #4: Future Insight
 
-We built a working, end-to-end App Store for recipes: a catalogue (OGC API Records over CKAN), a Cookbook Registry, a Cook that is itself an OGC API Process, and a web client. Recipes are written in CWL v1.2 and executed against our own processes and external testbed processes (roofer, Geolabs ZOO-Project, Varidian).
+We built a working, end-to-end App Store for recipes: a catalogue (OGC API – Records over CKAN), a Cookbook Registry, a Cook that is itself an OGC API Process, and a web client. Recipes are written in CWL v1.2 and executed against our own processes and external testbed processes (roofer, GeoLabs ZOO-Project, Varidian).
 
-Our main conclusion: **CWL works as a recipe format, but not unextended.** CWL describes ingredients, order and wiring well. It cannot say where a step's OGC API Process lives, which alternative processes a hub may use, or describe process inputs as precisely as JSON Schema does. We added three small extension fields in a declared nldt: namespace to close those gaps; with them, all five bundled recipes pass the reference validator, cwltool --validate.
+Our main conclusion: **CWL works as a recipe format, but not unextended.** CWL describes ingredients, order and wiring well. It cannot say where a step's OGC API Process lives, which alternative processes a hub may use, or describe process inputs as precisely as JSON Schema does. We added three small extension fields in a declared `nldt:` namespace to close those gaps; with them, all five bundled recipes pass the reference validator, `cwltool --validate`.
 
 Other key findings:
 
-- CWL's abstract Operation step maps one-to-one onto a remote OGC API Process.
-- CWL's own File + format cleanly separates data ingredients from parameters, and maps onto OGC by-reference (href) inputs.
-- OGC API Processes descriptions do not say machine-readably which inputs are datasets, so the recipe must declare it.
+- CWL's abstract `Operation` step maps one-to-one onto a remote OGC API Process.
+- CWL's own `File` + `format` cleanly separates data ingredients from parameters, and maps onto OGC by-reference (`href`) inputs.
+- OGC API – Processes descriptions do not say machine-readably which inputs are datasets, so the recipe must declare it.
 - Asynchronous execution with job polling is mandatory in practice for long-running processes.
 - DCAT-AP-NL has no recipe concept yet; proposing the extension is the main open research item.
 - Writing CWL by hand is hard for non-specialists; a guided editor is essential.
@@ -63,36 +63,36 @@ Other key findings:
 
 ## Research topic #4: Varidian
 
-Varidian started in May 2026 with creating a registry. The initial goal of this registry was to provide a standardized
+Varidian started in May 2026 by creating a registry. The initial goal of this registry was to provide a standardized
 interface for connecting with multiple data sources. All communication would go through the registry and data
 source-specific logic only has to exist inside this registry and its connected microservices instead of inside every
-individual client. Quickly after the initial working version, the need arose to also be able to execute processes using
-a standardized interface. Both registry implementations for these features were based on the OGC Features and OGC
-Processes API’s; and after finalizing the initial implementation for the processes interface in the registry the need
+individual client. Shortly after the initial working version, the need arose to also be able to execute processes using
+a standardized interface. Both registry implementations for these features were based on OGC API – Features and OGC
+API – Processes, and after finalizing the initial implementation for the processes interface in the registry the need
 for chaining processes became abundantly clear. This is when the overlap between the registry’s roadmap and *Research
 topic #4: App-Store / Recipes* of the testbed was observed. We are building a catalog of collections and processes to
 fill the gaps in information and analysis that our own solutions run into. This testbed lets us find out whether recipes
-can be added to this catalog, where recipes are a combination of data-sources (ingredients) and operations in the form
-of an ordered list of processes (like cooking instructions. An important aspect of experiencing whether recipes fit in
+can be added to this catalog, where recipes are a combination of data sources (ingredients) and operations in the form
+of an ordered list of processes (like cooking instructions). An important aspect of experiencing whether recipes fit in
 our catalog is to determine whether stating requirements about a recipe up front makes it possible to say something
-about the quality of the results that come out. Without reliable outcome, the selection of the most applicable or
-trustworthy recipe comes down to luck or expertise. Since we want to be able to use the results as information source
+about the quality of the results that come out. Without reliable outcomes, the selection of the most applicable or
+trustworthy recipe comes down to luck or expertise. Since we want to be able to use the results as an information source
 for our own solutions, needing either luck or expertise means it is not ready to be integrated. By researching which
 metadata is required to enrich both the source data and the process’s inputs and outputs we hope to find a way to make a
 recipe’s results readable and trustworthy, which is exactly the focus of this research topic.
 
-## Research topic #5: ThePeopleGroup
+## Research topic #5: The People Group
 
-The People Group implemented an exporter and an importer for Scene Context JSON (SCX) in its DigitalTwin platform and opened the exported scenes side by side in CesiumJS and ArcGIS. This report documents what we found, with the documents, code, measurements and service responses each finding is based on, and translates the findings into proposals for the SCX specification.
+The People Group implemented an exporter and an importer for Scene Context JSON (SCX) in its DigitalTwin platform and opened the exported scenes side by side in CesiumJS and ArcGIS. The report in Annex D documents what we found, with the documents, code, measurements and service responses each finding is based on, and translates the findings into proposals for the SCX specification.
 
 The main conclusions:
 
-- **The camera position travels, the lens does not.** Position, heading and tilt were reproduced exactly in three engines. The visible area differed by almost a factor of two because each engine uses a different default and definition of the field of view. We added `fov` and propose projection type and clipping planes (1.2).
-- **The nested `interval` structure is hard to implement and easy to get wrong.** It required workarounds in a typed environment and our own exporter produced output that does not validate. We propose a simple `{ start, end }` object (1.1).
-- **A layer reference must be complete and typed unambiguously.** An incomplete WMS URL produced two different pictures from one document, and independently written exporter and importer code already disagreed on format strings. We propose that `url` is the complete request and a closed `type`/`format` table (1.4, 1.5).
-- **The same 3D Tiles give different results per viewer.** All 1309 building tiles of one dataset contain invalid glTF that Cesium-based viewers accept and ArcGIS silently does not draw; heights stored as NAP but declared ellipsoidal cause a vertical offset of about 41 m in ArcGIS; instanced tree tiles are not supported by ArcGIS at all. We propose per-layer metadata for tile version, content type and vertical datum (1.6, 1.9).
-- **Simulation results cannot be exchanged yet.** 21 of the 28 resources in the test scene, including every time-dependent simulation result, have no stable URL another viewer can request. The 4D part of the scene therefore cannot be exported today (2.3).
-- **Results between implementations are only comparable with a shared status vocabulary** per layer (1.7).
+- **The camera position travels, the lens does not.** Position, heading and tilt were reproduced exactly in three engines. The visible area differed by almost a factor of two because each engine uses a different default and definition of the field of view. We added `fov` and propose projection type and clipping planes ([[[#tpg-1-2]]]).
+- **The nested `interval` structure is hard to implement and easy to get wrong.** It required workarounds in a typed environment and our own exporter produced output that does not validate. We propose a simple `{ start, end }` object ([[[#tpg-1-1]]]).
+- **A layer reference must be complete and typed unambiguously.** An incomplete WMS URL produced two different pictures from one document, and independently written exporter and importer code already disagreed on format strings. We propose making `url` the complete request and adding a closed `type`/`format` table ([[[#tpg-1-4]]], [[[#tpg-1-5]]]).
+- **The same 3D Tiles give different results per viewer.** All 1309 building tiles of one dataset contain invalid glTF that Cesium-based viewers accept and ArcGIS silently does not draw; heights stored as NAP but declared ellipsoidal cause a vertical offset of about 41 m in ArcGIS; instanced tree tiles are not supported by ArcGIS at all. We propose per-layer metadata for tile version, content type and vertical datum ([[[#tpg-1-6]]], [[[#tpg-1-9]]]).
+- **Simulation results cannot be exchanged yet.** 21 of the 28 resources in the test scene, including every time-dependent simulation result, have no stable URL another viewer can request. The 4D part of the scene therefore cannot be exported today ([[[#tpg-2-3]]]).
+- **Results between implementations are only comparable with a shared status vocabulary** per layer ([[[#tpg-1-7]]]).
 
 ## Research topic #5: uCrowds
 

@@ -4,7 +4,7 @@
 
 ## Summary {#summary}
 
-We built a working, end-to-end App Store for recipes: a catalogue (OGC API Records over CKAN), a Cookbook Registry, a Cook that is itself an OGC API Process, and a web client. Recipes are written in CWL v1.2 and executed against our own processes and external testbed processes (roofer, Geolabs ZOO-Project, Varidian).
+We built a working, end-to-end App Store for recipes: a catalogue (OGC API Records over CKAN), a Cookbook Registry, a Cook that is itself an OGC API Process, and a web client. Recipes are written in CWL v1.2 and executed against our own processes and external testbed processes (roofer, GeoLabs ZOO-Project, Varidian).
 
 Our main conclusion: **CWL works as a recipe format, but not unextended.** CWL describes ingredients, order and wiring well. It cannot say where a step's OGC API Process lives, which alternative processes a hub may use, or describe process inputs as precisely as JSON Schema does. We added three small extension fields in a declared `nldt:` namespace to close those gaps; with them, all five bundled recipes pass the reference validator, `cwltool --validate`.
 
@@ -19,15 +19,17 @@ Other key findings:
 - Every part of the stack works from one plan: the Cookbook Registry turns a recipe into a DAG, and the editor, catalogue, Wizard, Status tab and Cook all ask it for that plan instead of reading the CWL themselves.
 - An OGC API Process description already carries most of what a user needs to fill in a parameter (title, description, default, limits); the Wizard reads it when it shows the form, so recipes need not copy it.
 
-**Not finished:** DCAT-AP-NL recipe metadata is not implemented in the catalogue ([[[#recipe-metadata-in-dcat-ap-nl]]] sets out what a profile needs, based on what the testbed showed). Our OGC API Processes services were tested with OGC's official test suite, fixed where it found gaps, and re-tested on the live stack ([[[#plugfest-and-interoperability]]]).
+**Not finished:** DCAT-AP-NL recipe metadata is not implemented in the catalogue ([[[#recipe-metadata-in-dcat-ap-nl]]] sets out what a profile needs, based on what the testbed showed).
+
+**Tested:** our OGC API Processes services were tested with OGC's official test suite, fixed where it found gaps, and re-tested on the live stack ([[[#plugfest-and-interoperability]]]).
 
 **Live client:** [fi-group.github.io/nldt-tb2](https://fi-group.github.io/nldt-tb2/)
 
 ## Introduction and scope {#introduction-and-scope}
 
-This report covers Future Insight's work on Research Topic #4, App-Store / Recipes, of Geonovum's Testbed 2026 phase 2. The tender defines a recipe as a combination of data sources (ingredients) and an ordered list of processes (cooking instructions) that solves a real-world problem.
+This report covers Future Insight's work on research topic #4, App-Store / Recipes, of Geonovum's Testbed 2026 phase 2. The tender defines a recipe as a combination of data sources (ingredients) and an ordered list of processes (cooking instructions) that solves a real-world problem.
 
-![](media/image3.png)
+![Research topic #4 overview: what an App Store for recipes is, and what we had to build](media/image3.png)
 
 The table maps each component the tender (§7.3) asks for to what we built.
 
@@ -56,29 +58,29 @@ We proved the orchestration on a trivial recipe first, then moved to real geodat
 | `recipe-rotterdam-buffer-demo` | Real geodata: buffers Rotterdam's municipal outline, read live from PDOK via Hub Datasets (one data input, one parameter) | Our own buffer tool |
 | `recipe-add-multiply-demo` | The orchestration plumbing, (a + b) × c. Its nldt:compatibleTools allows swapping multiply for multiply-three-numbers, which adds a third input automatically | Our own add and multiply tools |
 | `playground-1` | Roofer pipeline: validate point clouds → reconstruct buildings → convert format | Roofer's processes (staging server) |
-| `playground-2` | ZOO-Project sampler: five processes (HelloPy, hellojs, Centroid, Buffer, GetArea), mostly in parallel, with one chain Buffer → GetArea | Geolabs' ZOO-Project processes |
+| `playground-2` | ZOO-Project sampler: five processes (HelloPy, hellojs, Centroid, Buffer, GetArea), mostly in parallel, with one chain Buffer → GetArea | GeoLabs' ZOO-Project processes |
 | `playground-3` | Subsidence analysis: where subsidence stays below a threshold, and so where construction is possible (see below) | Varidian's OGC API Process |
 
-![](media/image4.png)
+![App Store recipe catalogue with the two named recipes and the three playground slots](media/image4.png)
 
-**Playground slots: the state at the time of writing.** The three playground slots were seeded for the plugfests, so participants could test their own processes in a recipe without our help. Anyone can open a playground recipe in the editor, change it and save it: there is no login, no ownership and no version history (_finding 21_). Saving overwrites the slot for everyone. The table above therefore describes the playground recipes _as they were when this report was written_. A reader who opens the live App Store later may find something else in these slots, or an earlier version. [[[#appendix-c]]] keeps all three as they were, in full and annotated.
+**Playground slots: the state at the time of writing.** The three playground slots were seeded for the plugfests, so participants could test their own processes in a recipe without our help. Anyone can open a playground recipe in the editor, change it and save it: there is no login, no ownership and no version history (finding 21). Saving overwrites the slot for everyone. The table above therefore describes the playground recipes _as they were when this report was written_. A reader who opens the live App Store later may find something else in these slots, or an earlier version. [[[#appendix-c]]] keeps all three as they were, in full and annotated.
 
 Two things bring a playground slot back to a known state:
 
-![](media/image5.png)
+![Recipe editor for Playground Recipe 3, with the Reset button highlighted](media/image5.png)
 
 - **Reset**, in the recipe editor, loads the slot's _bundled_ recipe (the version shipped with the code, `GET /recipes/{id}/original`) into the editor. It only replaces the text in the editor; nothing changes for anyone else until that text is validated and saved. After the second plugfest we made the recipes in the table the bundled versions of all three slots, so Reset brings back exactly what is described here. (Until then, playground-3 was bundled as a heavily commented add → multiply template, meant as a starting point for one's own recipe.)
 - **Re-seeding**, run when the stack is redeployed, stores every bundled recipe again, overwriting whatever was saved in the slots.
 
 The two named recipes (`recipe-rotterdam-buffer-demo`, `recipe-add-multiply-demo`) can be edited in the same way; Reset and re-seeding restore them too.
 
-**Varidian's process in playground-3.** At the second plugfest, Varidian put a one-step recipe around their own OGC API Process, `varidian-cook_subsidence-analysis`, into playground-3. The process is published at `registry.playground.planspace.nl`. It asks where subsidence stays below a threshold, using the Deltares Atlantis calculation module, and returns the area(s) where construction is possible as a GeoJSON FeatureCollection. Its four inputs are a groundwater level, a surcharge thickness, a threshold and the surcharge area(s) as GeoJSON. The recipe keeps the GeoJSON as a parameter, typed or pasted into the form, rather than a data ingredient picked from Hub Datasets, so that testers can try their own polygons straight away. Runs are saved in Hub Datasets. Varidian's process is itself a "cook", which makes it an example of _finding 15_: a recipe published as a process, used as one step in another recipe.
+**Varidian's process in playground-3.** At the second plugfest, Varidian put a one-step recipe around their own OGC API Process, `varidian-cook_subsidence-analysis`, into playground-3. The process is published at `registry.playground.planspace.nl`. It asks where subsidence stays below a threshold, using the Deltares Atlantis calculation module, and returns the area(s) where construction is possible as a GeoJSON FeatureCollection. Its four inputs are a groundwater level, a surcharge thickness, a threshold and the surcharge area(s) as GeoJSON. The recipe keeps the GeoJSON as a parameter, typed or pasted into the form, rather than a data ingredient picked from Hub Datasets, so that testers can try their own polygons straight away. Runs are saved in Hub Datasets. Varidian's process is itself a "cook", which makes it an example of finding 15: a recipe published as a process, used as one step in another recipe.
 
 ## Architecture {#architecture}
 
 The stack is nine services of our own plus CKAN 2.11 (with its Postgres, Solr and Redis), each in its own Docker container, on one private network behind an nginx gateway. The gateway publishes everything under one public address, <https://nldt-tb2.clearly.app>, with each service under its own path. The App Store UI is also published on GitHub Pages, at <https://fi-group.github.io/nldt-tb2/>, and calls the services at that public address. The browser calls each service directly; there is no backend-for-frontend.
 
-![](media/image6.png)
+![Architecture of the stack: App Store UI, Records Wrapper over CKAN, Cookbook Registry, Hub Datasets, the Cook, our own tools and external OGC API Processes](media/image6.png)
 
 | **Service** | **Public address (under <https://nldt-tb2.clearly.app>)** | **Role** | **Standard** |
 | --- | --- | --- | --- |
@@ -92,13 +94,9 @@ The stack is nine services of our own plus CKAN 2.11 (with its Postgres, Solr an
 | `ckan` (+ Postgres, Solr, Redis) | Not public: reached only through the Records Wrapper | CKAN 2.11, the real store behind the wrapper | CKAN Action API |
 | `gateway` | `https://nldt-tb2.clearly.app` | One origin: UI at `/`, services under `/api/*` | — |
 
-Every service and tool can be opened directly in a browser, and the whole solution can be tested without the UI ([[[#appendix-b]]] lists the endpoints, with examples). For example, the Cook's process description is at: <https://nldt-tb2.clearly.app/api/orchestrator/processes/cook>,
+Every service and tool can be opened directly in a browser, and the whole solution can be tested without the UI ([[[#appendix-b]]] lists the endpoints, with examples). For example, the Cook's process description is at <https://nldt-tb2.clearly.app/api/orchestrator/processes/cook>, and the buffer tool's at <https://nldt-tb2.clearly.app/api/tools/geo-buffer/processes/buffer-geometry>.
 
-and the buffer tool's at:
-
-<https://nldt-tb2.clearly.app/api/tools/geo-buffer/processes/buffer-geometry>.
-
-**External processes and data:** roofer (staging), Geolabs ZOO-Project, Varidian, and PDOK WFS (Kadaster).
+**External processes and data:** roofer (staging), GeoLabs ZOO-Project, Varidian, and PDOK WFS (Kadaster).
 
 ### One cook run, step by step {#one-cook-run-step-by-step}
 
@@ -134,15 +132,15 @@ So only the Cookbook Registry reads CWL. Everything else asks the Registry one q
 
 **One exception, by design.** The editor's diagram and its guided builder read the CWL text in the browser, because their job is to edit that text line by line, including comments. They never decide what a recipe means: Validate and Save always go to the Registry.
 
-![](media/image7.png)
+![Recipe editor: CWL text on the left, the recipe diagram generated from it on the right](media/image7.png)
 
-![](media/image8.png)
+![Guided builder in the recipe editor, showing the CWL basics a recipe needs](media/image8.png)
 
 ## The recipe format: a CWL profile {#the-recipe-format-a-cwl-profile}
 
 A recipe is a CWL v1.2 Workflow whose steps each run an inline `class: Operation`: CWL's own abstract, non-executable step. The Operation's `id` is the OGC API Process identifier. We chose CWL over Arazzo and a custom JSON format because it is a mature, externally governed standard for chaining discrete steps.
 
-OGC's _Best Practice for Earth Observation Application Package_ (OGC 20-089)[^0] also packages CWL workflows for OGC API Processes, but differently. It uses CommandLineTool steps with container images that are _deployed_ to a platform (Processes Part 2). Our recipes use Operation steps that _call_ processes that already run elsewhere.
+OGC's _Best Practice for Earth Observation Application Package_ (OGC 20-089)[^0] also packages CWL workflows for OGC API Processes, but differently. It uses CommandLineTool steps with container images that are _deployed_ to a platform (OGC API Processes Part 2). Our recipes use Operation steps that _call_ processes that already run elsewhere.
 
 ### Standard CWL we use {#standard-cwl-we-use}
 
@@ -165,13 +163,13 @@ The Registry reads CWL with a purpose-built parser, not a general CWL engine. It
 
 CWL expressions are JavaScript; we never execute them. Four `valueFrom` forms are recognised by pattern-matching: a field path, a map over a list picking a field, a map building an object, and an object template.
 
-**requirements: declared for CWL standard, ignored by our stack.**
+**requirements: declared for the CWL standard, ignored by our stack.**
 
 CWL requires a recipe to declare the features it uses. A step input with `valueFrom` needs `StepInputExpressionRequirement`, and an expression that is real JavaScript, such as the map lines in the roofer recipe, also needs `InlineJavascriptRequirement`; a plain field path such as `$(self.model_3d_id)` does not.
 
-Neither the Registry nor the Cook reads these declarations: a recipe without them validates and runs the same in our stack. We declare them anyway, so that our recipes stay standard CWL: without them, `cwltool --validate` rejects a recipe that uses `valueFrom`. The Registry does not check for them either, another case of _finding 7_. Of the bundled recipes, only playground-1 (roofer) needs them ([[[#appendix-c]]]).
+Neither the Registry nor the Cook reads these declarations: a recipe without them validates and runs the same in our stack. We declare them anyway, so that our recipes stay standard CWL: without them, `cwltool --validate` rejects a recipe that uses `valueFrom`. The Registry does not check for them either, another case of finding 7. Of the bundled recipes, only playground-1 (roofer) needs them ([[[#appendix-c]]]).
 
-The Registry checks structure and wiring, not types: it checks that every connection points at something that exists, but not that the value sent fits what the other end expects. The reference validator, `cwltool --validate`, does check this, and it caught a real mistake the Registry had accepted during the first Plugfest. In the roofer recipe (playground-1), the recipe input `formats` was declared as a list of fixed choices (a CWL enum: `gpkg` or `cityjson`), but the convert step declared the process input it feeds as a list of free text (`string[]`). For CWL those are different types, so the connection between them is invalid, even though roofer itself would have accepted the values. We fixed the step's declaration to the same list of fixed choices.
+The Registry checks structure and wiring, not types: it checks that every connection points at something that exists, but not that the value sent fits what the other end expects. The reference validator, `cwltool --validate`, does check this, and it caught a real mistake the Registry had accepted during the first plugfest. In the roofer recipe (playground-1), the recipe input `formats` was declared as a list of fixed choices (a CWL enum: `gpkg` or `cityjson`), but the convert step declared the process input it feeds as a list of free text (`string[]`). For CWL those are different types, so the connection between them is invalid, even though roofer itself would have accepted the values. We fixed the step's declaration to the same list of fixed choices.
 
 **Naming a step and its app.** CWL gives every step two places for a name, and we use them for two different things:
 
@@ -207,7 +205,7 @@ $namespaces:
 
 **Two addresses in nldt:processLink: href and internalHref.** A process link carries two addresses for the same process:
 
-- `href` is the **public** address, the one anyone can open in a browser. For our own tools it is under <https://nldt-tb2.clearly.app/api/tools/…>; for an external process it is that server's own address.
+- `href` is the **public** address, the one anyone can open in a browser. For our own tools it is under `https://nldt-tb2.clearly.app/api/tools/…`; for an external process it is that server's own address.
 - `internalHref` is the address **the Cook calls**. For an external process it is the same public address. For our own tools it is their address on the stack's private Docker network (for example `http://tool-add:8000/processes/add-two-numbers`), which works only from inside that network.
 
 The second address exists because the Cook runs on the same private network as our own tools. Calling them there is direct: the request does not leave the server, and does not depend on the public gateway, its TLS certificate or the Cloudflare proxy in front of it. It is not a development shortcut; the deployed Cook uses it on every run.
@@ -220,7 +218,7 @@ Two harmless warnings remain: `cwltool` still resolves type keys inside our fiel
 
 **Running a recipe vs swapping tools.** Running a recipe as written needs no central process registry: each step carries its own `nldt:processLink`. Tool swaps are more limited:
 
-![](media/image9.png)
+![Recipe editor with the list of alternative tools a hub may swap in for a step](media/image9.png)
 
 - Alternatives are checked against a built-in catalogue of our four tools (`add`, `multiply`, `multiply3`, `buffer`). Unknown ids in the allowlist are silently dropped, so a hub cannot swap in an external process such as roofer or ZOO-Project.
 - A step without an allowlist entry allows only its own tool.
@@ -228,7 +226,7 @@ Two harmless warnings remain: `cwltool` still resolves type keys inside our fiel
 - The catalogue exists in four copies (Registry, Cook fallback, and two in the UI) that must stay in sync.
 - Hand-editing `nldt:processLink` can point a step at any process; only the Wizard's swaps are allowlisted.
 
-![](media/image10.png)
+![Recipe Wizard Tool & Engine step, with a Change button per step and the setup summary](media/image10.png)
 
 ### Data inputs vs parameters {#data-inputs-vs-parameters}
 
@@ -263,11 +261,11 @@ So the Wizard fetches the description of each step's process (once per session, 
 - **The recipe always wins.** A label, description or default written in the CWL is used as written. The process only fills what the recipe leaves out.
 - **Nothing is written back.** The process's information is shown, and its defaults are sent when a field is left empty, but the stored recipe never changes. If the process changes its description, the next Wizard session shows the new one, so this cannot go stale the way a pasted `nldt:jsonSchema` can.
 
-![](media/image11.png)
+![Wizard parameter form with titles, defaults and limits taken from the process description](media/image11.png)
 
-![](media/image12.png)
+![Wizard parameter fields showing default placeholders and help text](media/image12.png)
 
-This works for any recipe and any process, not only the ones in this testbed. Its limit is what process providers publish: the subsidence process gives no default or example for its GeoJSON input, so that field stays required, and the form can only show the expected shape (an empty FeatureCollection). A JSON Schema `example` entry would let the form show a real polygon ([[[#collaboration]]]).
+This works for any recipe and any process, not only the ones in this testbed. Its limit is what process providers publish: the subsidence process gives no default or example for its GeoJSON input, so that field stays required, and the form can only show the expected shape (an empty FeatureCollection). A JSON Schema `examples` entry would let the form show a real polygon ([[[#collaboration]]]).
 
 ### Example {#example}
 
@@ -339,7 +337,7 @@ Recipes are stored in SQLite in a Docker volume. Schema and DAG are derived fres
 
 **CWL vs DAG.** CWL is a document written for people: order in the file is arbitrary and it carries labels, docs and extensions. The DAG is the machine form: steps in topological order, each input resolved to a workflow input or another step's output. [[[#design-principle]]] explains why every part of the stack works from the DAG.
 
-![](media/image13.png)
+![A recipe's CWL and the DAG the Cookbook Registry derives from it](media/image13.png)
 
 ### What the DAG contains {#what-the-dag-contains}
 
@@ -409,7 +407,7 @@ Two design choices matter:
 
 - **Validation is a gate, twice.** The editor's _Validate_ calls the validate endpoint; _Save_ re-validates server-side. Nothing is stored unless a DAG can be built. Validation is structural only: it never calls the processes.
 
-![](media/image14.png)
+![Validating a recipe in the editor before it can be saved](media/image14.png)
 
 - **Catalogue outages don't lose recipes.** A recipe is stored first, then published. If the catalogue is down, the response says `catalog_published: false` plus the error, rather than failing.
 
@@ -421,13 +419,13 @@ The Cook is itself an OGC API Processes Part 1: Core 1.0 service with exactly on
 
 The `cook` process takes `recipeId`, `parameters` and `toolOverrides` (`{stepId: toolId}`) and returns `result`. It declares the conformance classes `core`, `json`, `oas30`, `job-list` and `dismiss`.
 
-![](media/image15.png)
+![The Cook as an OGC API Process with a single process, cook](media/image15.png)
 
 ### What happens when you click 'Execute' {#what-happens-when-you-click-execute}
 
 In short, the browser hands the recipe to the Cook and gets a job number back at once. The Cook then works through the recipe's DAG on its own: it starts every step whose inputs are ready, calls that step's OGC API Process, waits for it (following the process's own job when the process runs asynchronously), and passes its outputs on to the steps that need them. Meanwhile the browser asks the Cook every 2 seconds how far it is.
 
-![](media/image16.png)
+![Overview of a cook run, from Execute to the result](media/image16.png)
 
 In detail:
 
@@ -454,7 +452,7 @@ It posts these to the Cook, `POST /processes/cook/execution` with the header `Pr
 **5. In the Cook: call the process.** The Cook posts `{"inputs": {…}}` to the step's process, at its `nldt:processLink.internalHref` plus `/execution`, again with `Prefer: respond-async`. A process can answer in one of two ways, and the Cook handles both:
 
 - **Synchronously:** `200 OK` with the results in the response. Our own four tools always do this; they ignore the header.
-- **Asynchronously:** `201` or `202` with a job of its own. Roofer, the Geolabs ZOO-Project processes and Varidian's subsidence process support this. The Cook finds the job's address (the `Location` header, else the job's `self` or `monitor` link, else `/jobs/{jobID}`), then asks it for its status every 2 seconds, copying the remote status, progress and message into the step's own progress. When the job reports `successful`, the Cook fetches `…/results`. When it reports `failed`, the Cook fetches the error document from the same address, because some servers (ZOO-Project) leave their status message at "accepted" even after failing.
+- **Asynchronously:** `201` or `202` with a job of its own. Roofer, the GeoLabs ZOO-Project processes and Varidian's subsidence process support this. The Cook finds the job's address (the `Location` header, else the job's `self` or `monitor` link, else `/jobs/{jobID}`), then asks it for its status every 2 seconds, copying the remote status, progress and message into the step's own progress. When the job reports `successful`, the Cook fetches `…/results`. When it reports `failed`, the Cook fetches the error document from the same address, because some servers (ZOO-Project) leave their status message at "accepted" even after failing.
 
 **6. In the Cook: read the outputs.** Processes return results in different shapes: our own tools as `{"outputs": {…}}`, standard OGC results as `{name: value}` or `{name: {"value": …}}`, ZOO-Project as multipart text when a process has several outputs, and some servers as the bare value of a single-output process. The Cook turns each of these into one shape, `{outputName: value}`, and stores it. Every step waiting for this step's outputs may now be ready (back to point 3). The Cook also records a trace entry: exactly what the step was sent, what it returned, and whether its process was found through its `nldt:processLink` or the fallback table ([[[#where-a-step-runs]]]).
 
@@ -502,9 +500,9 @@ The Status tab uses this field to tell the user "_Error source: external tool bu
 
 Two cases can be labelled wrongly. A tool response the Cook cannot parse counts as a tool error, even if the Cook's parsing is at fault. A network problem between the Cook and a tool also counts as a tool error, although the message says "unreachable". `errorSource` is a field beyond OGC API Processes' `statusInfo`; synchronous execution still returns only the error text.
 
-Figure below shows the banner for a run whose tool could not be reached. It was made on a local copy of the stack, with the buffer tool's container stopped, so the live services and recipes were not touched.
+The figure below shows the banner for a run whose tool could not be reached. It was made on a local copy of the stack, with the buffer tool's container stopped, so the live services and recipes were not touched.
 
-![](media/image17.png)
+![Status tab banner for a failed run whose tool could not be reached](media/image17.png)
 
 ## Catalogue and recipe metadata {#catalogue-and-recipe-metadata}
 
@@ -516,9 +514,9 @@ The Records Wrapper exposes the landing page, conformance, collections, items (p
 
 Records Part 1 is read-only, so publishing uses two non-standard write endpoints, `POST` and `DELETE` on `/collections/{id}/items`, which the Registry calls to publish and retract records.
 
-Figure below shows one OGC API Records search, `items?q=flooding`, and the CKAN `package_search` call the Records Wrapper turns it into.
+The figure below shows one OGC API Records search, `items?q=flooding`, and the CKAN `package_search` call the Records Wrapper turns it into.
 
-![](media/image18.png)
+![An OGC API Records search and the CKAN package_search call the Records Wrapper makes for it](media/image18.png)
 
 We first built our own SQLite store, then switched to real CKAN to match the tender's architecture. The swap touched only the wrapper's repository module; the API and its clients were unchanged.
 
@@ -571,7 +569,7 @@ That covers much of a recipe's _discovery_ metadata. A recipe has a title, a des
 
 - A class **Recipe** (subclass of `dcat:Resource`) with the normal descriptive properties, plus links to its **steps**, **data inputs**, **parameters** and **outputs**, its expected **execution mode**, and its **access** and **cost** requirements.
 - A **Step** names its role in the recipe and the **data service** (OGC API Process) it calls, plus any allowed alternatives. Each data service is described once, as DCAT-AP-NL already allows, with its endpoint and process description.
-- A **Data input** and an **Output** each carry a name and the media types they accept or produce. DPROD's input and output ports are a candidate to reuse for these.
+- A **Data input** and an **Output** each carry a name and the media types they accept or produce. The input and output ports of the W3C Data Product Ontology (DPROD) are a candidate to reuse for these.
 - A **Parameter** points at the app's own input schema instead of copying it.
 - The CWL file is the recipe's distribution, conforming to CWL v1.2 and to the recipe profile.
 - Results produced by a recipe run carry provenance back to the recipe.
@@ -621,7 +619,7 @@ The App Store UI finds recipes, binds them to a hub's own data and tools, and ex
 
 We chose this deliberately. It shows recipes in the setting where they would actually be used, next to a hub's own data and apps, rather than in a bare test client. Parts of the OUP that are outside this research topic (reviews, hub management, digital twins, pricing) are shown as they would look, but are not functional in the sandbox.
 
-![](media/image19.png)
+![App Store UI in the style of Clearly Hub, with its navigation and active hub](media/image19.png)
 
 ### How the UI uses the recipe {#how-the-ui-uses-the-recipe}
 
@@ -645,19 +643,19 @@ The UI never interprets CWL itself ([[[#design-principle]]]). Everything it show
 
 **Catalogue.** Recipes from the Records Wrapper, filterable by facets. Separate pages list Data (Hub Datasets) and Apps (live OGC API Processes, from each one's own process description).
 
-![](media/image20.png)
+![App Store catalogue page with recipe cards and facet filters](media/image20.png)
 
 **Recipe detail.** Metadata, the recipe's graph, and its compatible data and apps. A banner on a live recipe points to the Recipe Wizard tab, where a run is set up.
 
-![](media/image21.png)
+![Recipe detail page with metadata, the recipe graph and a banner pointing to the Wizard](media/image21.png)
 
 **Home page.** Recent activity: the recipes, apps and datasets live in the sandbox.
 
-![](media/image22.png)
+![App Store home page with recent recipes, apps and datasets](media/image22.png)
 
 ### The Recipe Wizard {#the-recipe-wizard}
 
-![](media/image23.png)
+![Recipe Wizard with its four steps and the recipe graph](media/image23.png)
 
 The Wizard binds a recipe to a hub in four steps. Every step shows the same **recipe graph** above its own controls, so the user always sees the whole recipe while setting up one part of it:
 
@@ -668,7 +666,7 @@ The Wizard binds a recipe to a hub in four steps. Every step shows the same **re
 
 Colours show the state of the setup: green for ready (a dataset picked, a value or default set), red for still needed, amber for an app swapped for this run. The graph is drawn from the effective DAG ([[[#design-principle]]]), so it always shows what the Cook will actually run.
 
-![](media/image24.png)
+![Recipe graph in the Wizard, coloured by setup state](media/image24.png)
 
 1. **Tool & Engine.** One card per step: the step's name, and the app that runs it. If the recipe owner allows alternatives (`nldt:compatibleTools`), "Change" offers them. Swapping an app asks the Registry for the effective recipe and redraws the graph straight away: swapping `multiply` for `multiply3` on `recipe-add-multiply-demo` turns that app amber and adds its third input, `z`, to the graph and to the Parameters step. The swap applies to this run only; the stored recipe never changes.
 2. **Data Ingredients.** For each File input, a dataset from Hub Datasets whose media type matches the input's format.
@@ -676,17 +674,17 @@ Colours show the state of the setup: green for ready (a dataset picked, a value 
 
 Each group starts with the same app row as step 1, and a "Process description" link to the app's OGC API Process description (JSON).
 
-![](media/image25.png)
+![Wizard Parameters step, with parameters grouped by app and a Process description link](media/image25.png)
 
 Each field shows the parameter's readable title, its technical name as a small tag, a chip ("Default -1", "Required" or "Optional"), one line of help (its description and limits, such as "Must be at least 0.1"), and a "Definition" link to the same process description.
 
-![](media/image26.png)
+![A parameter field with its title, technical name, default chip, help line and Definition link](media/image26.png)
 
 A default is shown as grey placeholder text: an untouched field sends it, typing replaces it, clearing the field brings it back. Structured values (objects, lists, GeoJSON) are typed as JSON in the same way, with the expected shape as placeholder; there are no special template buttons. [[[#parameters-cwl-types-vs-json-schema]]] explains where titles, descriptions and defaults come from. A parameter used by two apps appears once, under the first, with "_Also used by …_"; one no app reads appears under "_Not used by any app_".
 
 4. **Output.** Where the result is saved. In this testbed every result is saved to the Sandbox Stack Recipe Results dataset in the nLDT Sandbox Hub, so the hub and dataset dropdowns are shown, as they would be in a full App Store, but locked to that destination, with a note saying why.
 
-![](media/image27.png)
+![Wizard Output step, locked to the Sandbox Stack Recipe Results dataset](media/image27.png)
 
 Every step can be opened at any time; nothing forces completing one step before the next. A setup summary beside the steps, styled as a basket, lists the apps used and an execution fee for each. The fees are illustrative and nothing is charged; it only shows where pricing would appear (finding 25).
 
@@ -694,11 +692,11 @@ Every step can be opened at any time; nothing forces completing one step before 
 
 **Status.** Shows the recipe graph, the data ingredients, and the parameters grouped per app exactly as in the Wizard, read-only, each with the value that will be sent (marked "default" when it is one). It also works when the Wizard was never opened: missing values fall back to their defaults, the same way the Wizard does. Execute stays disabled, with a warning naming what is missing, until every required parameter and data ingredient has a value. Execute, progress, cancelling, the result and saving it are described in [[[#what-happens-when-you-click-execute]]]; a failure says whose it is ([[[#where-a-failure-came-from]]]).
 
-![](media/image28.png)
+![Status tab with the recipe graph, data ingredients and the values to be sent](media/image28.png)
 
 **Saved results.** Every successful run is saved to the Sandbox Stack Recipe Results dataset. Its Preview, on the Data page, shows all saved results on one map, each as a layer that can be switched on and off. The layer list shows each result by its recipe's name, with the date and time it was saved. A zoom button per result fits the map to that result and opens its label; a result with no geometry (for example the number from `recipe-add-multiply-demo`) says so instead.
 
-![](media/image29.png)
+![Saved results shown as switchable layers on one map](media/image29.png)
 
 A result that links to a CityJSON model, such as roofer's reconstruction (`artifacts.cityjson.href`), is shown by its building footprints: the browser fetches the model, takes each building's LoD0 footprint, converts it from RD New (EPSG:28992) to WGS84, and draws it; clicking a building shows its id and its roof and ground heights. Only the footprints are drawn, since the map is 2D. "Delete selected" removes only the results whose layer is switched on, after a confirmation that lists each of them. Hub Datasets delete them one by one (`DELETE /datasets/{id}/resources/{resourceId}`); built-in datasets such as the live PDOK boundary cannot be deleted.
 
@@ -706,9 +704,9 @@ A result that links to a CityJSON model, such as roofer's reconstruction (`artif
 
 The recipe's CWL as syntax-highlighted text, as a diagram and as a guided builder. The builder adds a process by URL: it reads the process description and generates the step, its inputs and outputs, and its process link. It connects inputs and marks an input as data or parameter. It displays `valueFrom` reshaping but does not write it; that is still done by hand. _Save_ is enabled only after a successful _Validate_, editing again disables it, and Save re-validates on the server. _Reset_ reloads the bundled original.
 
-![](media/image30.png)
+![Orchestrator editor with CWL text and diagram](media/image30.png)
 
-![](media/image31.png)
+![Guided builder adding a process step from its URL](media/image31.png)
 
 The guided builder answers the main usability finding from the first plugfest: writing a recipe required knowing exactly how we had structured the CWL.
 
@@ -719,7 +717,7 @@ At the first plugfest, we executed recipes against external processes from other
 **What interoperated:**
 
 - Roofer staging (validate → reconstruct → convert), called by reference with a 1.2 MB crop of AHN3 tile c_37en2 (Delft), from TU Delft's 3dfier example data. Roofer staging returns fixture results and does not download the point cloud, so this proves the plumbing, not a reconstruction: whatever the input, it returns the same sample model, 165 buildings in Nijmegen.
-- Geolabs ZOO-Project processes (Buffer, GetArea, Centroid), on the ZOO-Project server GeoLabs runs on Geonovum's testbed host, fetching a polygon by reference from a public URL.
+- GeoLabs ZOO-Project processes (Buffer, GetArea, Centroid), on the ZOO-Project server GeoLabs runs on Geonovum's testbed host, fetching a polygon by reference from a public URL.
 - OGC API Processes clients that build URLs themselves can call our cook directly, since it is itself a process. Clients that follow the links in its answers got wrong addresses behind the gateway until this was fixed (see Conformance below).
 
 **What we learned from participants:**
@@ -881,7 +879,7 @@ The tender (§7.3) asks participants to document what they expect from each othe
 **What we used from others:**
 
 - Roofer staging processes for a realistic, long-running, structured-input pipeline.
-- Geolabs ZOO-Project processes for by-reference data from an independent server.
+- GeoLabs ZOO-Project processes for by-reference data from an independent server.
 - Varidian's _Subsidence Analysis_ process (`registry.playground.planspace.nl`), itself a cook, as a step in our `playground-3` recipe. Its well-described inputs (titles, descriptions, defaults, limits) are what the Wizard's parameter form now reads.
 - PDOK WFS (Kadaster) for live boundary data.
 
@@ -912,10 +910,10 @@ The client and backend stay online for at least six months after the testbed end
 
 ```bash
 docker compose up --build
-python services/records-wrapper/scripts/bootstrap_ckan.py
 # once: CKAN organisation + API token
-python services/cookbook-registry/scripts/seed_demo_recipe.py
+python services/records-wrapper/scripts/bootstrap_ckan.py
 # store every bundled recipe
+python services/cookbook-registry/scripts/seed_demo_recipe.py
 ```
 
 The UI is then served by the `ui` container, and every service on its own port, as listed in `docker-compose.yml`. The seed script needs PyYAML installed on the host. On first start, CKAN and the services need a few minutes before `bootstrap_ckan.py` works. Run the seed only once CKAN is up: a recipe is always stored, but if CKAN is not ready, publishing it to the catalogue fails and the script reports "STORED BUT NOT PUBLISHED". Running the script again is safe. Seeding overwrites all stored recipes, including whatever participants saved in the playground slots. After the `nldt:` namespace change, re-seeding is required, because old stored recipes no longer parse.
@@ -939,7 +937,7 @@ The decisions that shaped the solution, oldest first. Most are a turning point: 
 | 8 Sep | The Cook is itself an OGC API Process (`cook`), reading the recipe's plan fresh on every run | Any OGC API Processes client can run any recipe without knowing CWL, and a saved recipe needs no redeployment. The cost: a recipe never appears as its own process with typed inputs; clients only see `cook` (finding 15) |
 | 8 Sep | Recipes carry their own process link (`nldt:processLink`); a static table of our tools is only a fallback | First, the Cook looked every process up in a static table: every new app meant a code change. With the link in the recipe, we swapped multiply for a divide app through the UI without touching code: (2 + 3) / 4 = 1.25 |
 | 9 Sep | Shared "playground" recipe slots for the plugfests, instead of a recipe-creation UI | Every mechanism needed (edit, validate, save, run) already existed; the gap was only "not enough recipes to hand out". The price: anyone can overwrite a slot, and there is no version history (finding 21, [[[#use-cases-and-bundled-recipes]]]) |
-| 10 Sep | Catalogue backend: real CKAN 2.11 behind the Records Wrapper, instead of our own SQLite store | The tender's architecture names CKAN. The switch touched only the wrapper's storage module, which proved the seam. CKAN's 2.9 and 2.10 images would not start; 2.11 did |
+| 10 Sep | Catalogue backend: real CKAN 2.11 behind the Records Wrapper, instead of our own SQLite store | The tender's architecture names CKAN. The switch touched only the wrapper's repository module, which proved the seam. CKAN's 2.9 and 2.10 images would not start; 2.11 did |
 | Sep–Oct | The Cook always asks each process for asynchronous execution and follows its job; independent steps run in parallel | The first roofer recipe (28 Sep) failed on a 10-second synchronous timeout, and on inputs that were not plain numbers or text. Real processes outlive any HTTP timeout, so async became the default for every step (finding 12). The same attempt showed that the Cook could not send credentials: the first sign of the access problem in findings 23–24 |
 | 16 Oct | In the recipe editor, the CWL text is the single source of truth: text and diagram side by side, kept in sync, with the guided builder as an optional help, and nothing wired automatically | We first made the guided builder the default. But people arrive with CWL to paste, and automatic wiring connects things behind their backs. The builder itself answered the first plugfest's lesson: writing a recipe required knowing how we had structured the CWL |
 | Oct | One public address for everything (UI and `/api/*` behind one gateway), and the UI also on GitHub Pages | Cloudflare's proxy only forwards a fixed list of ports, so per-service ports could not work behind TLS. The UI has no server logic, so it can run anywhere. The side effect, found only on 28 October with OGC's test suite: services built links without their `/api/…` prefix, until each was told its public prefix ([[[#plugfest-and-interoperability]]]) |
@@ -998,7 +996,7 @@ All requests and answers are JSON, except the raw CWL (`application/cwl+yaml`). 
 
 ### Our own apps {#our-own-apps}
 
-These four apps are ours, and can be called directly. The playground recipes call other parties' processes (roofer, Geolabs ZOO-Project, Varidian); run those through the Cook, as their owners intended, rather than calling them directly.
+These four apps are ours, and can be called directly. The playground recipes call other parties' processes (roofer, GeoLabs ZOO-Project, Varidian); run those through the Cook, as their owners intended, rather than calling them directly.
 
 | **App** | **Request (under `/api/tools`)** | **Inputs** | **Output** |
 | --- | --- | --- | --- |
@@ -1062,7 +1060,7 @@ curl -X POST "$B/orchestrator/processes/cook/execution" \
 
 The trace shows the piping: `add`'s `sum` (5) became `multiply`'s `x`.
 
-**Run the same recipe with an app swapped** (`multiply` → `multiply` three numbers, which needs a third value, `z`). The recipe itself is not changed:
+**Run the same recipe with an app swapped** (`multiply` → `multiply-three-numbers`, which needs a third value, `z`). The recipe itself is not changed:
 
 ```bash
 curl -X POST "$B/orchestrator/processes/cook/execution" \
@@ -1129,7 +1127,7 @@ doc: >
   start fresh, open Edit Recipe → Orchestrator and click Reset: that loads the
   starter version, whose comments explain where to begin. Then Validate and
   Save.
-requirements:                        # ← for the CWL standard only: our Cook ignores these two lines (section 5.1)
+requirements:                        # ← for the CWL standard only: our Cook ignores these two lines (see 'Standard CWL we use')
   StepInputExpressionRequirement: {} # ← declares that steps use "valueFrom" to reshape inputs (all three steps do)
   InlineJavascriptRequirement: {}    # ← declares that those expressions contain JavaScript (the two "map" lines)
 $namespaces:
@@ -1150,7 +1148,7 @@ inputs:
     default:                         # ← pre-filled value in the Wizard
       kind: buildings
       building_ids: ["0000000000000001", "0000000000000002"]
-    nldt:jsonSchema:                 # ← the exact allowed shape, copied from roofer's process description (section 5.4)
+    nldt:jsonSchema:                 # ← the exact allowed shape, copied from roofer's process description (see 'Parameters: CWL types vs JSON Schema')
       oneOf:                         # ← CWL types can't say "one of these three shapes"; the Wizard reads this instead
         - title: "By BAG asset"      # ← option 1: a whole BAG asset
           type: object
@@ -1275,7 +1273,7 @@ steps:
       inputs:
         model_3d_id: { type: int }
         formats:
-          type: { type: array, items: { type: enum, symbols: [gpkg, cityjson] } }   # ← must match the recipe input's type (section 5.1)
+          type: { type: array, items: { type: enum, symbols: [gpkg, cityjson] } }   # ← must match the recipe input's type (see 'Standard CWL we use')
       outputs:
         converted_model: { type: Any }
     in:
@@ -1286,9 +1284,9 @@ steps:
     out: [converted_model]           # ← links to the CityJSON/GeoPackage files; the CityJSON is shown on the preview map
 ```
 
-### playground-2: Geolabs ZOO-Project sampler {#playground-2-geolabs-zoo-project-sampler}
+### playground-2: GeoLabs ZOO-Project sampler {#playground-2-geolabs-zoo-project-sampler}
 
-Five processes on Geolabs' ZOO-Project server. Four of them do not depend on each other and run in parallel; one chain, Buffer → GetArea, passes Buffer's GML output on by value.
+Five processes on GeoLabs' ZOO-Project server. Four of them do not depend on each other and run in parallel; one chain, Buffer → GetArea, passes Buffer's GML output on by value.
 
 ```yaml
 cwlVersion: v1.2
@@ -1346,7 +1344,7 @@ steps:
       id: HelloPy
       label: "Create a welcome message string."
       doc: "Calls the 'HelloPy' OGC API Process."
-      nldt:processLink:              # ← where this process lives: Geolabs' ZOO-Project server
+      nldt:processLink:              # ← where this process lives: GeoLabs' ZOO-Project server
         rel: process
         type: application/json
         href: "https://host1.tb.geonovum.geolabs.fr/ogc-api/processes/HelloPy"
@@ -1392,7 +1390,7 @@ steps:
       inputs:
         InputPolygon: { type: File, format: "iana:application/json" }   # ← sent by reference: {"href": …, "type": "application/json"}
       outputs:
-        Result: { type: Any, format: "iana:application/json" }          # ← asks the process for this output as JSON (section 5.1)
+        Result: { type: Any, format: "iana:application/json" }          # ← asks the process for this output as JSON (see 'Standard CWL we use')
     in:
       InputPolygon: polygon
     out: [Result]
@@ -1463,7 +1461,7 @@ inputs:                              # ← all four are PARAMETERS, typed or pas
   thickness:
     type: float                      # ← surcharge (fill) thickness in metres, for areas that don't set their own
   geojson:
-    type: Any                        # ← a GeoJSON FeatureCollection; a parameter, not a data input (section 3)
+    type: Any                        # ← a GeoJSON FeatureCollection; a parameter, not a data input (see 'Use cases and bundled recipes')
     label: "Surcharge area(s)"
     doc: "Paste a GeoJSON FeatureCollection."
   threshold:
@@ -1473,7 +1471,7 @@ outputs:
     type: File
     outputSource: varidian-cook_subsidence-analysis/buildArea   # ← taken from the step below, output "buildArea"
 steps:
-  varidian-cook_subsidence-analysis: # ← no step label, so the UI shows this key (section 5.1)
+  varidian-cook_subsidence-analysis: # ← no step label, so the UI shows this key (see 'Standard CWL we use')
     run:
       class: Operation
       id: varidian-cook_subsidence-analysis   # ← the OGC API Process id at Varidian

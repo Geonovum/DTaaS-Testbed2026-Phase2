@@ -8,24 +8,24 @@ Make an existing calculation module work according to the nLDT reference archite
 
 ### Description 
 
-Add a full implementation of the OGC API Processes specification to an existing calculation module. With “full” implementation we mean supporting process input & output descriptions, both Sync and Async execution mode, and job management. The implementation must pass the OGC compliance check and pass Geonovum’s OGC-checker with no faults. 
+Add a full implementation of the OGC API – Processes specification to an existing calculation module. With “full” implementation we mean supporting process input & output descriptions, both Sync and Async execution modes, and job management. The implementation must pass the OGC compliance check and pass Geonovum’s OGC-checker with no faults. 
 
 ### Deliverables 
 
-- A written report of the findings encountered during implementation. Geonovum will provide a Github repository where the report can be added in markdown format. We will act as editors and consolidate all reports into one Respec/HTML document.  
+- A written report of the findings encountered during implementation. Geonovum will provide a GitHub repository where the report can be added in Markdown format. We will act as editors and consolidate all reports into one ReSpec/HTML document.  
 - The software component developed under this contract must be made available in the standard market offering, at no additional cost. 
 - A demo service (with demo data) should be kept available for the public at least until 6 months after the testbed ends. 
-- Short demo video’s 
+- Short demo videos 
 
-### Requirements / standards / Open-Source software 
+### Requirements / standards / open-source software 
 
 - Mandatory Standards: https://ogcapi.ogc.org/processes/ 
 
-    OGC API Processes v1.0 is the approved version of the API, and v2.0 is a stable draft. We want to encourage using version 2 of the specification. 
+    OGC API – Processes v1.0 is the approved version of the API, and v2.0 is a stable draft. We want to encourage using version 2 of the specification. 
 
-- Optional available Open-Source Software (for inspiration and as example code for testing): 
+- Optional available open-source software (for inspiration and as example code for testing): 
 
-    For OGC API Processes open source client and server implementations are listed in the OGC Github repository: https://github.com/opengeospatial/ogcapi-processes/blob/master/implementations.adoc 
+    For OGC API – Processes, open-source client and server implementations are listed in the OGC GitHub repository: https://github.com/opengeospatial/ogcapi-processes/blob/master/implementations.adoc 
 
   
     The above software is listed for convenience; there may be more available.  
@@ -34,29 +34,29 @@ Add a full implementation of the OGC API Processes specification to an existing 
 
 ### Goal 
 
-Complete an existing API Processes implementation, make it function within the nLDT ecosystem and have it interoperate with software from other software vendors. 
+Complete an existing OGC API – Processes implementation, make it function within the nLDT ecosystem and have it interoperate with software from other software vendors. 
 
 ### Description 
 
-Complete an existing implementation of the OGC API Process specification to a full implementation on top of an existing calculation module. With “full” implementation we mean supporting process input & output descriptions, both Sync and Async execution mode and job management. The implementation must pass the OGC compliance check and pass Geonovum’s OGC-checker with no faults. 
+Complete an existing implementation of the OGC API – Processes specification to a full implementation on top of an existing calculation module. With “full” implementation we mean supporting process input & output descriptions, both Sync and Async execution modes and job management. The implementation must pass the OGC compliance check and pass Geonovum’s OGC-checker with no faults. 
 
 ### Deliverables 
 
-- A written report of the findings encountered during implementation. Geonovum will provide a Github repository where the report can be added in markdown format. We will act as editors and consolidate all reports into one Respec/HTML document.  
+- A written report of the findings encountered during implementation. Geonovum will provide a GitHub repository where the report can be added in Markdown format. We will act as editors and consolidate all reports into one ReSpec/HTML document.  
 - The software component developed under this contract must be made available in the standard market offering, at no additional cost. 
 - A demo service (with demo data) should be kept available for the public at least until 6 months after the testbed ends. 
-- Component is ready to do taken up in an AppStore 
-- Short demo video’s 
+- Component is ready to be taken up in an App Store 
+- Short demo videos 
 
-### Requirements / standards / Open-Source Software 
+### Requirements / standards / open-source software 
 
 - Mandatory Standards: https://ogcapi.ogc.org/processes/ 
 
-    OGC API Processes v1.0 is the approved version of the API, and v2.0 is a stable draft. We want to encourage the use of version 2 of the specification. 
+    OGC API – Processes v1.0 is the approved version of the API, and v2.0 is a stable draft. We want to encourage the use of version 2 of the specification. 
 
-- Optional available Open Source Software (for inspiration and as example code for testing): 
+- Optional available open-source software (for inspiration and as example code for testing): 
 
-    For OGC API Processes open source client and server implementations are listed in the OGC Github repository: https://github.com/opengeospatial/ogcapi-processes/blob/master/implementations.adoc 
+    For OGC API – Processes, open-source client and server implementations are listed in the OGC GitHub repository: https://github.com/opengeospatial/ogcapi-processes/blob/master/implementations.adoc 
 
   The above software is listed for convenience; there may be more available.  
 
@@ -64,29 +64,29 @@ Complete an existing implementation of the OGC API Process specification to a fu
 
 ### Goal 
 
-Implement an OGC API Processes client, make it function within the nLDT ecosystem and have it interoperate with software from other software vendors. 
+Implement an OGC API – Processes client, make it function within the nLDT ecosystem and have it interoperate with software from other software vendors. 
 
 ### Description 
 
-Create a full implementation of an OGC API Process specification client in your visualization software. With “full” implementation we mean supporting process input & output descriptions, both Sync and Async execution mode, and job management. 
+Create a full implementation of an OGC API – Processes specification client in your visualization software. With “full” implementation we mean supporting process input & output descriptions, both Sync and Async execution modes, and job management. 
 
 ### Deliverables 
 
-- A written report of the findings encountered during implementation. Geonovum will provide a Github repository where the report can be added in markdown format. We will act as editors and consolidate all reports into one Respec/HTML document.  
+- A written report of the findings encountered during implementation. Geonovum will provide a GitHub repository where the report can be added in Markdown format. We will act as editors and consolidate all reports into one ReSpec/HTML document.  
 - The software component developed under this contract must be made available in the standard market offering, at no additional cost. 
 - A demo client-side service should be kept available for the public at least until 6 months after the testbed ends. 
-- Component is ready to do taken up in an AppStore 
-- Short demo video’s 
+- Component is ready to be taken up in an App Store 
+- Short demo videos 
 
-### Requirements / standards / Open-Source Software 
+### Requirements / standards / open-source software 
 
 - Mandatory Standards: https://ogcapi.ogc.org/processes/ 
 
-    OGC API Processes v1.0 is the approved version of the API, and v2.0 is a stable draft. We want to encourage the use of version 2 of the specification. 
+    OGC API – Processes v1.0 is the approved version of the API, and v2.0 is a stable draft. We want to encourage the use of version 2 of the specification. 
 
-- Optional available Open-Source Software (for inspiration and as example code for testing): 
+- Optional available open-source software (for inspiration and as example code for testing): 
 
-    For OGC API Processes open-source client and server implementations are listed in the OGC Github repository: https://github.com/opengeospatial/ogcapi-processes/blob/master/implementations.adoc 
+    For OGC API – Processes, open-source client and server implementations are listed in the OGC GitHub repository: https://github.com/opengeospatial/ogcapi-processes/blob/master/implementations.adoc 
 
   The above software is listed for convenience; there may be more available.  
 
@@ -94,7 +94,7 @@ Create a full implementation of an OGC API Process specification client in your 
 
 ### Goal 
 
-Offer ready-made solutions for real-world problems, expressed as a ‘recipe’: a combination of data-sources (ingredients) and operations in the form of an ordered list of processes (like cooking instructions).
+Offer ready-made solutions for real-world problems, expressed as a ‘recipe’: a combination of data sources (ingredients) and operations in the form of an ordered list of processes (like cooking instructions).
 
 ### Description 
 
@@ -106,13 +106,13 @@ Payment is easily arranged in both the App Stores of smart devices and those of 
 
 App settings are stored in the operating system; when the app is used on another device by the same user, it is immediately recognizable.  
 
-Digital Twins also operate within their own ecosystem (and together form an ecosystem). Digital Twins are defined using computational modules and an App Store in the context of Digital Twins, it should offer easy-to-install-and-use computational modules. 
+Digital Twins also operate within their own ecosystem (and together form an ecosystem). Digital Twins are defined using computational modules; an App Store for Digital Twins should offer easy-to-install-and-use computational modules. 
 
-Whereas the App Store in smart devices uses the native functions of Windows or macOS, the App Store in Digital Twins uses HTTP as the primary means of communication. 
+Whereas the App Stores of smart devices, Windows and macOS use the native functions of their operating system, the App Store in Digital Twins uses HTTP as the primary means of communication. 
 
 #### Recipes 
 
-Recipes can be expressed in various ways. OGC API Processes part 2 https://docs.ogc.org/DRAFTS/20-044.html. Common Workflow Language (CWL), a standard that specifies the document schema and execution semantics for composing workflows from components such as command line tools and other workflows. This could be a way to describe recipes. Another proposal for recipe description was created within nLDT. This proposal is not yet standardized and could be used as a basis or inspiration source for experimental implementation. (see appendix B for link to the experimental implementation) A third option for describing recipes is Arazzo, a community-driven open specification within the OpenAPI Initiative. (https://www.openapis.org/arazzo-specification)
+Recipes can be expressed in various ways. One option is OGC API – Processes – Part 2 ([https://docs.ogc.org/DRAFTS/20-044.html](https://docs.ogc.org/DRAFTS/20-044.html)). Another is the Common Workflow Language (CWL), a standard that specifies the document schema and execution semantics for composing workflows from components such as command line tools and other workflows. This could be a way to describe recipes. Another proposal for recipe description was created within nLDT. This proposal is not yet standardized and could be used as a basis or inspiration source for experimental implementation (see [nLDT-Recipe](https://github.com/Geonovum/nLDT-Recipe) for the experimental implementation). Another option for describing recipes is Arazzo, a community-driven open specification within the OpenAPI Initiative. (https://www.openapis.org/arazzo-specification)
 
 #### Catalogs 
 
@@ -124,11 +124,11 @@ An important aspect of such a catalog system is the focus on accessibility and r
 
 #### Metadata 
 
-Metadata consists of descriptive data that helps to find, understand, and correctly interpret datasets and services. They include information about the content, origin, structure, and quality of the data, among other things. By capturing this context, it becomes clear to users exactly what a dataset contains, how current or reliable it is, and in which situations it is suitable for use. In this way, metadata acts as a kind of user manual for data. 
+Metadata consists of descriptive data that helps to find, understand, and correctly interpret datasets and services. It includes information about the content, origin, structure, and quality of the data, among other things. By capturing this context, it becomes clear to users exactly what a dataset contains, how current or reliable it is, and in which situations it is suitable for use. In this way, metadata acts as a kind of user manual for data. 
 
-Standards are often used to record metadata in a structured and interchangeable manner. A widely used standard is DCAT, a vocabulary developed to describe services. DCAT defines uniform terms and relationships, making services easier to publish, search, and link between different platforms. Through this standardization, organizations can keep their data descriptions consistent and promote interoperability. 
+Standards are often used to record metadata in a structured and interchangeable manner. A widely used standard is DCAT, a vocabulary developed to describe datasets and services. DCAT defines uniform terms and relationships, making datasets and services easier to publish, search, and link between different platforms. Through this standardization, organizations can keep their data descriptions consistent and promote interoperability. 
 
-In addition to improving findability and consistency, metadata also contributes to transparency and governance. They clarify who is responsible for a dataset, which license applies, how it is updated, and what restrictions apply. As a result, users can better assess whether the data is suitable for their purposes, and organizations maintain an overview of their own information management. 
+In addition to improving findability and consistency, metadata also contributes to transparency and governance. It clarifies who is responsible for a dataset, which license applies, how it is updated, and what restrictions apply. As a result, users can better assess whether the data is suitable for their purposes, and organizations maintain an overview of their own information management. 
 
 #### Recipe metadata 
 
@@ -136,55 +136,55 @@ DCAT is a mature and widely used standard, and the Netherlands has a standardize
 
 For users to find recipes in a catalog, they must be described using metadata, just like datasets and services. How to capture recipe metadata in DCAT-AP-NL is not yet fully defined. 
 
-There are standards extending DCAT to describe properties like Recipes. We are investigating DPROD (Data Product Ontology (DPROD)) and APKG (GitHub - ILIAD-ocean-twin/APKG: Application Package Application Profile · GitHub).
+There are standards extending DCAT to describe properties like recipes. We are investigating [DPROD](https://ekgf.github.io/dprod/) (Data Product Ontology) and [APKG](https://github.com/ILIAD-ocean-twin/APKG) (Application Package Application Profile).
 
 ### Deliverables 
 
-- A written report; Geonovum will provide a Github repository where the report can be added in markdown format. We will act as editors and consolidate all reports into one Respec/HTML document.  
+- A written report; Geonovum will provide a GitHub repository where the report can be added in Markdown format. We will act as editors and consolidate all reports into one ReSpec/HTML document.  
 - If any software component is developed, we prefer the code to be made available in an open-source repository and pull requests to existing OS projects in case these are used.  
 - The solution should be kept available for the public at least until 6 months after the testbed ends.  
-- Results are input for an AppStore 
-- Short demo video’s 
-    - A viewer can find the Metadata, bind the recipe and execute the recipe – the results are visualized in the viewer. 
+- Results are input for an App Store 
+- Short demo videos 
+    - A viewer can find the metadata, bind the recipe and execute the recipe – the results are visualized in the viewer. 
 
-### Requirements / standards / Open-Source Software 
+### Requirements / standards / open-source software 
 
 - Mandatory Standards: 
-    - OGC API Processes 
-    - OGC API Records 
+    - OGC API – Processes 
+    - OGC API – Records 
     - DCAT-AP-NL 
 
  More on orchestration to be found as a deliverable from Testbed2 (https://github.com/Geonovum/DTaaS-Testbed2/blob/main/deliverables/DTaas2_Orchestration-Avineon_Tensing.pdf). 
 
-OGC API Processes v1.0 is the approved version of the API, and v2.0 is a stable draft. We want to encourage the use of version 2 of the specification. 
+OGC API – Processes v1.0 is the approved version of the API, and v2.0 is a stable draft. We want to encourage the use of version 2 of the specification. 
 
 - Proposed Standards: 
     - CWL (https://www.commonwl.org) 
     - Arazzo (https://www.openapis.org/arazzo-specification) 
-    - Roll-your own (https://github.com/Geonovum/nLDT-Recipe) 
+    - Roll-your-own (https://github.com/Geonovum/nLDT-Recipe) 
 
-NOTE: We intend to award multiple participants for this research topic. Our aim is to have at least one of each for these Recommended Standards.
+NOTE: We intend to award multiple participants for this research topic. Our aim is to have at least one for each of these Proposed Standards.
 
 ## Research topic #5: Web 3D Context document (export/import)
 
 ### Goal 
 
-The nLDT ecosystem knows a lot of visualization components, each having their own strengths and specific capabilities (including AR/VR). The goal of this research topic is the ability to export scene information from a visualization component and the ability to import that scene information in another visualization component. 
+The nLDT ecosystem knows a lot of visualization components, each having their own strengths and specific capabilities (including AR/VR). The goal of this research topic is the ability to export scene information from a visualization component and the ability to import that scene information into another visualization component. 
 
 ### Description 
 
-The 3D Context Document states how a specific grouping of one or more maps from one or more map servers can be described in a portable, platform-independent format for storage in a repository or for transmission between clients. This description is known as a Web 3D Context Document,” or simply a “3d Context.” A 3D Context document includes information about the services(s) providing data in the overall view, the 3D viewpoint, time, bounding box and map projection shared by all the data, sufficient operational metadata for Client software to reproduce the 3D viewpoint, and ancillary metadata used to annotate or describe the maps and their provenance for the benefit of human viewers. A 3D Context document is structured using JSON.    
+The 3D Context Document states how a specific grouping of one or more maps from one or more map servers can be described in a portable, platform-independent format for storage in a repository or for transmission between clients. This description is known as a “Web 3D Context Document,” or simply a “3D Context.” A 3D Context document includes information about the service(s) providing data in the overall view, the 3D viewpoint, time, bounding box and map projection shared by all the data, sufficient operational metadata for Client software to reproduce the 3D viewpoint, and ancillary metadata used to annotate or describe the maps and their provenance for the benefit of human viewers. A 3D Context document is structured using JSON.    
 
 > The work should continue to build on the export-import-scenes: https://geonovum.github.io/DTaaS-Testbed2/#export-import-scenes-6-2-0. 
 
 ### Deliverables 
 
-- A written report; Geonovum will provide a Github repository where the report can be added in markdown format. We will act as editors an consolidate all reports into one Respec/HTML document.  
-- If any software component is developed, we prefer the code to be made available in an open source repository and pull requests to existing OS projects in case these are used.   
+- A written report; Geonovum will provide a GitHub repository where the report can be added in Markdown format. We will act as editors and consolidate all reports into one ReSpec/HTML document.  
+- If any software component is developed, we prefer the code to be made available in an open-source repository and pull requests to existing OS projects in case these are used.   
 - The solution should be kept available for the public at least until 6 months after the testbed ends.  
-- Short demo video’s 
+- Short demo videos 
 
-### Requirements / standards / Open-Source Software 
+### Requirements / standards / open-source software 
 
 - Mandatory documents: 
     https://github.com/Geonovum/DTaaS-Testbed2/blob/main/deliverables/Digital_Twin_as_a_Service%E2%80%93Testbed_II-Import_Export_Scenes.pdf (also to be found in the DTaaS-Testbed2 repository, under deliverables).  

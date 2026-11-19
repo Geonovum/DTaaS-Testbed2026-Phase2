@@ -1,6 +1,6 @@
 # Topic 4: App-Store / Recipes — Collaborall
 
-*DTaaS Testbed 2026, phase 2 · research topic #4 · findings report*
+*DTaaS Testbed 2026, phase 2 · Research topic #4 · findings report*
 
 ## Summary
 
@@ -34,12 +34,12 @@ Our main findings and advice:
    concept set for a *scenario* — an area and a building programme — would let one input
    serve many recipes. We built a proof of concept on an existing OGC keyword.
 
-The recommendations are collected in chapter 9, and a field reference for the recipe
-extension is in appendix A.
+The recommendations are collected in [[[#collab-recommendations]]], and a field reference for the recipe
+extension is in [[[#collab-field-reference]]].
 
-## 1. Introduction
+## Introduction
 
-### 1.1 The question
+### The question
 
 The testbed asked how ready-made solutions for real-world problems can be offered as
 recipes in an App Store for digital twins. The topic names three mandatory standards — OGC
@@ -56,7 +56,7 @@ We split that into four questions:
 - **Adopt.** What do these standards ask of an existing platform that was not built for
   them?
 
-### 1.2 The use cases
+### The use cases
 
 We worked from questions a municipality asks when it plans housing:
 
@@ -75,7 +75,7 @@ We worked from questions a municipality asks when it plans housing:
 
 Five recipes over five processes are published. Two of them chain more than one step.
 
-### 1.3 The approach
+### The approach
 
 Every part of the solution is exposed through the standards the topic names:
 
@@ -89,12 +89,12 @@ Every part of the solution is exposed through the standards the topic names:
 
 The surface runs on ANT without changes to its core. Each endpoint is a configured
 endpoint of the platform that returns the document the standard requires, and a small proxy
-in front supplies the parts of HTTP the platform cannot set itself (chapter 6). The pattern
+in front supplies the parts of HTTP the platform cannot set itself ([[[#collab-platform]]]). The pattern
 is not specific to ANT.
 
-## 2. Recipe metadata in DCAT-AP-NL
+## Recipe metadata in DCAT-AP-NL
 
-### 2.1 Why a recipe is not a dataset
+### Why a recipe is not a dataset {#collab-not-dataset}
 
 DCAT-AP-NL 3.0 describes a `dcat:Dataset`, which is data, and a `dcat:DataService`, which
 is an endpoint that serves or processes data. A recipe is neither: it is an executable
@@ -109,7 +109,7 @@ recipes is to answer *which recipes depend on this service* and *which recipes w
 dataset*. A recipe typed as a dataset cannot answer either without the consumer fetching
 and parsing the recipe itself.
 
-### 2.2 The choices
+### The choices {#collab-choices}
 
 **A recipe is a `dcat:Resource` with its own class.** `dcat:Resource` is the class DCAT
 provides for catalogued things that are not datasets. It carries identification, rights and
@@ -129,14 +129,14 @@ stays the authority on the wiring.
 
 **The language of the recipe is a metadata value, not part of the model.** `dct:conformsTo`
 on each distribution names the language the recipe is written in. This was tested by
-events: when we moved from Arazzo to OWS (chapter 4), the model did not change. Each recipe
+events: when we moved from Arazzo to OWS ([[[#collab-recipe-language]]]), the model did not change. Each recipe
 now has two distributions, one per language, and a client reads `dct:conformsTo` to choose
 the one it can run.
 
-The extension is two classes and six properties. Appendix A lists them with their
+The extension is two classes and six properties. [[[#collab-field-reference]]] lists them with their
 cardinalities.
 
-### 2.3 Process and recipe
+### Process and recipe {#collab-process-recipe}
 
 At the first plugfest the participants discussed what distinguishes a process from a
 recipe. A workflow can contain a workflow, so from the outside every recipe is a process.
@@ -165,7 +165,7 @@ organisational workflow, which depends on how an organisation works rather than 
 services exist. That belongs in the organisation's own workflow tooling, which can call a
 recipe as one of its steps.
 
-### 2.4 What is not covered yet
+### What is not covered yet {#collab-not-covered}
 
 - **Typing of ingredients.** The extension has no terms for the object type, units,
   coordinate reference system or temporal validity of an ingredient. Existing vocabularies
@@ -185,7 +185,7 @@ recipe as one of its steps.
 - **The namespace.** Our vocabulary's namespace does not resolve. For this research that
   made no difference. It matters once several parties publish recipes — see below.
 
-### 2.5 One vocabulary, many publishers
+### One vocabulary, many publishers {#collab-namespace}
 
 Two kinds of namespace are easily confused. The **vocabulary** — the recipe class and its
 properties — should exist once. If every publisher defines the same class under its own
@@ -194,7 +194,7 @@ them. The **identifiers of what is catalogued** — a recipe, a process record �
 the publisher, and a platform can provide a namespace for those to each of its customers,
 so that nobody has to set one up in order to take part.
 
-### 2.6 Advice from validating
+### Advice from validating {#collab-validating}
 
 We validate the catalogue that is actually served — not only an example file — against
 both the DCAT-AP 3.0 and the DCAT-AP-NL 3.0 shapes, automatically on every change. Three
@@ -207,22 +207,22 @@ things are enforced by the shapes and easy to miss in the text of the profile:
 
 Validating only against the national shapes misses the European rules that come with them.
 
-## 3. Catalogue and Cookbook
+## Catalogue and Cookbook
 
-### 3.1 What is published
+### What is published
 
 | Endpoint | Standard | Content |
 |---|---|---|
 | Records collection | OGC API Records | One record per released recipe, with its spatial extent and links to the recipe document and its DCAT description; search on text, bounding box and limit |
 | DCAT catalogue | DCAT-AP-NL 3.0, JSON-LD | Recipes, the processes they call and the datasets they use |
 | Cookbook | — | The list of recipes, and each recipe as an Arazzo or an OWS document |
-| Federated catalogue | DCAT-AP | The records harvested from other catalogues (3.4) |
+| Federated catalogue | DCAT-AP | The records harvested from other catalogues ([[[#collab-federation]]]) |
 
 Recipes, processes and datasets are together in the DCAT catalogue. The Records collection
 holds the recipes only, so one search across all three exists as one DCAT document and not
 yet as one Records search.
 
-### 3.2 A recipe is data, not code
+### A recipe is data, not code
 
 A recipe is stored as rows in two tables: one row per recipe and one per step. All
 documents — the Records item, the DCAT description and the recipe document in both
@@ -235,7 +235,7 @@ publish a recipe, and the store can list and manage what it holds. It asks one d
 of the publisher: a released recipe is replaced by a new version, never edited, because
 clients may already depend on it.
 
-### 3.3 What a persistent identifier has to be
+### What a persistent identifier has to be {#collab-pid}
 
 A catalogue entry promises that what it names will be the same tomorrow. That rules out
 pointing at something its owner can still edit. What a catalogue cites, and what a recipe
@@ -246,7 +246,7 @@ customers. This was the most useful match we found between an existing platform 
 standards: a store that versions what it offers has already done most of the work of
 persistent identification.
 
-### 3.4 One catalogue over several
+### One catalogue over several {#collab-federation}
 
 An App Store with recipes from several parties needs one place to search, without one party
 becoming the authority over the records of the others. We followed the pattern that data
@@ -263,7 +263,7 @@ catalogue harvests them.
 It was exercised against a public OGC demo server: its processes and a collection of about
 three hundred metadata records.
 
-### 3.5 A harvester refuses the catalogue
+### A harvester refuses the catalogue {#collab-harvester}
 
 If recipes are to travel as open data does — from a store to a national portal and on to
 data.europa.eu — the harvester behind data.europa.eu, piveau, must be able to read them. We
@@ -285,9 +285,9 @@ to DCAT-AP properties and offer the structure of the recipe behind a distributio
 recipe document already is one. How an extension should carry structure is a question the
 profile should answer once, rather than each publisher discovering it.
 
-## 4. Recipe language and execution
+## Recipe language and execution {#collab-recipe-language}
 
-### 4.1 From Arazzo to the Open Workflow Specification
+### From Arazzo to the Open Workflow Specification {#collab-arazzo-ows}
 
 We started with Arazzo, one of the three languages the topic proposes. An Arazzo step names
 an operation in an OpenAPI description and passes values between steps with expressions.
@@ -311,7 +311,7 @@ formerly called Serverless Workflow) for three reasons:
 - a check on the result of a step is a schema on its output, which is stricter than a
   comparison and fails with a typed error.
 
-The choice of language did not affect the metadata (2.2), and the Cookbook serves every
+The choice of language did not affect the metadata ([[[#collab-choices]]]), and the Cookbook serves every
 recipe in both languages.
 
 Recipes from parties that use Arazzo can be translated to OWS when they are imported: a
@@ -324,7 +324,7 @@ request body is passed. Every OGC process execution is a `POST` with a body. An 
 over OGC processes therefore has to call a URL directly, and loses the binding through the
 API description that lets a stranger execute it.
 
-### 4.2 The missing mechanism: from one step to the next
+### The missing mechanism: from one step to the next {#collab-step-to-step}
 
 OGC API Processes describes and executes each step. The recipe language says how steps are
 connected. A workflow platform can order tasks, start them and record each run. **None of
@@ -347,7 +347,7 @@ to the recipe, and it has consequences:
   can wait for an asynchronous step, or run two steps in parallel and continue when both
   are finished. Whether a step can run asynchronously is decided by the process server.
 
-### 4.3 Binding through the API description
+### Binding through the API description
 
 A recipe step should name an operation in a published API description, not a hard-coded
 address. Only then can someone who did not write the recipe execute it. This is easy to
@@ -356,7 +356,7 @@ description it referred to was not yet published. We now publish the OpenAPI des
 generated from the process descriptions, and the executor refuses a step whose operation
 the description does not declare.
 
-### 4.4 Calling the processes of other parties
+### Calling the processes of other parties {#collab-other-parties}
 
 The client can connect to any OGC API Processes server and run each of its processes as a
 recipe of one step. Tested against a public demo server, this showed a practical obstacle:
@@ -367,7 +367,7 @@ send it a JSON execute request in the normal way.
 `Content-Type` in its CORS preflight. OGC API Processes does not mention it, and most
 servers are configured for server-to-server use.
 
-## 5. The client and the demonstration
+## The client and the demonstration
 
 *Recepten* is the client shown in the demo video. It follows the flow the topic asks for:
 find the metadata, bind the recipe, execute it, and show the result in the viewer.
@@ -384,7 +384,7 @@ find the metadata, bind the recipe, execute it, and show the result in the viewe
 
 ![The result on the map](media/recipe-result.png)
 
-### 5.1 One scenario for several recipes
+### One scenario for several recipes {#collab-scenario}
 
 A user who has checked grid capacity for a plan wants to run the housing recipe on the same
 plan. Without further agreement that means drawing the area again and entering the
@@ -408,9 +408,9 @@ input at the concept it carries. With that annotation:
 The mechanism works on standards that exist today. The content does not exist yet: the
 concepts are ours, and they have not been agreed with the parties that own the definitions.
 
-## 6. The standards on an existing platform
+## The standards on an existing platform {#collab-platform}
 
-### 6.1 Where the standards and the platform meet
+### Where the standards and the platform meet {#collab-standards-platform}
 
 Producing the documents the standards require was not difficult. What an existing platform
 often cannot express is the HTTP around the document:
@@ -424,14 +424,14 @@ often cannot express is the HTTP around the document:
 | Deferred, asynchronous execution with job resources | Every request runs to completion | Synchronous execution only is declared |
 
 A platform that can declare a media type and a status code per endpoint needs no proxy. One
-that cannot, can still offer the full surface, at the cost of a proxy that is part of the
+that cannot can still offer the full surface, at the cost of a proxy that is part of the
 conformant surface and needs tests of its own.
 
 For a platform to carry recipes natively, three things are needed: a released, immutable
-version of each endpoint (3.3), a read path for discovery documents that is cheap, and a way
-to pass the output of one step to the next (4.2).
+version of each endpoint ([[[#collab-pid]]]), a read path for discovery documents that is cheap, and a way
+to pass the output of one step to the next ([[[#collab-step-to-step]]]).
 
-### 6.2 Conformance
+### Conformance {#collab-conformance}
 
 We claim no OGC conformance class as passed.
 
@@ -451,18 +451,18 @@ almost nothing, although every link was correct.
 We used OGC API Processes 1.0. Each deviation is declared in our compliance statement
 rather than left implicit.
 
-## 7. Collaboration and plugfests
+## Collaboration and plugfests {#collab-collaboration}
 
 The plugfests changed our design more than any other input.
 
-- **Plugfest 1 (28 September).** The discussion on Arazzo led to our move to OWS (4.1). The
+- **Plugfest 1 (28 September).** The discussion on Arazzo led to our move to OWS ([[[#collab-arazzo-ows]]]). The
   discussion on what a process is, as opposed to a recipe, gave the distinction by
-  visibility (2.3). And the wish to search several stores as one led to the federated
-  catalogue (3.4). We had prepared a public surface, a Postman collection and a worked
+  visibility ([[[#collab-process-recipe]]]). And the wish to search several stores as one led to the federated
+  catalogue ([[[#collab-federation]]]). We had prepared a public surface, a Postman collection and a worked
   example for the other participants.
 - **Plugfest 2 (27 October).** In preparation our processes were extended to accept inputs
   as a value, as a qualified value and by reference, as OGC API Processes allows, and the
-  client was extended to run the processes of other servers (4.4).
+  client was extended to run the processes of other servers ([[[#collab-other-parties]]]).
 
 **No recipe was exchanged between the topic 4 participants.** Our client can run the
 processes of another server and our catalogue can harvest another catalogue, but both were
@@ -472,16 +472,16 @@ stood in the way, and they would stand in the way again:
 - we did not receive the endpoints of another participant's recipes or catalogue, and our
   own surface was not yet on a stable public address;
 - the participants did not settle on one recipe language — we use OWS, Varidian reports
-  WDL — so there was no recipe both sides could run;
+  WDL and Future Insight uses CWL — so there was no recipe both sides could run;
 - each participant's own chain had to be finished first, and nothing in the schedule
   required both sides to be ready at the same moment.
 
 A jointly written description of the interface between a recipe step and an OGC API
 Processes service was not produced. From our findings its content would be: how an input is
-passed, how a refusal is recognised, what a browser client needs (4.4), and how an input
-states what it means (5.1).
+passed, how a refusal is recognised, what a browser client needs ([[[#collab-other-parties]]]), and how an input
+states what it means ([[[#collab-scenario]]]).
 
-## 8. Conclusions
+## Conclusions
 
 A recipe can be described in DCAT-AP-NL with a small extension, found through OGC API
 Records and executed over OGC API Processes services. The three mandatory standards are
@@ -491,62 +491,62 @@ sufficient for the parts they cover. What they leave open is what lies between t
   and an extension that adds one is not automatically readable for harvesters.
 - **Between the steps of a recipe:** no standard executes the passing of a value from one
   step to the next. A recipe language describes it, and the three participants in this
-  topic ended up with at least two different languages.
+  topic ended up with three different languages.
 - **Between recipes:** each recipe defines its own inputs, so the same plan has to be
   entered again for each one.
 
 An existing platform can offer all of this without changes to its core, with a small proxy
 for the parts of HTTP it cannot set.
 
-## 9. Recommendations
+## Recommendations {#collab-recommendations}
 
 ### For Geonovum
 
 1. **Choose one recipe language and the subset of it a recipe may use.** Today the way a
    recipe runs is defined by whichever client executes it. We recommend the Open Workflow
-   Specification, with Arazzo recipes translated on import (4.1, 4.2).
+   Specification, with Arazzo recipes translated on import ([[[#collab-arazzo-ows]]], [[[#collab-step-to-step]]]).
 2. **Keep the recipe vocabulary in one shared namespace.** The classes and properties
    should exist once, kept by a party that outlives any single participant. Identifiers of
    recipes and processes belong to their publishers, and a platform can provide those to its
-   customers (2.5).
+   customers ([[[#collab-namespace]]]).
 3. **Make the scenario — an area and a programme — a building block of the nLDT.** Publish
    the concept set for a building programme, with the parties that collect it today as
    owners, and derive an exchange format from it that an OGC process can refer to. A
-   catalogue can then answer *which recipes can run on my scenario?* (5.1).
+   catalogue can then answer *which recipes can run on my scenario?* ([[[#collab-scenario]]]).
 4. **Test a recipe store against a real harvester.** Conformance to the profile is necessary
-   and not sufficient (3.5).
+   and not sufficient ([[[#collab-harvester]]]).
 5. **Make exchange between participants a planned milestone**, with a date, endpoints
-   exchanged beforehand and a stable public address for each participant (chapter 7).
+   exchanged beforehand and a stable public address for each participant ([[[#collab-collaboration]]]).
 6. **Have the interface between a recipe step and a process service written down**, jointly
-   by the builders of services, clients and recipes (chapter 7).
+   by the builders of services, clients and recipes ([[[#collab-collaboration]]]).
 
 ### For the DCAT-AP-NL working group
 
 1. **Give compositions of services a recognised place in the profile.** A recipe is neither
-   a dataset nor a data service (2.1). Appendix A is our proposal.
+   a dataset nor a data service ([[[#collab-not-dataset]]]). The field reference ([[[#collab-field-reference]]]) is our proposal.
 2. **State how an extension should carry structure**, so that harvesters do not refuse the
-   whole catalogue (3.5).
+   whole catalogue ([[[#collab-harvester]]]).
 3. **Mention in the text what the shapes enforce**, and advise publishers to validate the
-   catalogue they serve against both the European and the national shapes (2.6).
-4. **Provide for the media types of workflow documents** (2.4).
+   catalogue they serve against both the European and the national shapes ([[[#collab-validating]]]).
+4. **Provide for the media types of workflow documents** ([[[#collab-not-covered]]]).
 
 ### For the OGC
 
 1. **Describe what an existing platform minimally needs to offer OGC API Processes**, and
-   what a proxy may supply (6.1).
+   what a proxy may supply ([[[#collab-standards-platform]]]).
 2. **Let a server declare that a client can poll a job without the work being deferred**,
    so that platforms that run every request to completion can state honestly what they do
-   (6.1).
-3. **Recommend that process servers allow `Content-Type` in their CORS settings** (4.4).
-4. **Let the test suite follow links** instead of assuming a path layout (6.2).
+   ([[[#collab-standards-platform]]]).
+3. **Recommend that process servers allow `Content-Type` in their CORS settings** ([[[#collab-other-parties]]]).
+4. **Let the test suite follow links** instead of assuming a path layout ([[[#collab-conformance]]]).
 
 ### For the Open Workflow Specification
 
-1. **Specify how a call bound to an OpenAPI operation passes a request body** (4.1).
+1. **Specify how a call bound to an OpenAPI operation passes a request body** ([[[#collab-arazzo-ows]]]).
 2. **Register a media type**, so that a catalogue can tell a workflow document from other
-   JSON (2.4).
+   JSON ([[[#collab-not-covered]]]).
 
-## Appendix A. Field reference of the recipe extension
+## Field reference of the recipe extension {#collab-field-reference}
 
 Prefix `recipe:`. The extension is layered on DCAT-AP-NL 3.0; everything not listed here is
 used as the profile defines it.
@@ -578,6 +578,6 @@ A process is described with existing terms only:
 | `dcat:endpointDescription` | The OGC process description |
 | `dct:conformsTo` | OGC API Processes |
 
-Given the finding in 3.5, `recipe:step` and `recipe:ingredient` are best offered behind a
+Given the finding in [[[#collab-harvester]]], `recipe:step` and `recipe:ingredient` are best offered behind a
 distribution rather than in the catalogue entry itself, until the profile states how an
 extension should carry structure.

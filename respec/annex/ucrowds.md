@@ -8,31 +8,31 @@ License: CC BY 4.0
 
 ## Executive summary
 
-Crowd simulation helps event organizers evaluate pedestrian movement and identify potential safety risks before an event takes place. Temporary event infrastructure, such as stages, barriers, entrances, and exits, is typically designed in CAD applications. Crowd simulation modelers often need to manually recreate walkable areas, obstacles, and other relevant features from these designs. This process is time-consuming, introduces opportunities for errors, and must be repeated when event designs change.
+Crowd simulation helps event organizers evaluate pedestrian movement and identify potential safety risks before an event takes place. Temporary event infrastructure, such as stages, barriers, entries, and exits, is typically designed in CAD applications. Crowd simulation modelers often need to manually recreate walkable areas, obstacles, and other relevant features from these designs. This process is time-consuming, introduces opportunities for errors, and must be repeated when event designs change.
 
-This research investigates how SCX, a lightweight format for exchanging scene information between applications, can be extended to support crowd simulation. The extension presented in this report adds semantic information to geographic data, allowing simulation applications to distinguish between features such as walkable areas, obstacles, entrances, exits, and queues.
+This research investigates how SCX, a lightweight format for exchanging scene information between applications, can be extended to support crowd simulation. The extension presented in this report adds semantic information to geographic data, allowing simulation applications to distinguish between features such as walkable areas, obstacles, entries, exits, and queues.
 
 The research was carried out by uCrowds and AniVizzion. AniVizzion implemented the export workflow in SCAD Re-Event, while uCrowds implemented the import workflow in SimCrowds. The demonstration showed that event designs can be transferred directly from CAD into SimCrowds, where the relevant simulation objects and a navigation mesh are created without manual redrawing.
 
 The workflow automates construction of the simulation environment, although users must still connect simulation objects into pedestrian flows and configure simulation parameters. Further research could improve interoperability through shared semantic definitions, investigate applications in other simulation domains, and explore closer integration between CAD design and simulation.
 
-## 1. Introduction
+## Introduction
 
-Temporary infrastructure for public events, including stages, barriers, entrances, exits, and queue areas, is commonly designed in computer-aided design (CAD) applications. Crowd simulation applications use models of these event sites to evaluate pedestrian movement and support safety planning. To represent pedestrian movement, these applications need to distinguish areas where people can walk from obstacles and other inaccessible areas. Crowd models also describe destinations and intermediate goals, including points of interest such as food stalls, toilets, and viewing areas, that pedestrians may visit during an event. However, CAD designs are typically not transferred directly into simulation models. Instead, simulation modelers use CAD drawings as visual references and manually recreate walkable areas, obstacles, and other simulation-relevant features and destinations. This process takes time, introduces opportunities for interpretation errors, and must be repeated when event designs change. As a result, simulation models may also become inconsistent with the latest event design.
+Temporary infrastructure for public events, including stages, barriers, entries, exits, and queue areas, is commonly designed in computer-aided design (CAD) applications. Crowd simulation applications use models of these event sites to evaluate pedestrian movement and support safety planning. To represent pedestrian movement, these applications need to distinguish areas where people can walk from obstacles and other inaccessible areas. Crowd models also describe destinations and intermediate goals, including points of interest such as food stalls, toilets, and viewing areas, that pedestrians may visit during an event. However, CAD designs are typically not transferred directly into simulation models. Instead, simulation modelers use CAD drawings as visual references and manually recreate walkable areas, obstacles, and other simulation-relevant features and destinations. This process takes time, introduces opportunities for interpretation errors, and must be repeated when event designs change. As a result, simulation models may also become inconsistent with the latest event design.
 
-Geonovum Testbed 2026, phase 2, promotes interoperability between digital twin components based on the Dutch nLDT architecture. Research Topic #5, _Web 3D Context Document (export/import)_, investigates the exchange of scene information between independent applications. This research builds on the work of Esri Nederland in _Digital Twin as a Service Testbed II_, which introduced SCX, a lightweight JSON format for exchanging scene configurations, and demonstrated it between ArcGIS and Cesium. SCX describes a camera view, time settings, and references to external scene layers. The original format supports scene exchange for visualization but does not describe what a layer represents within a simulation.
+Geonovum Testbed 2026, phase 2, promotes interoperability between digital twin components based on the Dutch nLDT architecture. Research topic #5, _Web 3D Context Document (export/import)_, investigates the exchange of scene information between independent applications. This research builds on the work of Esri Nederland in _Digital Twin as a Service Testbed II_, which introduced SCX, a lightweight JSON format for exchanging scene configurations, and demonstrated it between ArcGIS and Cesium. SCX describes a camera view, time settings, and references to external scene layers. The original format supports scene exchange for visualization but does not describe what a layer represents within a simulation.
 
-The iCAD research investigates how SCX can be extended to assign semantic meaning to georeferenced 2D scene layers, allowing simulation applications to interpret their function rather than only their geometry. In the CAD-to-crowd use case, these functions distinguish walkable areas, obstacles, entrances, exits, and queues. The objective is to enable a simulation application to construct its environment directly from an event design, without manually redrawing the relevant geometry.
+The iCAD research investigates how SCX can be extended to assign semantic meaning to georeferenced 2D scene layers, allowing simulation applications to interpret their function rather than only their geometry. In the CAD-to-crowd use case, these functions distinguish walkable areas, obstacles, entries, exits, and queues. The objective is to enable a simulation application to construct its environment directly from an event design, without manually redrawing the relevant geometry.
 
 The research was carried out by a consortium of uCrowds and AniVizzion. uCrowds develops SimCrowds, a real-time crowd simulation application used to model and analyze pedestrian movement. AniVizzion develops SCAD Re-Event, a CAD application for event production and temporary infrastructure design. uCrowds led the design of the SCX extension and implemented the importer in SimCrowds, while AniVizzion implemented the exporter in SCAD Re-Event. Together, these implementations establish an exchange workflow from CAD design to crowd simulation. The demonstration also uses SimCrowds' existing Web Map Service (WMS) functionality to make simulated crowd density available to geographic visualization applications.
 
 The proof of concept focuses on one use case within event planning and crowd safety. It evaluates whether georeferenced 2D scene layers can be exchanged and interpreted to construct a crowd simulation environment without manual redrawing. The resulting simulation objects still require users to establish pedestrian flows and configure simulation parameters. Although the SCX extension could support other simulation domains, this research evaluates its application to crowd simulation.
 
-## 2. Background and standards
+## Background and standards
 
-Geonovum's Research Topic #5 builds on earlier work on exchanging 3D scene configurations between applications. This section introduces the SCX format developed in Digital Twin as a Service Testbed II, the existing CAD-to-crowd simulation workflow, and the geospatial standards relevant to the research.
+Geonovum's Research topic #5 builds on earlier work on exchanging 3D scene configurations between applications. This section introduces the SCX format developed in Digital Twin as a Service Testbed II, the existing CAD-to-crowd simulation workflow, and the geospatial standards relevant to the research.
 
-### 2.1 Scene exchange with SCX
+### Scene exchange with SCX
 
 Geonovum describes a Web 3D Context Document as a portable, platform-independent JSON description of a scene. It contains references to geographic data sources and information needed to reconstruct a scene, such as viewpoint, time, and spatial context.
 
@@ -50,7 +50,7 @@ SCX references external data sources rather than embedding geometry in the docum
 
 The original schema focuses on visualization. A layer's `type` identifies its representation or loading category, such as `imagery`, `elevation`, or `scene`, but does not describe its meaning within a simulation.
 
-### 2.2 Current CAD-to-crowd simulation workflow
+### Current CAD-to-crowd simulation workflow
 
 SCAD Re-Event provides detailed CAD layouts of temporary infrastructure for event planning and construction. Crowd simulation applications such as SimCrowds need the same environment described in terms of pedestrian-relevant functions. The simulation model must distinguish walkable areas from obstacles, identify locations where pedestrians enter, exit, or queue, and represent destinations or intermediate goals that pedestrians can visit.
 
@@ -58,7 +58,7 @@ In the existing workflow, modelers use CAD drawings as visual references and man
 
 Exchanging the geometry alone does not resolve this problem. The receiving application also needs the semantic meaning, i.e., the `function`, of the geometry to construct the corresponding simulation objects.
 
-### 2.3 Geographic data standards
+### Geographic data standards
 
 **GeoJSON (RFC 7946)** is a widely supported JSON format for geographic features. It represents points, lines, polygons, and their associated properties. GeoJSON uses WGS 84 (OGC:CRS84), with coordinates expressed in longitude, latitude order. It does not provide a standardized mechanism for declaring an alternative coordinate reference system (CRS).
 
@@ -74,7 +74,7 @@ JSON-FG makes it possible to exchange georeferenced CAD-derived geometry in a pr
 
 CityJSON provides another JSON-based approach for representing semantically classified 3D city objects. However, this research focuses on exchanging georeferenced 2D functional areas rather than 3D city models, making JSON-FG a more suitable choice for the scene layer data.
 
-### 2.4 Context within the nLDT architecture
+### Context within the nLDT architecture
 
 Geonovum's nLDT reference architecture promotes a network of interoperable local digital twins in which data, computational models, and visualization components can operate independently and exchange information through open standards.
 
@@ -82,7 +82,7 @@ The CAD-to-crowd workflow follows this approach. SCAD Re-Event provides event de
 
 SCX provides the scene-level exchange mechanism between these components. Extending it with semantic information supports the broader objective of interoperability between independent digital twin applications.
 
-## 3. Research question
+## Research question
 
 This research investigates how the SCX schema can be extended beyond scene visualization to support simulation applications. The main research question is:
 
@@ -96,27 +96,27 @@ To answer this question, the research addresses three sub-questions:
 
 The first two sub-questions guide the design of the SCX extension. The third evaluates the extension through the implemented CAD-to-crowd workflow and identifies remaining limitations.
 
-## 4. Methodology
+## Methodology
 
 The research followed an iterative, prototype-driven approach in which the SCX extension and its implementation were developed together. The work was organized around four activities: schema design, exporter development, importer development, and integration testing.
 
-### 4.1 Schema design
+### Schema design
 
 Schema design began by identifying basic spatial functions commonly needed for pedestrian simulation: areas where people can move, obstacles that restrict movement, locations for entering and exiting, queues, and intermediate destinations. We compared these roles with the information available in SCX and the event design data from SCAD Re-Event. SimCrowds served as the implementation used to evaluate the design; interoperability with other crowd simulation tools was not tested.
 
 uCrowds led the design of the extension, refining it during importer development rather than finalizing it beforehand. Design decisions were informed by practical implementation challenges, a review of related standards including GeoJSON and JSON-FG, and feedback from Geonovum. Particular attention was given to separating the semantic role of scene layers from the geometry and metadata contained in external layer files.
 
-### 4.2 Exporter and importer development
+### Exporter and importer development
 
-AniVizzion extended SCAD Re-Event with dedicated drawing elements for crowd simulation. Walkable areas, obstacles, waypoints and the terrain boundary are drawn as closed polygons on dedicated drawing layers. Entries, exits, queues and podiums are placed as parametric blocks whose width and height can be adjusted, and whose orientation defines the facing direction. During the modeling phase, designers draw these elements directly on the terrain alongside the temporary event infrastructure. Walkable areas define the terrain on which pedestrians can move, while the other elements represent functional parts of the crowd simulation environment.  
+AniVizzion extended SCAD Re-Event with dedicated drawing elements for crowd simulation. Walkable areas, obstacles, waypoints and the terrain boundary are drawn as closed polygons on dedicated drawing layers. Entries, exits and queues are placed as parametric blocks whose width and height can be adjusted, and whose orientation defines the facing direction. During the modeling phase, designers draw these elements directly on the terrain alongside the temporary event infrastructure. Walkable areas define the terrain on which pedestrians can move, while the other elements represent functional parts of the crowd simulation environment.  
   
 AniVizzion developed an SCX exporter that converts the modeled scene into an extended SCX document referencing georeferenced JSON-FG files, one file per function. The exporter assigns the SCX layer `function` from the source of the geometry: the drawing layer for polygons, or the block name for parametric blocks. Polygons nested inside other blocks are included. Function layers without any features are omitted from the export. The exported scene can optionally be uploaded from the export dialog to an AniVizzion scene server, which makes it available through a publicly accessible URL.
 
-uCrowds developed the corresponding importer in SimCrowds. The importer retrieves the SCX document and its referenced JSON-FG files, interprets the layer functions, and creates the corresponding simulation objects. After the import, the simulation environment and underlying datastructures are automatically generated.
+uCrowds developed the corresponding importer in SimCrowds. The importer retrieves the SCX document and its referenced JSON-FG files, interprets the layer functions, and creates the corresponding simulation objects. After the import, the simulation environment and underlying data structures are automatically generated.
 
-### 4.3 Validation
+### Validation
 
-Validation focused on whether the exchanged scene data could be interpreted correctly and used to construct a crowd simulation environment. The workflow was evaluated using a real-world event design for Huntenpop 2025, described in Section 6.1.
+Validation focused on whether the exchanged scene data could be interpreted correctly and used to construct a crowd simulation environment. The workflow was evaluated using a real-world event design for Huntenpop 2025, described in [[[#ucrowds-test-scene]]].
 
 The exported JSON-FG files were checked using Geonovum's JSON-FG OGC Checker. In SimCrowds, we tested whether the layer functions were correctly interpreted, whether the corresponding simulation objects were created, and whether a navigation mesh could be generated from the imported environment.
 
@@ -124,7 +124,7 @@ We also examined which steps still required user interaction after import, parti
 
 Finally, the return path was tested by publishing simulated crowd density through WMS and displaying the resulting layer in QGIS and Esri Map Viewer. This demonstrated that the simulation output could be consumed by standard geospatial clients.
 
-## 5. SCX extension
+## SCX extension
 
 The SCX extension developed in this research enables simulation applications to interpret the meaning of georeferenced scene layers, rather than only displaying their geometry. It builds on the lightweight SCX schema introduced by Esri Nederland in Digital Twin as a Service Testbed II, which describes a scene through a camera view, time settings, and references to external data sources.
 
@@ -132,15 +132,15 @@ The extension introduces a `function` field that identifies the role of a layer 
 
 The following subsections explain these design choices and their application in the CAD-to-crowd workflow.
 
-### 5.1 Semantic layer functions
+### Semantic layer functions
 
 The principal addition is the `function` field on an SCX layer. The existing `type` field indicates how a layer is represented or loaded, while `function` describes the role its data has within a particular scene. Layers containing similar polygons can therefore be interpreted differently by simulation applications.
 
 Because the function belongs to the scene layer rather than the source data, the same dataset can serve different purposes in different scenes. For example, an open area could be available for general pedestrian movement in one event layout but designated as a queueing area in another.
 
-The field accepts an open string rather than a fixed vocabulary. The crowd modeling roles considered in this research are `walkable`, `obstacle`, `entry`, `exit`, `queue`, and `waypoint`. These describe functional concepts rather than a particular application's object classes. The SimCrowds-specific interpretation of each function is provided once, in Section 5.5. In the developed importer, a layer without a recognized function is treated as visual only and does not produce a simulation object.
+The field accepts an open string rather than a fixed vocabulary. The crowd modeling roles considered in this research are `walkable`, `obstacle`, `entry`, `exit`, `queue`, and `waypoint`. These describe functional concepts rather than a particular application's object classes. The SimCrowds-specific interpretation of each function is provided once, in [[[#ucrowds-mapping]]]. In the developed importer, a layer without a recognized function is treated as visual only and does not produce a simulation object.
 
-### 5.2 Coordinate reference systems
+### Coordinate reference systems
 
 The extension distinguishes between the working CRS of a scene and the CRS of its underlying data.
 
@@ -154,7 +154,7 @@ JSON-FG 1.0 extends GeoJSON with additional members, including `coordRefSys` to 
 
 The original SCX `view` section remains separate from `preferredCrs`. Its camera position uses latitude, longitude, and altitude regardless of the scene's preferred working CRS.
 
-### 5.3 Scene layer data and feature properties
+### Scene layer data and feature properties
 
 In this research, layers with `type` set to `scene` reference static JSON-FG files containing georeferenced 2D features. Each file contains a FeatureCollection with geometry and associated feature properties. Plain GeoJSON is also accepted.
 
@@ -167,9 +167,9 @@ This arrangement allows the exporter to preserve georeferenced CAD geometry in i
 
 Simulation-specific information can be included in the `properties` member of each feature. For example, an entry could have an `agents_per_second` property indicating an inflow rate. SCX does not standardize these parameters. The exporter determines which values to include, and the importer decides whether and how to interpret them.
 
-JSON-FG is an existing OGC standard, so this report does not reproduce its complete specification. Further information is available in the [official JSON-FG 1.0 specification](https://docs.ogc.org/is/21-045r1/21-045r1.html). Appendix A provides a compact example of a JSON-FG file referenced by an SCX scene layer.
+JSON-FG is an existing OGC standard, so this report does not reproduce its complete specification. Further information is available in the [official JSON-FG 1.0 specification](https://docs.ogc.org/is/21-045r1/21-045r1.html). [[[#ucrowds-example-json-fg]]] provides a compact example of a JSON-FG file referenced by an SCX scene layer.
 
-### 5.4 Example SCX document
+### Example SCX document {#ucrowds-example-scx}
 
 The following SCX document describes an event scene with three layers: a site boundary for visual context, a walkable area, and an entry area for crowd simulation. The URLs are examples rather than published project resources.
 
@@ -217,13 +217,13 @@ The following SCX document describes an event scene with three layers: a site bo
 
 The document retains the original `view`, `time`, and `layers` structure. The `view` describes the camera, and `time` supplies temporal context. The added fields are `preferredCrs` at document level and `function` at layer level.
 
-The SCX document contains references rather than geometry. The example entry layer points to `entry.json`, whose structure is illustrated using a real exported file in Appendix A.
+The SCX document contains references rather than geometry. The example entry layer points to `entry.json`, whose structure is illustrated using a real exported file in [[[#ucrowds-example-json-fg]]].
 
-### 5.5 Mapping between SCAD Re-Event and SimCrowds
+### Mapping between SCAD Re-Event and SimCrowds {#ucrowds-mapping}
 
 In the implemented workflow, the SCAD Re-Event exporter assigns the SCX layer `function` from the source of the geometry: closed polygons on a dedicated drawing layer, or a dedicated parametric block. The following table shows how the tested SimCrowds importer interprets the resulting functions. The source names are those used by the SCAD Re-Event exporter; they are not intended as a standardized vocabulary.
 
-| SCAD Re-Event block category   | SCX `function` | SimCrowds object and interpretation                                                              |
+| SCAD Re-Event source element   | SCX `function` | SimCrowds object and interpretation                                                              |
 | ------------------------------ | -------------- | ------------------------------------------------------------------------------------------------ |
 | Walkable area polygons (layer) | `walkable`     | Walkable Area: defines terrain available to pedestrians and supports navigation mesh generation. |
 | Obstacle polygons (layer)      | `obstacle`     | Obstacle: excludes its area from pedestrian movement.                                            |
@@ -235,52 +235,58 @@ In the implemented workflow, the SCAD Re-Event exporter assigns the SCX layer `f
 _\*Block features carry their width, height, rotation and facing direction (`directionDegrees`) as feature properties; layer polygons carry only an identifier and the source layer name.
 \*\*The `queue` function uses SimCrowds' existing Grandstand object, which can also represent a set of parallel queues._
 
-## 6. Demonstration and results
+## Demonstration and results
 
 This section reports the observed results of the Huntenpop 2025 CAD-to-crowd demonstration, including file validation, simulation environment construction, and the existing WMS-based crowd density return path.
 
-### 6.1 Test scene
+### Test scene {#ucrowds-test-scene}
 
 The demonstration used an event design for Huntenpop 2025, a two-day music festival held in Ulft, the Netherlands. The festival site covers approximately 300 × 250 meters (7.5 hectares) and contains five music stages and various supporting facilities, including bars, food and beverage stalls, toilets, and other points of interest.
 
-AniVizzion prepared the event scene in SCAD Re-Event. The scene included the site environment, walkable areas, obstacles, entrances, exits, queues, and waypoints. These elements provided the geographic and functional information needed to evaluate the transfer of the event design into SimCrowds.
+AniVizzion prepared the event scene in SCAD Re-Event. The scene included the site environment, walkable areas, obstacles, entries, exits, queues, and waypoints. These elements provided the geographic and functional information needed to evaluate the transfer of the event design into SimCrowds.
 
-![Demo environment](./media/walkable_demo_scx.png)
-*Figure 1: Huntenpop 2025 event design in SCAD Re-Event, showing the festival layout and functional areas.
+<figure id="ucrowds-fig-huntenpop-design">
+<img src="./media/walkable_demo_scx.png" alt="Demo environment">
+<figcaption>Huntenpop 2025 event design in SCAD Re-Event, showing the festival layout and functional areas.</figcaption>
+</figure>
 
-### 6.2 Export output and JSON-FG validation
+### Export output and JSON-FG validation
 
 The SCAD Re-Event exporter successfully generated an extended SCX document and the associated georeferenced JSON-FG files for the Huntenpop 2025 scene. These files were used directly by SimCrowds without intermediate manual conversion.
 
-The exported JSON-FG files were checked using Geonovum's JSON-FG OGC Checker and passed its checks. An abbreviated example of an exported JSON-FG file is provided in Appendix A.
+The exported JSON-FG files were checked using Geonovum's JSON-FG OGC Checker and passed its checks. An abbreviated example of an exported JSON-FG file is provided in [[[#ucrowds-example-json-fg]]].
 
-### 6.3 Import and simulation environment construction
+### Import and simulation environment construction
 
-In the demonstration, SimCrowds successfully interpreted the recognized layer functions and created the corresponding simulation objects. Walkable areas, obstacles, entrances, exits, queues, and waypoints were transferred from the event design into the simulation environment using the mappings in Section 5.5.
+In the demonstration, SimCrowds successfully interpreted the recognized layer functions and created the corresponding simulation objects. Walkable areas, obstacles, entries, exits, queues, and waypoints were transferred from the event design into the simulation environment using the mappings in [[[#ucrowds-mapping]]].
 
 The imported geometry also supported successful generation of a navigation mesh, which represents the areas through which simulated pedestrians can move while accounting for obstacles.
 
 The result establishes that the relevant CAD-defined areas can be imported as simulation objects without redrawing. The same exchange approach also permits a revised design to be imported, although continuous updates preserving existing simulation settings were not tested.
 
-![Simcrowds import](./media/simcrowds_import.png)
-*Figure 2: imported SCX document in SimCrowds.
+<figure id="ucrowds-fig-simcrowds-import">
+<img src="./media/simcrowds_import.png" alt="SimCrowds import">
+<figcaption>Imported SCX document in SimCrowds.</figcaption>
+</figure>
 
 The import process does not, however, produce a fully configured simulation. After importing the environment, a user must still connect simulation objects into flows and configure parameters such as the number of pedestrians entering per second and their destinations.
 
 JSON-FG feature `properties` can contain additional information that could support this configuration, but automatic interpretation of these properties was not tested in this project. The demonstrated automation therefore covers the construction of the simulation environment, not the complete configuration of pedestrian behavior.
 
-### 6.4 Crowd density publication through WMS
+### Crowd density publication through WMS
 
 The demonstration also included a return path from crowd simulation to geospatial visualization. SimCrowds can publish calculated crowd density as a geographic raster layer through an OGC Web Map Service (WMS).
 
 This capability already existed in SimCrowds before the iCAD project. The project used it to demonstrate how simulation results can be made available to other applications through an established open standard.
 
-The WMS output was successfully displayed in QGIS (Figure 3) and Esri Map Viewer. This allows the spatial distribution of simulated crowds to be viewed alongside other geographic information without requiring the receiving application to support the SimCrowds simulation format.
+The WMS output was successfully displayed in QGIS ([[[#ucrowds-fig-qgis-density]]]) and Esri Map Viewer. This allows the spatial distribution of simulated crowds to be viewed alongside other geographic information without requiring the receiving application to support the SimCrowds simulation format.
 
-![QGIS](./media/QGIS_wms_densities.png)
-*Figure 3: WMS density map visualization in QGIS. The colors indicate the density levels, e.g. blue areas have low-density and orange areas (in this case, near the entry) are high-density.*
+<figure id="ucrowds-fig-qgis-density">
+<img src="./media/QGIS_wms_densities.png" alt="QGIS">
+<figcaption>WMS density map visualization in QGIS. The colors indicate the density levels, e.g., blue areas have low density and orange areas (in this case, near the entry) have high density.</figcaption>
+</figure>
 
-### 6.5 Summary of demonstrated results
+### Summary of demonstrated results
 
 The proof of concept produced the following results:
 
@@ -297,11 +303,11 @@ The main result is that event-design geometry can be exchanged between SCAD Re-E
 
 A video demonstrating the end-to-end CAD-to-crowd simulation workflow is available through the [Geonovum project repository](https://github.com/Geonovum/DTaaS-Testbed2026-Phase2/tree/main/Topic5-uCrowds).
 
-## 7. Discussion
+## Discussion
 
 The research demonstrates how SCX can be extended beyond visualization to support the construction of simulation environments from georeferenced scene data. The CAD-to-crowd workflow illustrates the practical value of combining a lightweight scene description with semantic information, while preserving the flexibility of the original SCX approach.
 
-### 7.1 Semantic interoperability
+### Semantic interoperability
 
 The principal contribution of the extension is the ability to describe the function of a layer within a scene. By distinguishing between geometric representation and semantic meaning, SCX allows simulation applications to interpret scene data and construct corresponding simulation objects.
 
@@ -311,7 +317,7 @@ Defining functions at the SCX layer level also allows the same source data to se
 
 Simulation-specific parameters can remain in JSON-FG feature properties, allowing individual applications to exchange additional information without requiring SCX to standardize their simulation models.
 
-### 7.2 Coordinate reference systems
+### Coordinate reference systems
 
 The extension separates the preferred working CRS of a scene from the coordinate reference systems of its underlying datasets. The advisory `preferredCrs` communicates the intended working CRS, while each JSON-FG dataset identifies its own CRS through the standard JSON-FG conventions.
 
@@ -319,13 +325,13 @@ This approach permits CAD-derived geometry to remain in a national projected CRS
 
 Using JSON-FG also builds on an existing OGC standard rather than introducing a separate coordinate reference mechanism within SCX. This preserves the lightweight character of the scene document and its separation from the referenced geographic data.
 
-### 7.3 Scope and limitations of the prototype
+### Scope and limitations of the prototype
 
 One interoperability limitation concerns the use of open function strings. They provide flexibility but do not guarantee consistent interpretation between independent applications without shared conventions. Applications may name equivalent functions differently or interpret the same function in different ways.
 
 Imported objects still require connections into pedestrian flows and the configuration of simulation parameters. This is a boundary of the demonstrated automation, but not necessarily a weakness of the CAD-to-crowd workflow. Defining pedestrian flows in SCAD Re-Event would require adding simulation-specific functionality to a CAD application that is primarily designed for drawing event layouts. Keeping these steps in SimCrowds allows event designers to define the physical layout in CAD while simulation modelers configure pedestrian behavior in a tool designed for that purpose.
 
-### 7.4 Applicability beyond crowd simulation
+### Applicability beyond crowd simulation
 
 Although this research uses crowd simulation as its application, the underlying approach is not specific to pedestrian movement. Other simulation domains, such as traffic or hydraulic modeling, could define their own scene-level functions and interpret the associated geometry according to their requirements.
 
@@ -333,17 +339,17 @@ By separating scene context, geographic data, and application-specific parameter
 
 This contributes to the objectives of the nLDT architecture by enabling independent applications to exchange meaningful spatial information through open formats, while retaining their specialized simulation capabilities.
 
-## 8. Conclusions, further research, and next steps
+## Conclusions, further research, and next steps
 
-### 8.1 Conclusion
+### Conclusion
 
-This research demonstrates that SCX can be extended to give georeferenced scene layers semantic meaning, allowing simulation applications to construct environments from externally drawn spatial data. The extension introduces a scene-level `function` field, an advisory `preferredCrs`, and the use of JSON-FG for georeferenced 2D scene data.
+This research demonstrates that SCX can be extended to give georeferenced scene layers semantic meaning, allowing simulation applications to construct environments from externally drawn spatial data. The extension introduces a layer-level `function` field, an advisory `preferredCrs`, and the use of JSON-FG for georeferenced 2D scene data.
 
 The implemented CAD-to-crowd demo confirms the feasibility of this approach. Event designs exported from SCAD Re-Event were successfully imported into SimCrowds, where layer functions were interpreted to create simulation objects and generate a navigation mesh without manual redrawing.
 
 The automation covers construction of the simulation environment, not complete simulation configuration. Users must still connect simulation objects into flows and configure parameters before running a simulation.
 
-### 8.2 Further research
+### Further research
 
 The results support further development of semantic scene exchange within the SCX framework. We recommend the following research directions:
 
@@ -351,19 +357,19 @@ The results support further development of semantic scene exchange within the SC
 - **Shared function identifiers:** Investigate a shared vocabulary of layer functions using URI-based identifiers. This would support the consistent interpretation of functions across different applications. For example, the function `queue` could be represented by a URI such as `https://example.org/scx/functions/crowd-sim/queue`. This approach could accommodate functions from different simulation domains while preserving extensibility and reducing ambiguity between implementations.
 - **Deeper CAD-to-simulation integration:** Investigate ways to maintain a continuous connection between CAD authoring tools and simulation applications. For example, a crowd simulator could retrieve updated geometry from a CAD endpoint and automatically update its simulation environment while preserving existing simulation flows, connections, and parameters. This could further reduce manual work when event designs change.
 
-### 8.3 Next steps
+### Next steps
 
-The CAD-to-crowd SCX extension is already being used in a commercial project. The consortium will continue developing the integration between SCAD Re-Event and SimCrowds based on practical experience and findings from these projects.
+The CAD-to-crowd SCX extension is already being used in a commercial project. The consortium will continue developing the integration between SCAD Re-Event and SimCrowds based on practical experience and findings from this project.
 
 Further development can focus on reducing the remaining manual configuration steps, including the interpretation of simulation parameters from JSON-FG feature properties and the preservation of simulation configurations when CAD designs are updated.
 
 These activities will provide additional practical experience with semantic scene exchange and can contribute to the further development of interoperable digital twin applications within the nLDT ecosystem.
 
-## Appendix A. Technical field reference
+## Technical field reference
 
 This appendix summarizes the SCX extension fields and the JSON-FG structure used for georeferenced scene layers. It also provides an example from the CAD exporter.
 
-### A.1 SCX document
+### SCX document
 
 The extended SCX document retains the original `view`, `time`, and `layers` structure and adds `preferredCrs` at document level and `function` at layer level.
 
@@ -387,7 +393,7 @@ SCX layer objects use the following fields:
 | `url`      | URL of the referenced data source.                                                            |
 | `function` | Scene-specific role, such as `walkable`, `obstacle`, `entry`, `exit`, `queue`, or `waypoint`. |
 
-### A.2 JSON-FG scene layer data
+### JSON-FG scene layer data
 
 In this research, `scene` layers reference static JSON-FG 1.0 FeatureCollections. Plain GeoJSON is also accepted.
 
@@ -404,9 +410,9 @@ In this research, `scene` layers reference static JSON-FG 1.0 FeatureCollections
 
 The complete format is specified in the [OGC JSON-FG 1.0 specification](https://docs.ogc.org/is/21-045r1/21-045r1.html).
 
-### A.3 Example JSON-FG scene layer
+### Example JSON-FG scene layer {#ucrowds-example-json-fg}
 
-The following abbreviated example is based on the `entry.json` exported by SCAD Re-Event and corresponds to the `Entries` layer in Section 5.4. It contains one entry polygon in RD (EPSG:28992), a geographic fallback in WGS 84 (OGC:CRS84), and selected exporter properties. Coordinates have been rounded for readability.
+The following abbreviated example is based on the `entry.json` exported by SCAD Re-Event and corresponds to the `Entries` layer in [[[#ucrowds-example-scx]]]. It contains one entry polygon in RD (EPSG:28992), a geographic fallback in WGS 84 (OGC:CRS84), and selected exporter properties. Coordinates have been rounded for readability.
 
 ```json
 {

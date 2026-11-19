@@ -1,4 +1,6 @@
-# Geonovum Testbed 2026 · Topic 5 "Web 3D Context" — SCX Scene Context JSON: Findings from implementation and cross-viewer testing
+# Topic 5: Web 3D Context — The People Group
+
+*SCX Scene Context JSON: findings from implementation and cross-viewer testing*
 
 | | |
 |---|---|
@@ -72,7 +74,7 @@ Each finding describes the observation, the evidence it is based on, our proposa
 
 **What we built and tested.** The findings come from three parts of our work, referred to below as sources A, B and C: (A) an SCX exporter in the TPG DigitalTwin (Unreal Engine 5 with Cesium for Unreal), (B) an SCX importer in the same DigitalTwin, and (C) a cross-viewer test in which the exported document was opened side by side in CesiumJS 1.120 and ArcGIS Maps SDK for JavaScript 4.33.
 
-![](media/flowchart-lr.png)
+![Flowchart: the TPG DigitalTwin (Unreal Engine 5 + Cesium for Unreal) exports scene.scx.json, which is read back by the SCX importer in the TPG DigitalTwin (B) and opened in CesiumJS 1.120 and ArcGIS Maps SDK for JavaScript 4.33 in the cross-viewer test (C)](media/flowchart-lr.png)
 
 **Test scene.** The Rotterdam / Merwehaven twin: 28 resources in 12 dataset groups. Export of 16 Oct 2026 06:38 UTC:
 
@@ -132,13 +134,13 @@ All examples below refer to this exported document (7 layers):
 
 </details>
 
-**Status labels.** Each finding is marked with one or more of: `spec` (proposal for the SCX specification, [[[#tpg-part-4]]]), `implemented` (changed in the TPG DigitalTwin), `planned` (change scheduled in the TPG DigitalTwin), `data-side` (for the data or service provider), `engine` (viewer behaviour, outside the document).
+**Status labels.** Each finding is marked with one or more of: `spec` (proposal for the SCX specification, [[[#tpg-part-4]]]), `implemented` (changed in the TPG DigitalTwin), `planned` (change scheduled in the TPG DigitalTwin), `data-side` (for the data or service provider), `engine` (viewer behaviour, outside the document), `spec note` (a clarifying sentence for the specification rather than a schema change), `confirms` (an existing rule in the specification is confirmed by the test), `environment` (caused by the test environment, not by the format or the viewers), `ok` (worked without problems), `known` (a known limitation of the toolchain, documented for other implementers), `workaround in place` (handled by a workaround in our implementation until the specification changes).
 
 ## Part 1. Specification findings {#tpg-part-1}
 
 ### `interval` is a nested array (sources B, A; spec, planned) {#tpg-1-1}
 
-`time.interval` and `layers[].temporal.interval` are defined as "null, or an array containing exactly one array of exactly two date strings". The shape comes from OGC API Features/Records `extent.temporal`. In practice it is awkward in typed environments, it looks like a list while the spec allows only one entry, and our own writer already produces values that break it.
+`time.interval` and `layers[].temporal.interval` are defined as "null, or an array containing exactly one array of exactly two date strings". The shape comes from OGC API – Features / Records `extent.temporal`. In practice it is awkward in typed environments, it looks like a list while the spec allows only one entry, and our own writer already produces values that break it.
 
 The schema currently reads (`Tools/ScxCesiumViewer/schema/scx.schema.json`, `$defs/interval`):
 
@@ -289,9 +291,9 @@ Position, heading and tilt transfer correctly, but the resulting image differs p
 |---|---|---|
 | Unreal Engine 5 (`APlayerCameraManager.FOVAngle`) | 90° | 620 m |
 | CesiumJS 1.120 (`PerspectiveFrustum.fov`) | 60° | 358 m |
-| ArcGIS Maps SDK 4.33 (`SceneView.camera.fov`, diagonal 55°) | 55° diagonal | ≈ 323 m |
+| ArcGIS Maps SDK 4.33 (`SceneView.camera.fov`, diagonal) | 55° (diagonal) | ≈ 323 m |
 
-$\text{Width} = 2 \cdot d \cdot \tan(\text{fov}/2)$. The first reaction during testing was that the camera pointed somewhere else. In fact the position (51.70279 N, 5.28602 E, 310 m, heading 155°, tilt 63°) was identical in all three viewers. Only the zoom differed, by almost a factor of two between Unreal and ArcGIS.
+Width = 2 · d · tan(fov/2). The first reaction during testing was that the camera pointed somewhere else. In fact the position (51.70279 N, 5.28602 E, 310 m, heading 155°, tilt 63°) was identical in all three viewers. Only the zoom differed, by almost a factor of two between Unreal and ArcGIS.
 
 **What the exporter writes and how the viewers use it.** Exporter (`UCS_ScxExporter.cs`):
 
@@ -323,9 +325,9 @@ Resulting fragment in the 16 Oct export:
 
 The three engines use three definitions of fov (horizontal, wider axis, diagonal). The spec has to say which one SCX means. We chose horizontal, in degrees.
 
-**Still missing (B).** With `fov` aligned, the DigitalTwin importer and the browser viewers still differ in near/far clipping (Unreal default near plane 10 cm; CesiumJS near 1 m, far $5 \cdot 10^8$ m; ArcGIS does not expose it) and in projection type. All three support orthographic views, but SCX cannot express one. The level of detail loaded under the same camera also differed (see [[[#tpg-2-1]]]); that is an engine property, not a camera property.
+**Still missing (B).** With `fov` aligned, the DigitalTwin importer and the browser viewers still differ in near/far clipping (Unreal default near plane 10 cm; CesiumJS near 1 m, far 5 × 10⁸ m; ArcGIS does not expose it) and in projection type. All three support orthographic views, but SCX cannot express one. The level of detail loaded under the same camera also differed (see [[[#tpg-2-1]]]); that is an engine property, not a camera property.
 
-**BCF as a reference.** This is our own suggestion from the importer work, not a Geonovum requirement. BuildingSMART BCF 3.0 ([BCF-XML 3.0 documentation](https://github.com/BuildingSMART/BCF-XML/tree/release_3_0/Documentation), section *Visualization information*) defines a viewpoint as a camera location, a view direction and an up vector (six degrees of freedom), supports perspective and orthogonal cameras, and standardises clipping planes. The same model exists in JSON in [BCF-API 3.0](https://github.com/buildingSMART/BCF-API/blob/release_3_0/README.md), section 3.5. The fragment below uses the BCF-API JSON names (BCF-XML uses `PerspectiveCamera`, `CameraViewPoint`, `FieldOfView` etc.); the values are placeholders. We checked the field definitions against both specifications on 16 Oct 2026.
+**BCF as a reference.** This is our own suggestion from the importer work, not a Geonovum requirement. buildingSMART BCF 3.0 ([BCF-XML 3.0 documentation](https://github.com/buildingSMART/BCF-XML/tree/release_3_0/Documentation), section *Visualization information*) defines a viewpoint as a camera location, a view direction and an up vector (six degrees of freedom), supports perspective and orthogonal cameras, and standardises clipping planes. The same model exists in JSON in [BCF-API 3.0](https://github.com/buildingSMART/BCF-API/blob/release_3_0/README.md), section 3.5. The fragment below uses the BCF-API JSON names (BCF-XML uses `PerspectiveCamera`, `CameraViewPoint`, `FieldOfView` etc.); the values are placeholders. We checked the field definitions against both specifications on 16 Oct 2026.
 
 <details>
 <summary>Show the BCF camera fragment (19 lines)</summary>
@@ -379,7 +381,7 @@ Two differences matter. BCF `ClippingPlanes` "define a subsection of a building 
 **Implementation in the TPG DigitalTwin.**
 
 - Exporter (A): writes `fov` from `FOVAngle`. Planned: write `projection` (Unreal `ECameraProjectionMode`), `near` (`GNearClippingPlane`) and, for orthographic, `ortho.width` (`OrthoWidth`).
-- Importer (B): applies position/heading/tilt through the Cesium georeference (`Yaw = heading − 90`, `Pitch = tilt − 90` in the East-South-Up frame, the inverse of the exporter's `heading = esu.Yaw + 90`, `tilt = esu.Pitch + 90`). Planned: `view.fov` is ignored for now; call `SetFOV(fov)` on the camera manager, and `SetProjectionMode`/`SetOrthoWidth` once the spec has them.
+- Importer (B): applies position/heading/tilt through the Cesium georeference (`Yaw = heading − 90`, `Pitch = tilt − 90` in the East-South-Up frame, the inverse of the exporter's `heading = esu.Yaw + 90`, `tilt = esu.Pitch + 90`). `view.fov` is currently ignored. Planned: call `SetFOV(fov)` on the camera manager, and `SetProjectionMode`/`SetOrthoWidth` once the spec has them.
 - Browser viewers (C): apply `fov` with the conversions above and write it back on export. If it is absent, each viewer keeps its default and reports "fov: viewer default".
 
 ### Selection and visibility of objects is not part of the scene (source B; spec) {#tpg-1-3}
@@ -424,8 +426,8 @@ For reference, the BCF components block (our own choice of reference, see [[[#tp
 
 **Implementation in the TPG DigitalTwin.**
 
-- Exporter (A), planned: The source would be the current selection in the attribute panel (feature ID + tileset) and a hide list per feature, if there is one.
-- Importer (B), planned: After loading a tileset, apply selection and colouring through the Cesium for Unreal feature-ID lookup and the existing highlight material. Unknown ids get status `component-not-found` ([[[#tpg-1-7]]]).
+- Exporter (A), planned: the source would be the current selection in the attribute panel (feature ID + tileset) and a hide list per feature, if there is one.
+- Importer (B), planned: after loading a tileset, apply selection and colouring through the Cesium for Unreal feature-ID lookup and the existing highlight material. Unknown IDs get status `component-not-found` ([[[#tpg-1-7]]]).
 - Browser viewers (C): CesiumJS `Cesium3DTileFeature` by property; ArcGIS `highlight()` on the layer view.
 
 ### `url` must be the complete request (source C; spec, planned) {#tpg-1-4}
@@ -470,7 +472,7 @@ For 3D Tiles the complete request is the `tileset.json`; for quantized-mesh terr
 
 **Implementation in the TPG DigitalTwin.**
 
-- Exporter (A), planned: Read the selected layer names and image format from the WMS resource (the Blueprint "Apply WMS" path has them) and build the query string.
+- Exporter (A), planned: read the selected layer names and image format from the WMS resource (the Blueprint "Apply WMS" path has them) and build the query string.
 - Importer (B): `CreateDataResource(..., Url, ...)` passes the URL through unchanged. Planned: when a WMS URL already contains `layers=`, split it into endpoint and layer list for the Cesium for Unreal `WebMapServiceRasterOverlay`, which takes them as separate properties.
 - Browser viewers (C): parse the query string; CesiumJS takes `layers` from it, ArcGIS `sublayers`.
 
@@ -528,14 +530,14 @@ Rule: an importer that does not recognise the `format` falls back on `type` plus
 **Implementation in the TPG DigitalTwin.**
 
 - Exporter (A): already writes the `scene`/`elevation`/`imagery` tokens from the table. Once agreed we switch 3D Tiles to `application/vnd.3dtiles+json`, writing `application/json` alongside for one version.
-- Importer (B), planned: Add `application/geo+json` → `GeoJson`, add the `type`-only fallback with URL sniffing, and show `Unknown` as a message in the importer widget instead of skipping the layer.
+- Importer (B), planned: add `application/geo+json` → `GeoJson`, add the `type`-only fallback with URL sniffing, and show `Unknown` as a message in the importer widget instead of skipping the layer.
 
 ### The same 3D Tiles behave differently per viewer: invalid glTF, unsupported content and a vertical offset in ArcGIS (source C; data-side, spec) {#tpg-1-6}
 
 **Revised 16 Oct.** On 9 Oct the ArcGIS pane showed buildings "lower and not in the right place", and we put that down to the 3D Tiles 1.0 up-axis rule. That explanation was wrong. On 16 Oct, with ArcGIS Maps SDK 4.33.11 and both panes driven by the same camera in headless Chrome, the M4H-FI b3dm renders in ArcGIS exactly where CesiumJS renders it, and a diagnostic proxy that rewrites `asset.gltfUpAxis` (Y, Z, removed) makes no difference. We found three other causes:
 
 - **(a) Invalid glTF in the building tiles.** All 1309 `rotterdam-gebouwen-cm` tiles declare `emissiveFactor` with four components, where glTF 2.0 requires exactly three. CesiumJS and Cesium for Unreal accept it. The ArcGIS loader drops the primitive without an error: the layer reports `loaded`, fetches the tiles and draws nothing. With the array cut to three components, ArcGIS draws the buildings on the same footprints as CesiumJS.
-- **(b) A vertical offset of about 41 m in ArcGIS.** ArcGIS draws the ECEF tile geometry about 41 m below its draped basemap; CesiumJS draws it on the imagery. Seen from an oblique camera the buildings then appear shifted against the aerial photo. The offset is close to the geoid height at Rotterdam ($\approx 42\text{ m}$). With `elevationInfo.offset = +41` in ArcGIS the two panes coincide.
+- **(b) A vertical offset of about 41 m in ArcGIS.** ArcGIS draws the ECEF tile geometry about 41 m below its draped basemap; CesiumJS draws it on the imagery. Seen from an oblique camera the buildings then appear shifted against the aerial photo. The offset is close to the geoid height at Rotterdam (≈ 42 m). With `elevationInfo.offset = +41` in ArcGIS the two panes coincide.
 - **(c) ArcGIS cannot render the instanced tree tiles.** `rotterdam-bomen-cm` consists of `cmpt` composites of `i3dm` instances. ArcGIS supports neither. After conversion to 3D Tiles 1.1 glb with `EXT_mesh_gpu_instancing` it still draws nothing, and a tileset that uses 1.1 `contents` arrays is refused. CesiumJS renders both the original and the converted set.
 
 The document carries no content type, version or vertical datum, so a viewer cannot warn about any of this. It just shows a different picture.
@@ -576,15 +578,15 @@ The second reading would put the model 320 m east and 160 m south, and tilted. M
 
 `emissiveFactor` has four components; glTF 2.0 requires three. The M4H-FI tile (generator 4.6.5, 2015–2025) has `[0, 0, 0]` and renders. In the upgraded copy all 1309 of 1309 tiles are affected. What ArcGIS reports through the page's debug hook: layer view `loadStatus: "loaded"`, `loadError: null`, `updating: false`, 8 glb files fetched, nothing drawn. The same tile with `emissiveFactor` cut to `[0, 0, 0]` draws on the CesiumJS footprint. Things we tried separately that did not help: all-`REPLACE` refinement, a one-level subtree, a wider bounding region, and stripping all extensions from the glb. CesiumJS renders the original without complaint, so the defect stays hidden in a Cesium-based stack and only shows up in a stricter loader.
 
-**(b) The vertical offset.** Near-nadir test (tilt 3°, 650 m, camera over 51.9049 N 4.4231 E) with the repaired buildings in ArcGIS and the original in CesiumJS, and the same PDOK orthophoto in both panes. The tileset-centre marker lands on the same photo feature (a pier tip) in both panes, so the imagery is registered identically. In CesiumJS the building footprints match the roofs. In ArcGIS they are shifted radially away from the image centre, up to about 20 m at 300 m from nadir. Seen from above, a radial shift like that points to a height error: $\Delta x = \Delta h \cdot d / H$ gives $\Delta h \approx 20 \cdot 650 / 300 \approx 43\text{ m}$. We settled the sign with two more nadir captures and a check on a full-resolution screen: `layer.elevationInfo = { mode: "absolute-height", offset: +41 }` puts the footprints exactly on the roofs, `−41` does not. So in ArcGIS the geometry sits about 41 m below its draped ground, while in CesiumJS it sits on it.
+**(b) The vertical offset.** Near-nadir test (tilt 3°, 650 m, camera over 51.9049 N 4.4231 E) with the repaired buildings in ArcGIS and the original in CesiumJS, and the same PDOK orthophoto in both panes. The tileset-centre marker lands on the same photo feature (a pier tip) in both panes, so the imagery is registered identically. In CesiumJS the building footprints match the roofs. In ArcGIS they are shifted radially away from the image centre, up to about 20 m at 300 m from nadir. Seen from above, a radial shift like that points to a height error: Δx = Δh · d / H gives Δh ≈ 20 · 650 / 300 ≈ 43 m. We settled the sign with two more nadir captures and a check on a full-resolution screen: `layer.elevationInfo = { mode: "absolute-height", offset: +41 }` puts the footprints exactly on the roofs, `−41` does not. So in ArcGIS the geometry sits about 41 m below its draped ground, while in CesiumJS it sits on it.
 
-Our explanation, combined with the NAP heights below: the tiles carry NAP heights as if they were ellipsoidal (0–15 m). CesiumJS drapes its imagery on the ellipsoid ($h = 0$), so NAP-as-ellipsoidal data lands on the imagery. ArcGIS drapes its basemap on a flat ground at orthometric height 0, which is the geoid, about 42 m above the ellipsoid at Rotterdam (EGM96 and NLGEO2018 differ by about a metre there). The same data then ends up 41 m below the basemap. How exactly ArcGIS handles the geoid internally is an engine question; we did not verify it. For SCX the point is that the same ECEF geometry sits at a different height relative to each engine's draped ground, and the document has no way of saying which is intended. Our viewer now uses +41 m for ArcGIS by default for scenes in the Netherlands.
+Our explanation, combined with the NAP heights below: the tiles carry NAP heights as if they were ellipsoidal (0–15 m). CesiumJS drapes its imagery on the ellipsoid (h = 0), so NAP-as-ellipsoidal data lands on the imagery. ArcGIS drapes its basemap on a flat ground at orthometric height 0, which is the geoid, about 42 m above the ellipsoid at Rotterdam (EGM96 and NLGEO2018 differ by about a metre there). The same data then ends up 41 m below the basemap. How exactly ArcGIS handles the geoid internally is an engine question; we did not verify it. For SCX the point is that the same ECEF geometry sits at a different height relative to each engine's draped ground, and the document has no way of saying which is intended. Our viewer now uses +41 m for ArcGIS by default for scenes in the Netherlands.
 
 | Reference surface | Height above WGS84 ellipsoid (Rotterdam) | Role in the test |
 |---|---|---|
-| Ellipsoid (WGS84, $h = 0$) | 0 m | CesiumJS drapes its imagery here; SCX camera altitude (CRS84h) refers to it |
-| Geoid $\approx$ NAP 0 | $\approx 42\text{ m}$ | ArcGIS draws its flat ground and basemap here |
-| Tile geometry (NAP values stored as ellipsoidal) | −1.5 … 15 m | lands on the imagery in CesiumJS, $\approx 41\text{ m}$ below the basemap in ArcGIS |
+| Ellipsoid (WGS84, h = 0) | 0 m | CesiumJS drapes its imagery here; SCX camera altitude (CRS84h) refers to it |
+| Geoid ≈ NAP 0 | ≈ 42 m | ArcGIS draws its flat ground and basemap here |
+| Tile geometry (NAP values stored as ellipsoidal) | −1.5 … 15 m | lands on the imagery in CesiumJS, ≈ 41 m below the basemap in ArcGIS |
 
 **(c) The trees.** `rotterdam-bomen-cm`: 107 `cmpt` tiles, each with three `i3dm` inner tiles of 72 instances (`POSITION`, `SCALE_NON_UNIFORM`, `NORMAL_UP/RIGHT`, `BATCH_ID`) that reference ten external prototypes `proto_0.glb … proto_9.glb` (11.9 MB together). Root region height range −9999 … 15 m. ArcGIS: `IntegratedMesh3DTilesLayer` only accepts b3dm/glb meshes (Esri BUG-000166202: "only integrated mesh type"). After conversion with `splitCmpt` + `convertI3dmToGlb` (593 glb with `EXT_mesh_gpu_instancing`, `EXT_instance_features`, `EXT_structural_metadata`), CesiumJS renders the trees. ArcGIS fails to create the layer view when the tileset lists the parts as 1.1 `contents` (`Failed to create layerview … integrated-mesh-3dtiles`), and with one part per tile it loads, fetches 8 glb and draws nothing. The prototypes also have the four-component `emissiveFactor` (1186 occurrences in 593 files).
 
@@ -607,8 +609,8 @@ What does work (16 Oct, evening): `trees-to-geojson.mjs` reads the i3dm feature 
 
 **Implementation in the TPG DigitalTwin.**
 
-- Viewer tooling (C), all in `Tools/ScxCesiumViewer/`: `convert-tiles.mjs` downloads a tileset and upgrades it to 3D Tiles 1.1 glb with Cesium's `3d-tiles-tools`, then runs `fix-gltf.mjs`, which repairs the `emissiveFactor` defect in place (1312 files repaired in the building set, 0 in M4H-FI). `convert-cmpt.mjs` splits composites and converts i3dm to instanced glb (works in CesiumJS, not in ArcGIS). By default the page now gives ArcGIS the same behaviour as CesiumJS: every 3D Tiles layer loads immediately, the repaired local copy from `Saved/SCX/tiles/map.json` is used where there is one (the original url otherwise), tree points replace i3dm, and `elevationInfo.offset = +41 m` is applied. The ArcGIS caption bar matches the Cesium one. The diagnostics (source selector with the up-axis proxy modes of `sw.js`, z-offset box, reload button) are in a collapsed "ArcGIS diagnostics" block in the sidebar, with query overrides `arcgisTiles=`, `arcgisOffset=` and `tiles=request`. Headless cross-viewer captures with per-layer diagnostics come from a Puppeteer script (`window.__scx` debug hook). Planned: show the applied offset in the layer status, replace the fixed +41 m with a geoid lookup, and map tree species/prototypes to matching 3D symbols in the point representation.
-- Exporter (A), planned: Fetch `tileset.json` once at export time (we already read it for the status) and copy `asset.version`, the content extension and, if present, `asset.gltfUpAxis`.
+- Viewer tooling (C), all in `Tools/ScxCesiumViewer/`: `convert-tiles.mjs` downloads a tileset and upgrades it to 3D Tiles 1.1 glb with Cesium's `3d-tiles-tools`, then runs `fix-gltf.mjs`, which repairs the `emissiveFactor` defect in place (1312 files repaired in the building set, 0 in M4H-FI). `convert-cmpt.mjs` splits composites and converts i3dm to instanced glb (works in CesiumJS, not in ArcGIS). By default the page now gives ArcGIS the same behaviour as CesiumJS: every 3D Tiles layer loads immediately, the repaired local copy from `Saved/SCX/tiles/map.json` is used where there is one (the original URL otherwise), tree points replace i3dm, and `elevationInfo.offset = +41 m` is applied. The ArcGIS caption bar matches the Cesium one. The diagnostics (source selector with the up-axis proxy modes of `sw.js`, z-offset box, reload button) are in a collapsed "ArcGIS diagnostics" block in the sidebar, with query overrides `arcgisTiles=`, `arcgisOffset=` and `tiles=request`. Headless cross-viewer captures with per-layer diagnostics come from a Puppeteer script (`window.__scx` debug hook). Planned: show the applied offset in the layer status, replace the fixed +41 m with a geoid lookup, and map tree species/prototypes to matching 3D symbols in the point representation.
+- Exporter (A), planned: fetch `tileset.json` once at export time (we already read it for the status) and copy `asset.version`, the content extension and, if present, `asset.gltfUpAxis`.
 - Importer (B): Cesium for Unreal renders all of these tilesets, including the defective material and the instanced trees. The only thing to add is version and content type in the layer status.
 - Data-side (the actual fix): (1) the output of VCS X3DM Generator 4.4.7 has to be regenerated or post-processed so `emissiveFactor` has three components; a validator check in the provider's pipeline would have caught it. (2) Trees for ArcGIS need a non-instanced representation: a point dataset with a 3D symbol, or baked geometry at a lower level of detail. (3) Heights must be true ellipsoidal, or the dataset must state its vertical datum. (4) Tiles as 3D Tiles 1.1 glb with explicit transforms. We will report the `emissiveFactor` defect to the data provider with `fix-gltf.mjs` as reference fix. For the plug-fest the provider has to host the repaired building set (1344 MB locally); a local copy cannot be reached by other viewers.
 
@@ -621,10 +623,10 @@ Statuses the browser viewer produced for the 9 Oct document (CesiumJS / ArcGIS; 
 | Layer | CesiumJS | ArcGIS |
 |---|---|---|
 | Water areas (3D Tiles) | loaded | loaded, nothing drawn (invalid glTF, [[[#tpg-1-6]]]) |
-| Terrain quantized-mesh | loaded (url rewritten: `layer.json` stripped) | unsupported format |
+| Terrain quantized-mesh | loaded (URL rewritten: `layer.json` stripped) | unsupported format |
 | Luchtfoto WMS | loaded (layers guessed: `0`) | loaded (service defaults), from 11:30 `service unavailable (HTTP 500)` |
-| Bomen / Gebouwen CM (3D Tiles) | loaded | loaded, nothing drawn (i3dm resp. invalid glTF, [[[#tpg-1-6]]]) |
-| M4H-FI (3D Tiles) | loaded after 23 MB | loaded, $\approx 41\text{ m}$ vertical offset ([[[#tpg-1-6]]]) |
+| Bomen / Gebouwen CM (3D Tiles) | loaded | loaded, nothing drawn (i3dm and invalid glTF respectively, [[[#tpg-1-6]]]) |
+| M4H-FI (3D Tiles) | loaded after 23 MB | loaded, ≈ 41 m vertical offset ([[[#tpg-1-6]]]) |
 | Tygron hub WMS | auth required (HTTP 401) | auth required |
 
 The service responses behind two of these:
@@ -653,15 +655,15 @@ The exporter's own messages, 21 for this scene, all of the same kind:
 | Status | Meaning |
 |---|---|
 | `loaded` | content requested and rendered |
-| `loaded-with-adjustment` | loaded after the importer changed something (url rewritten, layers guessed, fov default); the detail says what |
+| `loaded-with-adjustment` | loaded after the importer changed something (URL rewritten, layers guessed, fov default); the detail says what |
 | `unsupported-type` / `unsupported-format` | the importer knows the token but cannot render it (ArcGIS + quantized-mesh) |
 | `unknown-format` | token not in the vocabulary ([[[#tpg-1-5]]]) |
 | `invalid-content` | content fetched but not renderable (e.g. glTF that fails validation, [[[#tpg-1-6]]]) |
 | `no-url` | layer has no loadable address ([[[#tpg-2-3]]]) |
-| `unresolved-placeholder` | url contains an unexpanded variable such as `$activeHubId` ([[[#tpg-2-2]]]) |
+| `unresolved-placeholder` | URL contains an unexpanded variable such as `$activeHubId` ([[[#tpg-2-2]]]) |
 | `auth-required` | HTTP 401/403 |
 | `service-unavailable` | HTTP 5xx, DNS failure, timeout ([[[#tpg-2-4]]]) |
-| `component-not-found` | a `view.components` id did not resolve ([[[#tpg-1-3]]]) |
+| `component-not-found` | a `view.components` ID did not resolve ([[[#tpg-1-3]]]) |
 
 And the counterpart for exporters: `exported`, `skipped-no-url`, `skipped-unsupported`, `placeholder-resolved`.
 
@@ -703,7 +705,7 @@ One round trip adds 2 hours; DT → browser → DT twice adds 4. For a traffic s
 
 **Implementation in the TPG DigitalTwin.**
 
-- Importer (B), planned: Parse with `DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal` in the `TryParse` calls (`MinDate`, `MaxDate` in temporal; `MinDate`, `MaxDate`, `CurrentDate` in time) and convert to `FDateTime` as UTC.
+- Importer (B), planned: parse with `DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal` in the `TryParse` calls (`MinDate`, `MaxDate` in temporal; `MinDate`, `MaxDate`, `CurrentDate` in time) and convert to `FDateTime` as UTC.
 - Exporter (A): already writes `Z` from `FDateTime` taken as UTC (`"current": "2026-10-16T13:00:00Z"` in [[[#tpg-scope]]]). No change.
 
 ### The vertical datum rule in §4.5 holds and should stay normative (source C; spec, confirms) {#tpg-1-9}
@@ -762,13 +764,13 @@ Of the 28 resources in the twin, 21 have resource type `api`. The exporter log o
 [SCX] Laag 'Rotterdam - Stekkerdoospagina' (groep 'Common model Stekkers') overgeslagen: ...
 ```
 
-This matters for 4D. The datasets with `validFrom`/`validTo` tags (Merwehaven traffic, heat and flooding, before/during/after) contain only `api` resources: OGC API Processes endpoints, RANA, DAT.Mobility and Tygron job results, and "Stekkerdoos" pages. None of them has a URL another viewer can GET. As a result the 4D part of the scene cannot be exported today, which is why the 16 Oct document has `"interval": []` and no `temporal` on any layer.
+This matters for 4D. The datasets with `validFrom`/`validTo` tags (Merwehaven traffic, heat and flooding, before/during/after) contain only `api` resources: OGC API – Processes endpoints, RANA, DAT.Mobility and Tygron job results, and "Stekkerdoos" pages. None of them has a URL another viewer can GET. As a result the 4D part of the scene cannot be exported today, which is why the 16 Oct document has `"interval": []` and no `temporal` on any layer.
 
-**Proposal (data-side, needed for scenario D).** Register job results in the OUP as datasets with a stable resource URL that can be fetched with GET (GeoJSON or 3D Tiles), and store `validFrom`/`validTo` as dataset metadata that the exporter maps to `temporal.interval`.
+**Proposal (data-side, needed for scenario D).** Register job results in the Open Urban Platform (OUP) as datasets with a stable resource URL that can be fetched with GET (GeoJSON or 3D Tiles), and store `validFrom`/`validTo` as dataset metadata that the exporter maps to `temporal.interval`.
 
 **Implementation in the TPG DigitalTwin.** The exporter skips `api` resources with a message (done) and will map `validFrom`/`validTo` to `temporal` as soon as such a dataset has a loadable resource (the code path exists, see [[[#tpg-3-1]]]). The importer maps `Temporal` to `StaticMinDate`/`StaticMaxDate` on the created resource; with fix [[[#tpg-3-1]]] that path is now reached.
 
-### Service availability is outside the document (source C; engine, 1.7) {#tpg-2-4}
+### Service availability is outside the document (source C; engine, [[[#tpg-1-7]]]) {#tpg-2-4}
 
 On 9 Oct, `diensten.rotterdam.nl` answered GetCapabilities at 10:50 with `HTTP 200`. From about 11:30 every request, including the ArcGIS REST root, returned `HTTP 500 "ArcGIS Web Adaptor: Could not access any server machines"`. The document did not change. Both browser viewers kept the layer in the list with status `service unavailable`. A viewer that fails the whole import because of one layer makes the document look broken. We suggest the report states that a failing layer never fails the scene.
 
@@ -861,7 +863,7 @@ Resources imported from the OUP carry the OUP format string (`3dtiles`, `3dterra
 
 ### Importer creates every resource with `Id = 'temp'` (source A; planned, importer) {#tpg-3-12}
 
-Two imports of the same document create resources that cannot be told apart. A stable id (hash of `url`, or `group/index`) would make re-importing idempotent.
+Two imports of the same document create resources that cannot be told apart. A stable ID (hash of `url`, or `group/index`) would make re-importing idempotent.
 
 ### Full round trip A → B → A (source A; planned) {#tpg-3-13}
 
@@ -871,7 +873,7 @@ Unreal export → Unreal import → Unreal export, then diff the two documents. 
 
 1. **`interval` as object `{ start, end }`**, open bound omitted or null; remove the deprecated flat `start`/`end` ([[[#tpg-1-1]]]).
 2. **Camera:** keep `view.fov` (horizontal, degrees); add `projection`, `near`, `far`, `ortho.width` ([[[#tpg-1-2]]]).
-3. **`view.components`** for selection, visibility and colouring, modelled on BCF, keyed by layer index + feature id ([[[#tpg-1-3]]]).
+3. **`view.components`** for selection, visibility and colouring, modelled on BCF, keyed by layer index + feature ID ([[[#tpg-1-3]]]).
 4. **`url` is the complete request**, with WMS as the worked example; quantized-mesh = directory; no placeholders ([[[#tpg-1-4]]], [[[#tpg-2-2]]], [[[#tpg-2-5]]]).
 5. **Closed `type`/`format` table**, `type` sufficient on its own, `application/vnd.3dtiles+json` preferred for 3D Tiles ([[[#tpg-1-5]]]).
 6. **Per-layer `tiles.version` / `gltfUpAxis` / `verticalDatum`** ([[[#tpg-1-6]]], [[[#tpg-1-9]]]).
@@ -899,7 +901,7 @@ Unreal export → Unreal import → Unreal export, then diff the two documents. 
 
 - Esri, *Import & Export Scenes*, Testbed II report (T. Lier, 2026): origin of the SCX schema and of the reference scripts `arcgisToSCX`, `applySCXToCesium`, `cesiumToSCX`, `scxToArcGIS`.
 - OGC API – Features / Records, `extent.temporal`: origin of the nested `interval` structure ([[[#tpg-1-1]]]).
-- buildingSMART, BCF-XML 3.0, section *Visualization information*: <https://github.com/BuildingSMART/BCF-XML/tree/release_3_0/Documentation> ([[[#tpg-1-2]]], [[[#tpg-1-3]]]).
+- buildingSMART, BCF-XML 3.0, section *Visualization information*: <https://github.com/buildingSMART/BCF-XML/tree/release_3_0/Documentation> ([[[#tpg-1-2]]], [[[#tpg-1-3]]]).
 - buildingSMART, BCF-API 3.0, section 3.5: <https://github.com/buildingSMART/BCF-API/blob/release_3_0/README.md> ([[[#tpg-1-2]]], [[[#tpg-1-3]]]).
 - Khronos Group, glTF 2.0 specification and glTF Validator ([[[#tpg-1-6]]]).
 - OGC, 3D Tiles 1.0 and 1.1 specifications ([[[#tpg-1-6]]], [[[#tpg-2-6]]]).
