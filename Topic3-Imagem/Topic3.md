@@ -60,6 +60,38 @@ _Figure 4: A process result added to the map as a layer_
 
 [IMAGEM Testbed 2026 - Plain version](https://github.com/wagenvoort-imagem/DTaaS-Testbed2026-Phase2/blob/IMAGEM-topic-3-report/Topic3-Imagem/videos/IMAGEM-TESTBED-2026-PLAIN.mp4)
 
+## Connection with third parties
+
+Within our application, it is possible to seamlessly switch between OGC API endpoints. We support both v1 and v2 endpoints, as well as endpoints that offer only collections or processes. Here are some examples we worked with during development, in addition to the Varidian Registry:
+
+![A list of multiple supported endpoints](images/figure-5-list-of-available-ogc-apis.png)
+
+_Figure 5: List of multiple supported endpoints_
+
+### 3DGI Roofer Online
+
+Here is an example of an OGC API created during this testbed. While these processes require more in-depth knowledge of their inputs, we were still able to generate input forms to run them.
+
+![Example of a process from 3DGI Roofer online](images/figure-6-roofer-online.png)
+
+_Figure 6: Example of a process from 3DGI Roofer online_
+
+### ZOO-Project
+
+ZOO-Project was an existing OGC API that we worked with during the testbed. It had a lot of different inputs and outputs for us to test our implementation with. Some processes had a lot of inputs but were still fully supported by our implementation.
+
+![Example of a process from ZOO-Project](images/figure-7-zoo-project.png)
+
+_Figure 7: Example of a process from ZOO-Project_
+
+### PDOK
+
+At the start of the testbed, PDOK happened to release a demo endpoint with a more up-to-date OGC API - Collections implementation. This allowed us to improve our collection filtering system, enabling users to use OGC API - Features as they would use a WFS service in our client.
+
+![Example of the collections available by PDOK](images/figure-8-pdok.png)
+
+_Figure 8: Example of the collections available by PDOK_
+
 ## Findings
 
 **Inputs and outputs**
