@@ -96,36 +96,36 @@ _Figure 8: Example of the collections available by PDOK_
 
 **Inputs and outputs**
 
-Implementing a client with support for every process including once added in the future is nearly impossible, while we tried to focus on supporting the given schemas by converting them to JSON schema for automatic form generation, while that worked fine for our own implementation, for processes by other providers it is really dependent on their implementation of the schema. Some only supplied a minimal schema, i.e. only requesting an object for GeoJSON inputs instead of requesting an object with its own schema.
+Implementing a client with support for every process, including once added in the future, is nearly impossible. Initially the focus was on supporting the given schemas by converting them to JSON schema for automatic form generation. Initially this worked well for our own implementation. Later on however it was noticed that this wasn't really the case for processes from other providers. The main finding here is that the implementation on our side very much dependents on their implementation of the schema. In some cases a very 'minimal' schema was provided; i.e. only requesting an object for GeoJSON inputs instead of requesting an object with its own schema.
 
-This was also present at the output, because without an exact schema of what an output contains a client is never able to display it properly.
+This finding was also noticed on dealing with the outputs. For us as a visualisation client, this is extremely important because without an exact schema of what an output contains, a client is never able to display it properly. As a client we can guess what the outputs would be but that would create work which isn't guaranteed to be needed. Getting the information from the Output parameters is therefore key in supporting the right outputs and reducing the time needed to implement.
 
-We followed the OGC schema for the process descriptions, inputs and outputs. Wherever a process description was valid according to the schema but not yet supported by the client, support for that case was added to the client.
+The OGC schema was followed for the process descriptions, inputs and outputs. During the implementation phase it was discovered that a process description could be valid according to the schema but not yet supported by the client. In those cases support for that particular process description was added to the client.
 
 **OGC Schema issues**
 
-The OGC schema / documentation is written in such a way that a party can create an OGC schema compliant API. There is no such thing for clients, which results in clients implementing only the parts supplied to them by external APIs. This causes the client to always lack feature support until a developer adds support for that feature, this is present in basically every process input/output schema.
+The OGC schema / documentation is written in such a way that a party can create an OGC schema compliant API. There is however no such thing for clients! This results in clients implementing only the parts supplied to them by external APIs. This creates a situation where initially only those parts provided by the external API will be supported by the client. This process repeats every time a different external API is connected to the client. A consequence of this is that the client never feels 'ready': it always seems to lack (feature) support for some parts that weren't provided yet. So currently we have a client that lacks feature support until a developer adds support for those 'new' features that were previously missing. This situation was present in basically every process input/output schema.
 
 **Schema might be too complex to fully support in a single client implementation**
 
-Because of the complexity and openness of the ogc schema implementing an “explorer“ client like we did is “impossible“ without a never ending list of test processes.
+Because of the complexity and openness of the OGC schema, implementing an “explorer“ client like we did is “impossible“ without a never ending list of test processes.
 
-Even so, we are positive about our implementation: it already works with the processes of multiple providers. We do think that a client built for a few specific endpoints or processes, instead of a generic explorer, will result in a better experience for the user. It would also allow visualising a broader range of outputs, without the user needing to style the result themselves.
+Nevertheless, we are positive about our implementation: it already works with the processes of multiple providers. We do think that a client built for a few specific endpoints or processes, instead of a generic explorer, will result in a better experience for the user. It would also allow visualising a broader range of outputs, without the user needing to style the results themselves.
 
 **Interoperability**
 
-We were able to implement multiple different OGC API providers, both v1 and v2, in the same client without provider-specific code. The differences between providers were handled in a generic way (see Inputs and outputs), not by special cases per provider.
+We were able to implement multiple different OGC API providers, both in versions v1 and v2, in the same client without provider-specific code. The differences between providers were handled in a generic way (see Inputs and outputs), not by special cases per provider. 
 
 ## Process implementation
 
-Together with Varidian we developed a process calling our Deltares Atlantis subsidence API, while also simplifying and validating the user inputs. The process was originally created by IMAGEM and is hosted in Varidian's registry.
+Together with Varidian we developed an OGC API Process called 'Deltares Atlantis Subsidence API'. This is a process we previously maintained as an existing API connection for the calculation model. For the OGC API Process we also simplified and validated the user inputs. The process was originally created by IMAGEM and is hosted in Varidian's registry.
 
 The process (`subsidence_subsidence`, "Deltares Atlantis - Subsidence Analysis") performs a settlement calculation for urban development with the Deltares Atlantis calculation module. It is available through Varidian's registry (https://registry.playground.planspace.nl/processes/subsidence_subsidence) and can be run from the OGC API Explorer, synchronously and asynchronously.
 
 Simplifications compared to our existing subsidence module:
 
-- The input areas are requested in EPSG:4326 instead of the Dutch RD coordinate reference system, so a client does not need to reproject.
-- Multiple levels of `dikte` (surcharge thickness) can be given in one request, one per feature. This is not possible in our other implementation.
+- The input areas are requested in EPSG:4326 instead of the Dutch RD coordinate reference system, so a client does not need to reproject the coordinates.
+- Multiple levels of `dikte` (surcharge thickness) can be given in one request, one per feature. This is not possible in our other/existing implementation.
 
 Inputs:
 
@@ -133,9 +133,10 @@ Inputs:
 - **Surcharge thickness** (`thickness`): fallback thickness of the surcharge in metres (default 1.5, minimum 0.1), used for every area without its own `dikte` property.
 - **Surcharge areas** (`geojson`): a GeoJSON FeatureCollection of polygons, optionally with a per-feature `dikte` override.
 
-Outputs: the run ID and three GeoTIFFs (initial subsidence 0-3 years, remaining subsidence 3-60 years, and total subsidence), which can be added to the map as raster layers.
+Outputs: 
+- the 'run ID' and three GeoTIFFs (initial subsidence 0-3 years, remaining subsidence 3-60 years, and total subsidence), which can be added to the map as raster layers.
 
-## Recommendations for the OGC standard
+## Our recommendations for the OGC standard
 
 - Make the schema of inputs and outputs more specific where a client needs it: a GeoJSON input should state its geometry types, and outputs should always have a schema, so a client can render them.
 - Describe the unit and meaning of inputs and outputs in a machine-readable way, not only in free text. This allows clients to render the proper inputs.
