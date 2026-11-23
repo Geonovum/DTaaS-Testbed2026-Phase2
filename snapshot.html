@@ -1644,6 +1644,57 @@ body:has(input[name=color-scheme][value=dark]:checked) .hljs{
       <section id="Results"><div class="header-wrapper"><h2 id="x3-results"><bdi class="secno">3. </bdi>Results</h2><a class="self-link" href="#Results" aria-label="Permalink for Section 3."></a></div>
 <p>In this chapter only the summaries of the participants are included. The full reports from the participants are included in the Annex.</p>
 <section id="adoption-topic-1-3dgi"><div class="header-wrapper"><h3 id="x3-1-adoption-topic-1-3dgi"><bdi class="secno">3.1 </bdi>Adoption topic #1: 3dgi</h3><a class="self-link" href="#adoption-topic-1-3dgi" aria-label="Permalink for Section 3.1"></a></div>
+<p>3DGI added an OGC API – Processes interface to <a href="https://roofer-online.nl">Roofer Online</a>, which reconstructs 3D buildings from point clouds and building footprints. The contribution addresses Topic 1: exposing an existing calculation module through the nLDT architecture and making it usable by other vendors' clients.</p>
+<p>There are two versions of the Roofer Online processes API.</p>
+<ul>
+<li><code>v1</code>: A public demo that was developed for the testbed, and it uses fixture data. Live at <a href="https://processes.staging.roofer-online.nl/ogcapi">https://processes.staging.roofer-online.nl/ogcapi</a>.<ul>
+<li><a href="https://processes.staging.roofer-online.nl/ogcapi/processes">process catalogue</a></li>
+<li><a href="https://processes.staging.roofer-online.nl/ogcapi/docs">Swagger UI</a></li>
+<li><a href="https://processes.staging.roofer-online.nl/ogcapi/openapi.json">OpenAPI document</a></li>
+</ul>
+</li>
+<li><code>v2</code>: The client-facing live Roofer Online processes API, which requires a Roofer Online account and authentication. Live at  <a href="https://roofer-online.nl/ogcapi">https://roofer-online.nl/ogcapi</a>.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>v1: public testbed demo</th>
+<th>v2: live Roofer Online API</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Purpose</td>
+<td>Let participants test discovery, execution, job handling and process chaining</td>
+<td>Run building reconstruction within Roofer Online</td>
+</tr>
+<tr>
+<td>Processing</td>
+<td>Deterministic fixture results and sample CityJSON/GeoPackage files</td>
+<td>Point-cloud ingestion, BAG selection, reconstruction and export</td>
+</tr>
+<tr>
+<td>Access</td>
+<td>Public, no access restriction</td>
+<td>Public discovery; authenticated execution, jobs, results and artifact downloads</td>
+</tr>
+<tr>
+<td>Processes</td>
+<td>Separate validation, reconstruction and conversion processes</td>
+<td>One reconstruction process incorporating preparation and requested exports</td>
+</tr>
+<tr>
+<td>Execution</td>
+<td>Synchronous and asynchronous</td>
+<td>Asynchronous only</td>
+</tr>
+<tr>
+<td>Testbed status</td>
+<td>Tested</td>
+<td>Not tested because authentication is required</td>
+</tr>
+</tbody></table>
+<p>The reusable components and v1 implementation are public on GitHub, with Apache-2.0 licence: <a href="https://github.com/3DGI/roofer-online-processes">https://github.com/3DGI/roofer-online-processes</a></p>
 </section><section id="adoption-topic-1-clappform"><div class="header-wrapper"><h3 id="x3-2-adoption-topic-1-clappform"><bdi class="secno">3.2 </bdi>Adoption topic #1: Clappform</h3><a class="self-link" href="#adoption-topic-1-clappform" aria-label="Permalink for Section 3.2"></a></div>
 </section><section id="adoption-topic-2-geolabs"><div class="header-wrapper"><h3 id="x3-3-adoption-topic-2-geolabs"><bdi class="secno">3.3 </bdi>Adoption topic #2: GeoLabs</h3><a class="self-link" href="#adoption-topic-2-geolabs" aria-label="Permalink for Section 3.3"></a></div>
 <p><strong>Results at a glance</strong></p>
@@ -1684,7 +1735,66 @@ body:has(input[name=color-scheme][value=dark]:checked) .hljs{
 </tr>
 </tbody></table>
 </section><section id="adoption-topic-3-breinstein"><div class="header-wrapper"><h3 id="x3-4-adoption-topic-3-breinstein"><bdi class="secno">3.4 </bdi>Adoption topic #3: Breinstein</h3><a class="self-link" href="#adoption-topic-3-breinstein" aria-label="Permalink for Section 3.4"></a></div>
+<p>OGC API – Processes lets a client discover, run and monitor computational
+processes over a Web API. In the Dutch national digital twin architecture
+(nLDT), a visualisation front end calls computational modules through this
+standard. Existing conformance testing checks servers from outside the
+browser, so it cannot show whether a web page can use them. Of the existing
+open-source client libraries, most do not cover Processes. The one that does
+reduces each response to its JSON body, so it loses the <code>Location</code> header that
+asynchronous execution depends on.</p>
+<p>We built a browser client in two layers:</p>
+<ul>
+<li>a runtime-neutral protocol core, published on npm;</li>
+<li>a web interface on top of it, which generates input forms and shows results
+on a map, so a user can run a process without writing any code.</li>
+</ul>
+<p>The client speaks the 2.0 draft of the standard where a service declares it,
+and falls back to 1.0 otherwise. With it, we tested six deployments: two
+implementations run by the team throughout the testbed (pygeoapi and
+ZOO-Project), and three services run by testbed parties. We recorded every
+point at which a service's behaviour differed from the standard, from its own
+declarations, or from what a browser allows: 72 filed findings.</p>
+<p>The main results:</p>
+<ul>
+<li><strong>CORS decides whether a web page can use a service at all</strong>, not OGC
+conformance. Three of the six deployments can be reached directly from a web
+page. Only one of those three lets a page read the <code>Location</code> header that
+names a new asynchronous job.</li>
+<li><strong>Declarations and behaviour diverge in both directions.</strong> Capabilities
+that work are not declared, and capabilities that are declared or listed do
+not work.</li>
+<li><strong>Neither team-run implementation validates execute inputs</strong>, and in 16
+findings a server answers with a success status while doing something other
+than what was asked.</li>
+<li><strong>The same request returns differently shaped answers</strong> from different
+implementations.</li>
+</ul>
+<p>We considered a server-side relay to work around these limits, and built one.
+We decided not to deploy it publicly, for security reasons. Instead we
+recommend that services configure CORS correctly, and that any access control
+they need uses a documented scheme that a browser can send. We also propose
+profile guidance, and identify four gaps in the standard itself.</p>
 </section><section id="adoption-topic-3-imagem"><div class="header-wrapper"><h3 id="x3-5-adoption-topic-3-imagem"><bdi class="secno">3.5 </bdi>Adoption topic #3: Imagem</h3><a class="self-link" href="#adoption-topic-3-imagem" aria-label="Permalink for Section 3.5"></a></div>
+<p>Implement an OGC API Processes client, make it function within the nLDT ecosystem and have it interoperate with software from other software vendors.</p>
+<p><strong>Approach</strong></p>
+<p>For IMAGEM, the approach was to continue to build on the progress made in the previous testbeds (2024 &amp; 2025). In these testbeds, first explorations were done to work with OGC API Processes. Where it all started as a static implementation of OGC API Processes, a more complete implementation of the OGC API Processes (v2) was the aim for this testbed.</p>
+<p>In this approach, some new features of the OGC API Processes were tested and implemented in the Digital Twin client (Planspace Simulator). On one side this meant an attempt to create a user interface based on the input and output descriptions of the OGC API Processes provided during this testbed. On the other hand a Job Management System had to be implemented to track the Async processes of this testbed (In previous testbeds, only Sync processes were part of the Adoption topics).</p>
+<p>Going into detail, the approach can be divided in four steps:</p>
+<ul>
+<li><strong>Creating a catalogue with OGC API Processes</strong></li>
+<li><strong>Generating UI elements based on the process definition</strong></li>
+<li><strong>Creating the Job Management System in the client to manage the Async job executions</strong></li>
+<li><strong>Visualising the results of the OGC API Processes.</strong></li>
+</ul>
+<p><strong>Client implementation</strong></p>
+<p>The client is the OGC API Explorer in the Planspace Simulator. It is not tied to specific processes: the user selects an OGC API endpoint (Varidian's registry is the default, other endpoints can be added) and the explorer uses the conformance declaration to enable the parts the endpoint supports:</p>
+<ul>
+<li><strong>Collections</strong> (OGC API - Features): browse collections, filter on queryables and add a collection as a layer to the map.</li>
+<li><strong>Processes</strong> (OGC API - Processes): the input form is generated from the process description (JSON Schema), including GeoJSON inputs that can be drawn, uploaded or edited. A process can be executed synchronously or asynchronously, depending on its <code>jobControlOptions</code>.</li>
+<li><strong>Jobs</strong>: asynchronous executions are listed and polled until they finish, with status, progress and timestamps. Jobs can be dismissed when the endpoint supports it, and the results of a finished job can be opened.</li>
+<li><strong>Results</strong>: outputs are rendered read-only from the output schema. GeoJSON, GeoTIFF and feature collection outputs can be added to the map as a layer.</li>
+</ul>
 </section><section id="research-topic-4-collaboral"><div class="header-wrapper"><h3 id="x3-6-research-topic-4-collaboral"><bdi class="secno">3.6 </bdi>Research topic #4: Collaboral</h3><a class="self-link" href="#research-topic-4-collaboral" aria-label="Permalink for Section 3.6"></a></div>
 <p>Collaborall investigated how a <em>recipe</em> — a combination of data sources and an ordered
 list of processes — can be described, found and executed in a national digital-twin App
@@ -1765,6 +1875,7 @@ recipe’s results readable and trustworthy, which is exactly the focus of this 
 <p>The workflow automates construction of the simulation environment, although users must still connect simulation objects into pedestrian flows and configure simulation parameters. Further research could improve interoperability through shared semantic definitions, investigate applications in other simulation domains, and explore closer integration between CAD design and simulation.</p>
 </section></section>
       <section id="Findings"><div class="header-wrapper"><h2 id="x4-findings"><bdi class="secno">4. </bdi>Findings</h2><a class="self-link" href="#Findings" aria-label="Permalink for Section 4."></a></div>
+<p>T.B.D.</p>
 </section>
       <section id="AnnexA" class="appendix"><div class="header-wrapper"><h2 id="a-topic-2-geolabs"><bdi class="secno">A. </bdi>Topic 2: Geolabs</h2><a class="self-link" href="#AnnexA" aria-label="Permalink for Appendix A."></a></div>
 <p><strong>From WPS to OGC API - Processes: the MapMint routing service on ZOO-Project-DRU</strong></p>
