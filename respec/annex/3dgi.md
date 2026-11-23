@@ -41,7 +41,7 @@ Roofer Online has a React frontend, a FastAPI backend and a [Dagster](https://da
 The frontend uses the service's existing internal application API to manage data, start jobs, poll their status and retrieve results.
 A separate authentication handler manages user sign-in.
 The API uses bearer-token authentication with JWT tokens and checks user roles and ownership to control access to processes and assets.
-[Dagster]([Dagster](https://dagster.io)) orchestrates point-cloud preparation, BAG synchronisation, reconstruction, format conversion and database export, managing dependencies between processing steps.
+[Dagster]((https://dagster.io)) orchestrates point-cloud preparation, BAG synchronisation, reconstruction, format conversion and database export, managing dependencies between processing steps.
 The backend submits jobs through Dagster's GraphQL API and stores process records with their Dagster run identifiers in PostgreSQL.
 When the frontend polls an active process, the backend queries Dagster, updates the stored process and asset statuses, and records output metadata when processing completes.
 This job lifecycle existed before the OGC API interface was added.
