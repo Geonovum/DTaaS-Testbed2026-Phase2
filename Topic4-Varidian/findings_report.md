@@ -40,6 +40,7 @@
     - [Appendix B: Registry playground](#appendix-b-registry-playground)
     - [Appendix C: Facet analysis](#appendix-c-facet-analysis)
     - [Appendix D: Sources](#appendix-d-sources)
+    - [Appendix E: WDL](#appendix-e-wdl-recipes)
 
 # Introduction
 
@@ -571,3 +572,7 @@ Spreadsheet with full facet analysis: [facet_analysis.xlsx](./attachments/facet_
 - Deltares model used by the subsidence process: <https://deltares-research.github.io/Atlans.jl/>
 - BRO data source for groundwater
   level: <https://api.pdok.nl/tno/bro-grondwatermonitoring-in-samenhang-karakteristieken/ogc/v1>
+
+## Appendix E: WDL recipes
+
+We have appended the WDL recipes we used in [recipes](./recipes).
