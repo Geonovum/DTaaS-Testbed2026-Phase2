@@ -4,6 +4,28 @@ In this chapter only the summaries of the participants are included. The full re
 
 ## Adoption topic #1: 3dgi
 
+3DGI added an OGC API – Processes interface to [Roofer Online](https://roofer-online.nl), which reconstructs 3D buildings from point clouds and building footprints. The contribution addresses Topic 1: exposing an existing calculation module through the nLDT architecture and making it usable by other vendors' clients.
+
+There are two versions of the Roofer Online processes API.
+
+- `v1`: A public demo that was developed for the testbed, and it uses fixture data. Live at [https://processes.staging.roofer-online.nl/ogcapi](https://processes.staging.roofer-online.nl/ogcapi).
+    - [process catalogue](https://processes.staging.roofer-online.nl/ogcapi/processes)
+    - [Swagger UI](https://processes.staging.roofer-online.nl/ogcapi/docs)
+    - [OpenAPI document](https://processes.staging.roofer-online.nl/ogcapi/openapi.json)
+- `v2`: The client-facing live Roofer Online processes API, which requires a Roofer Online account and authentication. Live at  [https://roofer-online.nl/ogcapi](https://roofer-online.nl/ogcapi).
+
+|                | v1: public testbed demo                                                       | v2: live Roofer Online API                                                      |
+|----------------|-------------------------------------------------------------------------------|---------------------------------------------------------------------------------|
+| Purpose        | Let participants test discovery, execution, job handling and process chaining | Run building reconstruction within Roofer Online                                |
+| Processing     | Deterministic fixture results and sample CityJSON/GeoPackage files            | Point-cloud ingestion, BAG selection, reconstruction and export                 |
+| Access         | Public, no access restriction                                                 | Public discovery; authenticated execution, jobs, results and artifact downloads |
+| Processes      | Separate validation, reconstruction and conversion processes                  | One reconstruction process incorporating preparation and requested exports      |
+| Execution      | Synchronous and asynchronous                                                  | Asynchronous only                                                               |
+| Testbed status | Tested                                                                        | Not tested because authentication is required                                   |
+
+The reusable components and v1 implementation are public on GitHub, with Apache-2.0 licence: https://github.com/3DGI/roofer-online-processes
+
+
 ## Adoption topic #1: Clappform
 
 ## Adoption topic #2: GeoLabs
@@ -23,7 +45,74 @@ __Results at a glance__
 
 ## Adoption topic #3: Breinstein
 
+OGC API – Processes lets a client discover, run and monitor computational
+processes over a Web API. In the Dutch national digital twin architecture
+(nLDT), a visualisation front end calls computational modules through this
+standard. Existing conformance testing checks servers from outside the
+browser, so it cannot show whether a web page can use them. Of the existing
+open-source client libraries, most do not cover Processes. The one that does
+reduces each response to its JSON body, so it loses the `Location` header that
+asynchronous execution depends on.
+
+We built a browser client in two layers:
+
+- a runtime-neutral protocol core, published on npm;
+- a web interface on top of it, which generates input forms and shows results
+  on a map, so a user can run a process without writing any code.
+
+The client speaks the 2.0 draft of the standard where a service declares it,
+and falls back to 1.0 otherwise. With it, we tested six deployments: two
+implementations run by the team throughout the testbed (pygeoapi and
+ZOO-Project), and three services run by testbed parties. We recorded every
+point at which a service's behaviour differed from the standard, from its own
+declarations, or from what a browser allows: 72 filed findings.
+
+The main results:
+
+- **CORS decides whether a web page can use a service at all**, not OGC
+  conformance. Three of the six deployments can be reached directly from a web
+  page. Only one of those three lets a page read the `Location` header that
+  names a new asynchronous job.
+- **Declarations and behaviour diverge in both directions.** Capabilities
+  that work are not declared, and capabilities that are declared or listed do
+  not work.
+- **Neither team-run implementation validates execute inputs**, and in 16
+  findings a server answers with a success status while doing something other
+  than what was asked.
+- **The same request returns differently shaped answers** from different
+  implementations.
+
+We considered a server-side relay to work around these limits, and built one.
+We decided not to deploy it publicly, for security reasons. Instead we
+recommend that services configure CORS correctly, and that any access control
+they need uses a documented scheme that a browser can send. We also propose
+profile guidance, and identify four gaps in the standard itself.
+
 ## Adoption topic #3: Imagem
+
+Implement an OGC API Processes client, make it function within the nLDT ecosystem and have it interoperate with software from other software vendors.
+
+__Approach__
+
+For IMAGEM, the approach was to continue to build on the progress made in the previous testbeds (2024 & 2025). In these testbeds, first explorations were done to work with OGC API Processes. Where it all started as a static implementation of OGC API Processes, a more complete implementation of the OGC API Processes (v2) was the aim for this testbed.
+
+In this approach, some new features of the OGC API Processes were tested and implemented in the Digital Twin client (Planspace Simulator). On one side this meant an attempt to create a user interface based on the input and output descriptions of the OGC API Processes provided during this testbed. On the other hand a Job Management System had to be implemented to track the Async processes of this testbed (In previous testbeds, only Sync processes were part of the Adoption topics).
+
+Going into detail, the approach can be divided in four steps:
+
+- **Creating a catalogue with OGC API Processes**
+- **Generating UI elements based on the process definition**
+- **Creating the Job Management System in the client to manage the Async job executions**
+- **Visualising the results of the OGC API Processes.**
+
+__Client implementation__
+
+The client is the OGC API Explorer in the Planspace Simulator. It is not tied to specific processes: the user selects an OGC API endpoint (Varidian's registry is the default, other endpoints can be added) and the explorer uses the conformance declaration to enable the parts the endpoint supports:
+
+- **Collections** (OGC API - Features): browse collections, filter on queryables and add a collection as a layer to the map.
+- **Processes** (OGC API - Processes): the input form is generated from the process description (JSON Schema), including GeoJSON inputs that can be drawn, uploaded or edited. A process can be executed synchronously or asynchronously, depending on its `jobControlOptions`.
+- **Jobs**: asynchronous executions are listed and polled until they finish, with status, progress and timestamps. Jobs can be dismissed when the endpoint supports it, and the results of a finished job can be opened.
+- **Results**: outputs are rendered read-only from the output schema. GeoJSON, GeoTIFF and feature collection outputs can be added to the map as a layer.
 
 ## Research topic #4: Collaboral
 
