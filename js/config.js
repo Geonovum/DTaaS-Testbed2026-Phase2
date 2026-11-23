@@ -42,7 +42,10 @@ var respecConfig =
     {name: "Gérald Fenoy",
     company: "GeoLabs SARL",
     companyURL: "https://www.geolabs.fr"
-    }
+    },
+    {name: "3DGI"},
+    {name: "Imagem"},
+    {name: "Breinstein"}
 
   ],
   editors: [
