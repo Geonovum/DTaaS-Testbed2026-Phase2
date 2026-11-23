@@ -1,4 +1,4 @@
-# Topic 5: uCrowds, AnniVizzion
+# Topic 5: uCrowds
 
 ## iCAD: Interoperable CAD-to-Crowd
 

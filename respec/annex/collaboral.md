@@ -1,4 +1,4 @@
-# Topic 4: App-Store / Recipes — Collaborall
+# Topic 4: Collaborall
 
 *DTaaS Testbed 2026, phase 2 · research topic #4 · findings report*
 

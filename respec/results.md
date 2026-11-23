@@ -2,7 +2,7 @@
 
 In this chapter only the summaries of the participants are included. The full reports from the participants are included in the Annex.
 
-## Adoption topic #1: 3dgi
+## Adoption topic #1: 3DGI
 
 3DGI added an OGC API – Processes interface to [Roofer Online](https://roofer-online.nl), which reconstructs 3D buildings from point clouds and building footprints. The contribution addresses Topic 1: exposing an existing calculation module through the nLDT architecture and making it usable by other vendors' clients.
 
