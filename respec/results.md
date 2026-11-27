@@ -28,6 +28,68 @@ The reusable components and v1 implementation are public on GitHub, with Apache-
 
 ## Adoption topic #1: Clappform
 
+__What we were asked to do__
+
+Topic 1 asks participants to put an OGC API - Processes interface on top of an existing
+calculation module, following the [nLDT reference
+architecture](https://github.com/Geonovum/NLDT-Architectuur), and to make it work with software
+from other vendors. The kickoff named sync and async execution, job management and full
+compliance with the specification as the bar.
+
+__What we built and validated__
+
+We took a Clappform calculation that existed as a Python notebook: it matches a housing-plan
+plot (*kavel*) against BAG buildings and scores how much of each building lies inside the
+plot. We ported it to Go and exposed it through a Processes server in three forms:
+
+1. **One call, caller supplies the buildings** (`plot-bag-matching`).
+2. **One call, the server fetches the buildings from the PDOK BAG WFS** (`plot-bag-matching-pdok`).
+3. **Five step processes** that a recipe chains together, with every intermediate value visible.
+
+We started on Processes 1.0 and moved the server to the 2.0 draft halfway through the testbed.
+We then added the `nested-processes` class of Part 3, so a client can send the whole five-step
+recipe as one request. Last, we built a browser console with no dependencies. It reads the
+process descriptions, generates input forms, follows async jobs, and runs the recipe from a
+CWL `Workflow` document, either step by step or as one nested request.
+
+In parallel we built the same matching as a Python plugin for pygeoapi, which implements
+Processes 1.0. Section 1.5 describes the plugin and section 5.8 what we fixed before it ran.
+
+We measured both recipe routes against live PDOK data. Each returned a `match_result`
+identical to the single call. 199 automated tests cover the server, among them a test that
+asserts the chained steps and the single call agree across 7 cases.
+
+__What we found__
+
+1. **2.0 is a major version, so 1.0 clients break.** The job status object, the execute
+   request and the sync response shape all changed. A 1.0 client cannot read a 2.0 server.
+   Section 2 lists each change.
+2. **A validator can pass a document it never checked.** The Geonovum `ogc-checker` parses
+   OpenAPI 3.0 only. It skipped every rule on our OpenAPI 3.1 document and reported it as
+   valid. A 3.0 copy of the same document produced 21 errors.
+3. **The response shape depends on how many outputs you ask for.** Zero outputs give
+   `204`, one gives the raw value, several give a results document of `{"value": …}`
+   wrappers. Every client, and every recipe step, needs both code paths.
+4. **The protocol lives in headers a browser hides by default.** `Location`,
+   `Preference-Applied`, `Link` and `OGC-Output-Values-Count` are invisible to a browser
+   client unless the server lists them in `Access-Control-Expose-Headers`.
+5. **Part 3 nesting is a tree, not a graph.** When one step feeds two others, the nested
+   request contains that step twice and the server runs it twice. The standard has no way
+   to refer to a sibling's output.
+6. **Splitting a calculation into steps changes its numbers unless you control rounding
+   and projection.** We had to move rounding out of the overlap step and keep geometry
+   repair in lon/lat before the split reproduced the single call exactly.
+7. **Neither Processes nor Part 3 carries values between steps for you.** Our console does
+   that wiring from the CWL document.
+8. **The 1.0 schema allows neither bilingual titles nor type arrays.** Our pygeoapi plugin
+   had to fall back to plain strings and `nullable`. Section 5.8 has the details.
+
+__Our recommendation in one line__
+
+Processes 2.0 is a sound base for a digital-twin calculation layer. Pin down the response
+shape, add sibling references to Part 3, and make the validators fail loudly on input they
+cannot read.
+
 ## Adoption topic #2: GeoLabs
 
 __Results at a glance__
