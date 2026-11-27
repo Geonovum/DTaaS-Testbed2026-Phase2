@@ -46,7 +46,7 @@ var respecConfig =
     {name: "Varidian"},
     {name: "The People Group"},
     {name: "uCrowds"},
-    {name: "Anivizion"}
+    {name: "Anivizzion"}
     
   ],
   editors: [
