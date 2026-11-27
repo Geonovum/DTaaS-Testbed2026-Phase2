@@ -247,7 +247,7 @@ The demonstration used an event design for Huntenpop 2025, a two-day music festi
 
 AniVizzion prepared the event scene in SCAD Re-Event. The scene included the site environment, walkable areas, obstacles, entrances, exits, queues, and waypoints. These elements provided the geographic and functional information needed to evaluate the transfer of the event design into SimCrowds.
 
-![Demo environment](./media/walkable_demo_scx.png)
+<img src="./media/walkable_demo_scx.png" alt="Demo environment" width="900">
 *Figure 1: Huntenpop 2025 event design in SCAD Re-Event, showing the festival layout and functional areas.
 
 ### 6.2 Export output and JSON-FG validation
@@ -264,7 +264,7 @@ The imported geometry also supported successful generation of a navigation mesh,
 
 The result establishes that the relevant CAD-defined areas can be imported as simulation objects without redrawing. The same exchange approach also permits a revised design to be imported, although continuous updates preserving existing simulation settings were not tested.
 
-![Simcrowds import](./media/simcrowds_import.png)
+<img src="./media/simcrowds_import.png" alt="Simcrowds import" width="900">
 *Figure 2: imported SCX document in SimCrowds.
 
 The import process does not, however, produce a fully configured simulation. After importing the environment, a user must still connect simulation objects into flows and configure parameters such as the number of pedestrians entering per second and their destinations.
@@ -279,7 +279,7 @@ This capability already existed in SimCrowds before the iCAD project. The projec
 
 The WMS output was successfully displayed in QGIS (Figure 3) and Esri Map Viewer. This allows the spatial distribution of simulated crowds to be viewed alongside other geographic information without requiring the receiving application to support the SimCrowds simulation format.
 
-![QGIS](./media/QGIS_wms_densities.png)
+<img src="./media/QGIS_wms_densities.png" alt="QGIS" width="900">
 *Figure 3: WMS density map visualization in QGIS. The colors indicate the density levels, e.g. blue areas have low-density and orange areas (in this case, near the entry) are high-density.*
 
 ### 6.5 Summary of demonstrated results

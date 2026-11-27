@@ -31,7 +31,7 @@ Other key findings:
 
 This report covers Future Insight's work on Research Topic #4, App-Store / Recipes, of Geonovum's Testbed 2026 phase 2. The tender defines a recipe as a combination of data sources (ingredients) and an ordered list of processes (cooking instructions) that solves a real-world problem.
 
-![](media/image3.png)
+<img src="./media/image3.png" alt="" width="900">
 
 The table maps each component the tender (§7.3) asks for to what we built.
 
@@ -63,13 +63,13 @@ We proved the orchestration on a trivial recipe first, then moved to real geodat
 | `playground-2` | ZOO-Project sampler: five processes (HelloPy, hellojs, Centroid, Buffer, GetArea), mostly in parallel, with one chain Buffer → GetArea | Geolabs' ZOO-Project processes |
 | `playground-3` | Subsidence analysis: where subsidence stays below a threshold, and so where construction is possible (see below) | Varidian's OGC API Process |
 
-![](media/image4.png)
+<img src="./media/image4.png" alt="" width="900">
 
 **Playground slots: the state at the time of writing.** The three playground slots were seeded for the plugfests, so participants could test their own processes in a recipe without our help. Anyone can open a playground recipe in the editor, change it and save it: there is no login, no ownership and no version history (_finding 21_). Saving overwrites the slot for everyone. The table above therefore describes the playground recipes _as they were when this report was written_. A reader who opens the live App Store later may find something else in these slots, or an earlier version. [[#appendix-c](#appendix-c)] keeps all three as they were, in full and annotated.
 
 Two things bring a playground slot back to a known state:
 
-![](media/image5.png)
+<img src="./media/image5.png" alt="" width="900">
 
 - **Reset**, in the recipe editor, loads the slot's _bundled_ recipe (the version shipped with the code, `GET /recipes/{id}/original`) into the editor. It only replaces the text in the editor; nothing changes for anyone else until that text is validated and saved. After the second plugfest we made the recipes in the table the bundled versions of all three slots, so Reset brings back exactly what is described here. (Until then, playground-3 was bundled as a heavily commented add → multiply template, meant as a starting point for one's own recipe.)
 - **Re-seeding**, run when the stack is redeployed, stores every bundled recipe again, overwriting whatever was saved in the slots.
@@ -82,7 +82,7 @@ The two named recipes (`recipe-rotterdam-buffer-demo`, `recipe-add-multiply-demo
 
 The stack is nine services of our own plus CKAN 2.11 (with its Postgres, Solr and Redis), each in its own Docker container, on one private network behind an nginx gateway. The gateway publishes everything under one public address, <https://nldt-tb2.clearly.app>, with each service under its own path. The App Store UI is also published on GitHub Pages, at <https://fi-group.github.io/nldt-tb2/>, and calls the services at that public address. The browser calls each service directly; there is no backend-for-frontend.
 
-![](media/image6.png)
+<img src="./media/image6.png" alt="" width="900">
 
 | **Service** | **Public address (under <https://nldt-tb2.clearly.app>)** | **Role** | **Standard** |
 | --- | --- | --- | --- |
@@ -138,9 +138,9 @@ So only the Cookbook Registry reads CWL. Everything else asks the Registry one q
 
 **One exception, by design.** The editor's diagram and its guided builder read the CWL text in the browser, because their job is to edit that text line by line, including comments. They never decide what a recipe means: Validate and Save always go to the Registry.
 
-![](media/image7.png)
+<img src="./media/image7.png" alt="" width="900">
 
-![](media/image8.png)
+<img src="./media/image8.png" alt="" width="900">
 
 ## The recipe format: a CWL profile {#the-recipe-format-a-cwl-profile}
 
@@ -224,7 +224,7 @@ Two harmless warnings remain: `cwltool` still resolves type keys inside our fiel
 
 **Running a recipe vs swapping tools.** Running a recipe as written needs no central process registry: each step carries its own `nldt:processLink`. Tool swaps are more limited:
 
-![](media/image9.png)
+<img src="./media/image9.png" alt="" width="900">
 
 - Alternatives are checked against a built-in catalogue of our four tools (`add`, `multiply`, `multiply3`, `buffer`). Unknown ids in the allowlist are silently dropped, so a hub cannot swap in an external process such as roofer or ZOO-Project.
 - A step without an allowlist entry allows only its own tool.
@@ -232,7 +232,7 @@ Two harmless warnings remain: `cwltool` still resolves type keys inside our fiel
 - The catalogue exists in four copies (Registry, Cook fallback, and two in the UI) that must stay in sync.
 - Hand-editing `nldt:processLink` can point a step at any process; only the Wizard's swaps are allowlisted.
 
-![](media/image10.png)
+<img src="./media/image10.png" alt="" width="900">
 
 ### Data inputs vs parameters {#data-inputs-vs-parameters}
 
@@ -267,9 +267,9 @@ So the Wizard fetches the description of each step's process (once per session, 
 - **The recipe always wins.** A label, description or default written in the CWL is used as written. The process only fills what the recipe leaves out.
 - **Nothing is written back.** The process's information is shown, and its defaults are sent when a field is left empty, but the stored recipe never changes. If the process changes its description, the next Wizard session shows the new one, so this cannot go stale the way a pasted `nldt:jsonSchema` can.
 
-![](media/image11.png)
+<img src="./media/image11.png" alt="" width="900">
 
-![](media/image12.png)
+<img src="./media/image12.png" alt="" width="900">
 
 This works for any recipe and any process, not only the ones in this testbed. Its limit is what process providers publish: the subsidence process gives no default or example for its GeoJSON input, so that field stays required, and the form can only show the expected shape (an empty FeatureCollection). A JSON Schema `example` entry would let the form show a real polygon ([[#collaboration](#collaboration)]).
 
@@ -343,7 +343,7 @@ Recipes are stored in SQLite in a Docker volume. Schema and DAG are derived fres
 
 **CWL vs DAG.** CWL is a document written for people: order in the file is arbitrary and it carries labels, docs and extensions. The DAG is the machine form: steps in topological order, each input resolved to a workflow input or another step's output. [[#design-principle](#design-principle)] explains why every part of the stack works from the DAG.
 
-![](media/image13.png)
+<img src="./media/image13.png" alt="" width="900">
 
 ### What the DAG contains {#what-the-dag-contains}
 
@@ -413,7 +413,7 @@ Two design choices matter:
 
 - **Validation is a gate, twice.** The editor's _Validate_ calls the validate endpoint; _Save_ re-validates server-side. Nothing is stored unless a DAG can be built. Validation is structural only: it never calls the processes.
 
-![](media/image14.png)
+<img src="./media/image14.png" alt="" width="900">
 
 - **Catalogue outages don't lose recipes.** A recipe is stored first, then published. If the catalogue is down, the response says `catalog_published: false` plus the error, rather than failing.
 
@@ -425,13 +425,13 @@ The Cook is itself an OGC API Processes Part 1: Core 1.0 service with exactly on
 
 The `cook` process takes `recipeId`, `parameters` and `toolOverrides` (`{stepId: toolId}`) and returns `result`. It declares the conformance classes `core`, `json`, `oas30`, `job-list` and `dismiss`.
 
-![](media/image15.png)
+<img src="./media/image15.png" alt="" width="900">
 
 ### What happens when you click 'Execute' {#what-happens-when-you-click-execute}
 
 In short, the browser hands the recipe to the Cook and gets a job number back at once. The Cook then works through the recipe's DAG on its own: it starts every step whose inputs are ready, calls that step's OGC API Process, waits for it (following the process's own job when the process runs asynchronously), and passes its outputs on to the steps that need them. Meanwhile the browser asks the Cook every 2 seconds how far it is.
 
-![](media/image16.png)
+<img src="./media/image16.png" alt="" width="900">
 
 In detail:
 
@@ -508,7 +508,7 @@ Two cases can be labelled wrongly. A tool response the Cook cannot parse counts 
 
 Figure below shows the banner for a run whose tool could not be reached. It was made on a local copy of the stack, with the buffer tool's container stopped, so the live services and recipes were not touched.
 
-![](media/image17.png)
+<img src="./media/image17.png" alt="" width="900">
 
 ## Catalogue and recipe metadata {#catalogue-and-recipe-metadata}
 
@@ -522,7 +522,7 @@ Records Part 1 is read-only, so publishing uses two non-standard write endpoints
 
 Figure below shows one OGC API Records search, `items?q=flooding`, and the CKAN `package_search` call the Records Wrapper turns it into.
 
-![](media/image18.png)
+<img src="./media/image18.png" alt="" width="900">
 
 We first built our own SQLite store, then switched to real CKAN to match the tender's architecture. The swap touched only the wrapper's repository module; the API and its clients were unchanged.
 
@@ -625,7 +625,7 @@ The App Store UI finds recipes, binds them to a hub's own data and tools, and ex
 
 We chose this deliberately. It shows recipes in the setting where they would actually be used, next to a hub's own data and apps, rather than in a bare test client. Parts of the OUP that are outside this research topic (reviews, hub management, digital twins, pricing) are shown as they would look, but are not functional in the sandbox.
 
-![](media/image19.png)
+<img src="./media/image19.png" alt="" width="900">
 
 ### How the UI uses the recipe {#how-the-ui-uses-the-recipe}
 
@@ -649,19 +649,19 @@ The UI never interprets CWL itself ([[#design-principle](#design-principle)]). E
 
 **Catalogue.** Recipes from the Records Wrapper, filterable by facets. Separate pages list Data (Hub Datasets) and Apps (live OGC API Processes, from each one's own process description).
 
-![](media/image20.png)
+<img src="./media/image20.png" alt="" width="900">
 
 **Recipe detail.** Metadata, the recipe's graph, and its compatible data and apps. A banner on a live recipe points to the Recipe Wizard tab, where a run is set up.
 
-![](media/image21.png)
+<img src="./media/image21.png" alt="" width="900">
 
 **Home page.** Recent activity: the recipes, apps and datasets live in the sandbox.
 
-![](media/image22.png)
+<img src="./media/image22.png" alt="" width="900">
 
 ### The Recipe Wizard {#the-recipe-wizard}
 
-![](media/image23.png)
+<img src="./media/image23.png" alt="" width="900">
 
 The Wizard binds a recipe to a hub in four steps. Every step shows the same **recipe graph** above its own controls, so the user always sees the whole recipe while setting up one part of it:
 
@@ -672,7 +672,7 @@ The Wizard binds a recipe to a hub in four steps. Every step shows the same **re
 
 Colours show the state of the setup: green for ready (a dataset picked, a value or default set), red for still needed, amber for an app swapped for this run. The graph is drawn from the effective DAG ([[#design-principle](#design-principle)]), so it always shows what the Cook will actually run.
 
-![](media/image24.png)
+<img src="./media/image24.png" alt="" width="900">
 
 1. **Tool & Engine.** One card per step: the step's name, and the app that runs it. If the recipe owner allows alternatives (`nldt:compatibleTools`), "Change" offers them. Swapping an app asks the Registry for the effective recipe and redraws the graph straight away: swapping `multiply` for `multiply3` on `recipe-add-multiply-demo` turns that app amber and adds its third input, `z`, to the graph and to the Parameters step. The swap applies to this run only; the stored recipe never changes.
 2. **Data Ingredients.** For each File input, a dataset from Hub Datasets whose media type matches the input's format.
@@ -680,17 +680,17 @@ Colours show the state of the setup: green for ready (a dataset picked, a value 
 
 Each group starts with the same app row as step 1, and a "Process description" link to the app's OGC API Process description (JSON).
 
-![](media/image25.png)
+<img src="./media/image25.png" alt="" width="900">
 
 Each field shows the parameter's readable title, its technical name as a small tag, a chip ("Default -1", "Required" or "Optional"), one line of help (its description and limits, such as "Must be at least 0.1"), and a "Definition" link to the same process description.
 
-![](media/image26.png)
+<img src="./media/image26.png" alt="" width="900">
 
 A default is shown as grey placeholder text: an untouched field sends it, typing replaces it, clearing the field brings it back. Structured values (objects, lists, GeoJSON) are typed as JSON in the same way, with the expected shape as placeholder; there are no special template buttons. [[#parameters-cwl-types-vs-json-schema](#parameters-cwl-types-vs-json-schema)] explains where titles, descriptions and defaults come from. A parameter used by two apps appears once, under the first, with "_Also used by …_"; one no app reads appears under "_Not used by any app_".
 
 4. **Output.** Where the result is saved. In this testbed every result is saved to the Sandbox Stack Recipe Results dataset in the nLDT Sandbox Hub, so the hub and dataset dropdowns are shown, as they would be in a full App Store, but locked to that destination, with a note saying why.
 
-![](media/image27.png)
+<img src="./media/image27.png" alt="" width="900">
 
 Every step can be opened at any time; nothing forces completing one step before the next. A setup summary beside the steps, styled as a basket, lists the apps used and an execution fee for each. The fees are illustrative and nothing is charged; it only shows where pricing would appear (finding 25).
 
@@ -698,11 +698,11 @@ Every step can be opened at any time; nothing forces completing one step before 
 
 **Status.** Shows the recipe graph, the data ingredients, and the parameters grouped per app exactly as in the Wizard, read-only, each with the value that will be sent (marked "default" when it is one). It also works when the Wizard was never opened: missing values fall back to their defaults, the same way the Wizard does. Execute stays disabled, with a warning naming what is missing, until every required parameter and data ingredient has a value. Execute, progress, cancelling, the result and saving it are described in [[#what-happens-when-you-click-execute](#what-happens-when-you-click-execute)]; a failure says whose it is ([[#where-a-failure-came-from](#where-a-failure-came-from)]).
 
-![](media/image28.png)
+<img src="./media/image28.png" alt="" width="900">
 
 **Saved results.** Every successful run is saved to the Sandbox Stack Recipe Results dataset. Its Preview, on the Data page, shows all saved results on one map, each as a layer that can be switched on and off. The layer list shows each result by its recipe's name, with the date and time it was saved. A zoom button per result fits the map to that result and opens its label; a result with no geometry (for example the number from `recipe-add-multiply-demo`) says so instead.
 
-![](media/image29.png)
+<img src="./media/image29.png" alt="" width="900">
 
 A result that links to a CityJSON model, such as roofer's reconstruction (`artifacts.cityjson.href`), is shown by its building footprints: the browser fetches the model, takes each building's LoD0 footprint, converts it from RD New (EPSG:28992) to WGS84, and draws it; clicking a building shows its id and its roof and ground heights. Only the footprints are drawn, since the map is 2D. "Delete selected" removes only the results whose layer is switched on, after a confirmation that lists each of them. Hub Datasets delete them one by one (`DELETE /datasets/{id}/resources/{resourceId}`); built-in datasets such as the live PDOK boundary cannot be deleted.
 
@@ -710,9 +710,9 @@ A result that links to a CityJSON model, such as roofer's reconstruction (`artif
 
 The recipe's CWL as syntax-highlighted text, as a diagram and as a guided builder. The builder adds a process by URL: it reads the process description and generates the step, its inputs and outputs, and its process link. It connects inputs and marks an input as data or parameter. It displays `valueFrom` reshaping but does not write it; that is still done by hand. _Save_ is enabled only after a successful _Validate_, editing again disables it, and Save re-validates on the server. _Reset_ reloads the bundled original.
 
-![](media/image30.png)
+<img src="./media/image30.png" alt="" width="900">
 
-![](media/image31.png)
+<img src="./media/image31.png" alt="" width="900">
 
 The guided builder answers the main usability finding from the first plugfest: writing a recipe required knowing exactly how we had structured the CWL.
 

@@ -40,19 +40,19 @@ To use the client:
 2. Create a digital twin.
 3. Open the OGC API tab on the left side of the screen. Here the OGC API endpoints can be explored and processes can be started.
 
-![The OGC API tab with the endpoint selector and the collections, processes and jobs tabs](media/figure-1-ogc-api-tab.png)
+<img src="./media/figure-1-ogc-api-tab.png" alt="The OGC API tab with the endpoint selector and the collections, processes and jobs tabs" width="900">
 
 _Figure 1: The OGC API tab with the endpoint selector and the collections, processes and jobs tabs_
 
-![A generated input form for the subsidence process](media/figure-2-process-input-form.png)
+<img src="./media/figure-2-process-input-form.png" alt="A generated input form for the subsidence process" width="900">
 
 _Figure 2: An input form generated from the process description (subsidence process)_
 
-![The job list with a running and a finished job](media/figure-3-job-list.png)
+<img src="./media/figure-3-job-list.png" alt="The job list with a running and a finished job" width="900">
 
 _Figure 3: The job list with a running and a finished job_
 
-![A subsidence result added to the map as a layer](media/figure-4-result-on-map.png)
+<img src="./media/figure-4-result-on-map.png" alt="A subsidence result added to the map as a layer" width="900">
 
 _Figure 4: A process result added to the map as a layer_
 
@@ -66,7 +66,7 @@ _Figure 4: A process result added to the map as a layer_
 
 Within our application, it is possible to seamlessly switch between OGC API endpoints. We support both v1 and v2 endpoints, as well as endpoints that offer only collections or processes. Here are some examples we worked with during development, in addition to the Varidian Registry:
 
-![A list of multiple supported endpoints](media/figure-5-list-of-available-ogc-apis.png)
+<img src="./media/figure-5-list-of-available-ogc-apis.png" alt="A list of multiple supported endpoints" width="900">
 
 _Figure 5: List of multiple supported endpoints_
 
@@ -74,7 +74,7 @@ _Figure 5: List of multiple supported endpoints_
 
 Here is an example of an OGC API created during this testbed. While these processes require more in-depth knowledge of their inputs, we were still able to generate input forms to run them.
 
-![Example of a process from 3DGI Roofer online](media/figure-6-roofer-online.png)
+<img src="./media/figure-6-roofer-online.png" alt="Example of a process from 3DGI Roofer online" width="900">
 
 _Figure 6: Example of a process from 3DGI Roofer online_
 
@@ -82,7 +82,7 @@ _Figure 6: Example of a process from 3DGI Roofer online_
 
 ZOO-Project was an existing OGC API that we worked with during the testbed. It had a lot of different inputs and outputs for us to test our implementation with. Some processes had a lot of inputs but were still fully supported by our implementation.
 
-![Example of a process from ZOO-Project](media/figure-7-zoo-project.png)
+<img src="./media/figure-7-zoo-project.png" alt="Example of a process from ZOO-Project" width="900">
 
 _Figure 7: Example of a process from ZOO-Project_
 
@@ -90,7 +90,7 @@ _Figure 7: Example of a process from ZOO-Project_
 
 At the start of the testbed, PDOK happened to release a demo endpoint with a more up-to-date OGC API - Collections implementation. This allowed us to improve our collection filtering system, enabling users to use OGC API - Features as they would use a WFS service in our client.
 
-![Example of the collections available by PDOK](media/figure-8-pdok.png)
+<img src="./media/figure-8-pdok.png" alt="Example of the collections available by PDOK" width="900">
 
 _Figure 8: Example of the collections available by PDOK_
 

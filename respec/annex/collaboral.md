@@ -378,11 +378,11 @@ find the metadata, bind the recipe, execute it, and show the result in the viewe
 3. **Execute.** The recipe runs step by step, with the progress of each step shown.
 4. **Show.** Results appear as map layers, key figures and tables, as the recipe declares.
 
-![The steps of a recipe](media/recipe-steps.png)
+<img src="./media/recipe-steps.png" alt="The steps of a recipe" width="900">
 
-![Entering the scenario](media/add-scenario-input.png)
+<img src="./media/add-scenario-input.png" alt="Entering the scenario" width="900">
 
-![The result on the map](media/recipe-result.png)
+<img src="./media/recipe-result.png" alt="The result on the map" width="900">
 
 ### 5.1 One scenario for several recipes
 

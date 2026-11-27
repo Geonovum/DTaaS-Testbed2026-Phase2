@@ -58,19 +58,19 @@ The Testbed proposal identified four Roofer Online capabilities to expose as OGC
 | `convert_format`        | Converts CityJSON models to OBJ, GeoPackage or 3D Tiles for use in other software or publication.                      |
 | `export_to_3dcitydb`    | Exports CityJSON models to a 3DCityDB database. *The 3DCityDB export process was not implemented in the testbed.*      |
 
-![Point-cloud selection showing density, classification and readiness.](media/roofer-online-01.png)
+<img src="./media/roofer-online-01.png" alt="Point-cloud selection showing density, classification and readiness." width="900">
 
 *Figure 1. Select an uploaded point cloud after validation.*
 
-![Map showing selected BAG buildings within the point-cloud extent.](media/roofer-online-02.png)
+<img src="./media/roofer-online-02.png" alt="Map showing selected BAG buildings within the point-cloud extent." width="900">
 
 *Figure 2. Select BAG buildings within the point-cloud extent, outlined in green.*
 
-![Reconstruction setup showing the selected inputs and point-density limit.](media/roofer-online-03.png)
+<img src="./media/roofer-online-03.png" alt="Reconstruction setup showing the selected inputs and point-density limit." width="900">
 
 *Figure 3. Review the inputs and reconstruction settings before starting the job.*
 
-![Completed reconstructions with download, publication and database export options.](media/roofer-online-04.png)
+<img src="./media/roofer-online-04.png" alt="Completed reconstructions with download, publication and database export options." width="900">
 
 *Figure 4. Access completed models and choose a download or export format.*
 
@@ -272,7 +272,7 @@ The implementation succeeds in calling the v1 processes in order and passing the
 The IMAGEM Planspace client lists Roofer Online as one of the available OGC Processes API-s, with the three processes in the v1 and its input fields. 
 The screenshot below shows the reconstruction process.
 
-![imagem](media/imagem.png)
+<img src="./media/imagem.png" alt="imagem" width="900">
 
 ## Findings
 

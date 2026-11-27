@@ -172,7 +172,7 @@ considerations in the scoring sheet from [Appendix A](#appendix-a-recipe-definit
 
 ## Created recipes
 
-![The created recipes](media/figure1.png)
+<img src="./media/figure1.png" alt="The created recipes" width="900">
 
 *Figure 1: The three created recipes*
 
@@ -209,7 +209,7 @@ the recipe. This results in a very simple recipe execution call.
 
 ## Platform expanded with recipes
 
-![Varidian's platform](media/figure2.png)
+<img src="./media/figure2.png" alt="Varidian's platform" width="900">
 
 *Figure 2: Our platform including the newly added cook service*
 

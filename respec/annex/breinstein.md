@@ -227,7 +227,7 @@ boundaries between the parts. The core may import no framework, no map library
 and neither application, and within the web interface only the map module may
 use MapLibre and Terra Draw.
 
-![The architecture of the client: web interface, protocol core and relay in one repository, another viewer embedding the core, and the services they call](media/architecture.png)
+<img src="./media/architecture.png" alt="The architecture of the client: web interface, protocol core and relay in one repository, another viewer embedding the core, and the services they call" width="900">
 
 *Figure 1. The architecture of the client. The dashed outline marks the MIT-licensed repository, which holds three parts. The web interface (React, TypeScript, MapLibre) generates forms, follows jobs and shows results on a map; it uses the protocol core only through the core's public API. The protocol core (`@breinstein/oap-client` on npm) implements the protocol and depends on no framework or map library. It sends its HTTP requests directly from the browser to the services. The relay (dashed box) is optional and is not deployed beside the public interface: it would receive callbacks and reach services without CORS on the page's behalf (section 6). "Another viewer" stands for any web or Node application that installs the core from npm and embeds it, without our web interface. It shows the intended reuse; no such integration is known to exist yet. Solid arrows are the paths in use; dashed arrows are paths through the relay.*
 
@@ -380,7 +380,7 @@ offers other example services on its start screen.
 of a service's landing page. The user can also pick a known service or start
 from an example process (Figure 2).
 
-![The start screen: a service address, examples, and known services](media/using-01-start.png)
+<img src="./media/using-01-start.png" alt="The start screen: a service address, examples, and known services" width="900">
 
 *Figure 2. The start screen.*
 
@@ -389,7 +389,7 @@ processes. For each one it shows what the user will need to provide, read from
 the process description: an area to draw, data to upload, or plain values
 (Figure 3).
 
-![The process list of the reference pygeoapi, with what each process needs](media/using-02-processes.png)
+<img src="./media/using-02-processes.png" alt="The process list of the reference pygeoapi, with what each process needs" width="900">
 
 *Figure 3. The processes a service offers, and what each needs.*
 
@@ -398,7 +398,7 @@ a form generated from the JSON Schema of each input (Figure 4). An area can be
 typed as GeoJSON, loaded from a file, taken from the current map view, or
 drawn. A checkbox runs the process in the background.
 
-![The form for "Buildings in an area", with the map beside it](media/using-03-form.png)
+<img src="./media/using-03-form.png" alt="The form for "Buildings in an area", with the map beside it" width="900">
 
 *Figure 4. A form generated from the process description.*
 
@@ -407,7 +407,7 @@ form fills in the GeoJSON as the user draws, and shows the size, here "about
 170 m across", so the user can see it is within the process's limit of 1 km
 (Figure 5). A place search moves the map to an address.
 
-![An area drawn over the centre of Amersfoort](media/using-04-draw.png)
+<img src="./media/using-04-draw.png" alt="An area drawn over the centre of Amersfoort" width="900">
 
 *Figure 5. An area drawn on the map, in Amersfoort.*
 
@@ -417,7 +417,7 @@ map in blue, beside the area the user sent, which is shown as a dashed outline
 format, offers a download, and repeats the inputs that were sent, so the user
 can check what the service was asked.
 
-![The buildings returned by the process, drawn on the map](media/using-05-result.png)
+<img src="./media/using-05-result.png" alt="The buildings returned by the process, drawn on the map" width="900">
 
 *Figure 6. The buildings in the area, from Kadaster's BAG via PDOK.*
 
@@ -427,7 +427,7 @@ shows the job's status and progress, and gives a link that opens the same job
 from any browser. It also offers to cancel the job, and says when the service
 does not declare that it supports cancelling (finding 0006).
 
-![A background job, accepted by the service, with a link and a cancel button](media/using-06-background-job.png)
+<img src="./media/using-06-background-job.png" alt="A background job, accepted by the service, with a link and a cancel button" width="900">
 
 *Figure 7. A job running in the background, here on pygeoapi 0.24.0.*
 
@@ -435,7 +435,7 @@ does not declare that it supports cancelling (finding 0006).
 the browser, with its status, and keeps it after the page is reloaded
 (Figure 8). From there the user can open the results or run the process again.
 
-![The jobs panel with one finished job](media/using-07-my-jobs.png)
+<img src="./media/using-07-my-jobs.png" alt="The jobs panel with one finished job" width="900">
 
 *Figure 8. The jobs panel.*
 
@@ -445,7 +445,7 @@ the page (finding 0039). The jobs panel then stays empty, and says why
 (Figure 9). This is the limit that sections 5.3 and 8.1 describe, as a user
 meets it.
 
-![The jobs panel against pygeoapi 0.21.0: no job can be listed](media/using-08-job-not-named.png)
+<img src="./media/using-08-job-not-named.png" alt="The jobs panel against pygeoapi 0.21.0: no job can be listed" width="900">
 
 *Figure 9. The same panel against a service that hides `Location`.*
 

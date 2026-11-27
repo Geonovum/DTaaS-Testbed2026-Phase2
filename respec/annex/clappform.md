@@ -169,7 +169,7 @@ apart.
 
 ### 1.4 The web console
 
-![Processes tab](media/Processes.png)
+<img src="./media/Processes.png" alt="Processes tab" width="900">
 
 *Figure 2. Processes tab: the input form is generated from the process description.*
 
@@ -180,14 +180,14 @@ The console has four tabs:
   OGC headers.
 - **Jobs** filters the job list by process, status and time, fetches results and dismisses jobs.
 
-  ![Jobs tab](media/Jobs.png)
+  <img src="./media/Jobs.png" alt="Jobs tab" width="900">
 
   *Figure 3. Jobs tab.*
 - **Recipe** reads a CWL `Workflow` document, draws the flow from it, and runs it. Each task
   lights up as it runs, shows its own timing, and opens to show the exact request and response.
   **Compare** runs the single-call process on the same plot and diffs the two results.
 
-  ![Recipe tab driven by CWL](media/Recipe%20CWL.png)
+  <img src="./media/Recipe%20CWL.png" alt="Recipe tab driven by CWL" width="900">
 
   *Figure 4. Recipe tab. The diagram and the run order come from the CWL document.*
 - **Service** shows the landing page, the conformance classes and the API definition.
