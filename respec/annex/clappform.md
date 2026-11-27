@@ -192,7 +192,7 @@ The console has four tabs:
   *Figure 4. Recipe tab. The diagram and the run order come from the CWL document.*
 - **Service** shows the landing page, the conformance classes and the API definition.
 
-A recorded walkthrough is in [`plot-bag-matching-process.mp4`](plot-bag-matching-process.mp4).
+A recorded walkthrough is in [`plot-bag-matching-process.mp4`](https://github.com/Geonovum/DTaaS-Testbed2026-Phase2/raw/refs/heads/main/Topic1-Clappform/plot-bag-matching-process.mp4).
 
 ### 1.5 A second implementation: a pygeoapi plugin
 
