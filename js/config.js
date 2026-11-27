@@ -33,20 +33,21 @@ var respecConfig =
       company: "Geonovum",
       companyURL: "https://www.geonovum.nl/"
     },
-    {name: "uCrowds"},
-    {name: "Anivizion"},
-    {name: "The People Group"},
-    {name: "Collaboral"},
-    {name: "Varidian"},
-    {name: "Future Insight"},
+    {name: "3DGI"},
+    {name: "Clappform"},
     {name: "Gérald Fenoy",
     company: "GeoLabs SARL",
     companyURL: "https://www.geolabs.fr"
     },
-    {name: "3DGI"},
+    {name: "Breinstein"},
     {name: "Imagem"},
-    {name: "Breinstein"}
-
+    {name: "Collaboral"},
+    {name: "Future Insight"},
+    {name: "Varidian"},
+    {name: "The People Group"},
+    {name: "uCrowds"},
+    {name: "Anivizion"}
+    
   ],
   editors: [
     {
